@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operations Control Center</title>
+    <!-- Tailwind CSS Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .nav-btn.active { background-color: #0f172a; color: #ffffff; font-weight: 700; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans flex h-screen overflow-hidden">
+
+    <!-- 1. Inject Dynamic Sidebar -->
+    {% include 'components/sidebar.html' %}
+
+    <!-- 2. Main View Container -->
+    <main class="flex-1 overflow-y-auto p-8">
+        
+        <!-- Tab: Dashboard Overview (Default Active) -->
+        <div id="view-dashboard" class="tab-view space-y-6">
+            {% include 'components/dashboard_home.html' %}
+        </div>
+
+        <!-- Tab: POS Terminal -->
+        <div id="view-pos" class="tab-view space-y-6 hidden">
+            {% include 'components/pos.html' %}
+        </div>
+
+        <!-- Tab: Queue Control -->
+        <div id="view-queue" class="tab-view space-y-6 hidden">
+            {% include 'components/queue.html' %}
+        </div>
+
+        <!-- Tab: Appointments -->
+        <div id="view-appointment" class="tab-view space-y-6 hidden">
+            {% include 'components/appointment.html' %}
+        </div>
+
+        <!-- Strict Managerial Views Insertion -->
+        {% if role == 'manager' %}
+        <div id="view-analytics" class="tab-view space-y-6 hidden">
+            {% include 'components/analytics.html' %}
+        </div>
+
+        <div id="view-settings" class="tab-view space-y-6 hidden">
+            {% include 'components/settings.html' %}
+        </div>
+        {% endif %}
+
+    </main>
+
+    <!-- CORE INTERACTION ENGINE -->
+    <script>
+        // Tab Switcher Router Logic
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const tabViews = document.querySelectorAll('.tab-view');
+        
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetViewId = button.getAttribute('data-target');
+                const targetElement = document.getElementById(targetViewId);
+                
+                // Siguraduhing nageexist ang element bago lumipat (Safety block laban sa staff injection manipulation)
+                if (targetElement) {
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    tabViews.forEach(view => view.classList.add('hidden'));
+                    
+                    button.classList.add('active');
+                    targetElement.classList.remove('hidden');
+                }
+            });
+        });
+
+        // Real-Time Polling Pool para sa Dashboard Home Cards
+        function updateDashboardMetrics() {
+            const queueCard = document.getElementById('dash-active-queue');
+            if (queueCard) { // Patakbuhin lang kung active o nakabukas ang dashboard panel
+                fetch('/api/manager/dashboard-counters')
+                    .then(res => res.json())
+                    .then(response => {
+                        if (response.status === "success") {
+                            const data = response.data;
+                            document.getElementById('dash-active-queue').textContent = data.active_queue;
+                            document.getElementById('dash-wait-time').textContent = `${data.est_wait_time_mins} mins`;
+                            document.getElementById('dash-machines-running').textContent = `${data.machines_running} / ${data.total_machines}`;
+                            document.getElementById('dash-revenue').innerHTML = `&#8369;${data.today_revenue_php.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                        }
+                    })
+                    .catch(err => console.error("Metrics pool offline:", err));
+            }
+        }
+
+        // Initialize Background Systems
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDashboardMetrics();
+            setInterval(updateDashboardMetrics, 5000); // 5-second background reload cycle
+        });
+    </script>
+</body>
+</html>

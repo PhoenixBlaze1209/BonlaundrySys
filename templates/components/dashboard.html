@@ -1,0 +1,45 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Active Queue Card -->
+    <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between h-36">
+        <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17"/></svg>
+        </div>
+        <div>
+            <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Active Queue</span>
+            <h3 id="dash-active-queue" class="text-2xl font-extrabold text-slate-800">--</h3>
+        </div>
+    </div>
+
+    <!-- Est. Wait Time Card -->
+    <div class="bg-white rounded-[24px] border-[#00B4F4] border p-6 shadow-sm flex flex-col justify-between h-36">
+        <div class="w-10 h-10 rounded-xl bg-cyan-50 flex items-center justify-center text-[#00B4F4]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div>
+            <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Est. Wait Time</span>
+            <h3 id="dash-wait-time" class="text-2xl font-extrabold text-[#00B4F4]">-- mins</h3>
+        </div>
+    </div>
+
+    <!-- Machines Status Card -->
+    <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between h-36">
+        <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        </div>
+        <div>
+            <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Machines Running</span>
+            <h3 id="dash-machines-running" class="text-2xl font-extrabold text-slate-800">-- / --</h3>
+        </div>
+    </div>
+
+    <!-- Today's Revenue Card -->
+    <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between h-36">
+        <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div>
+            <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Today's Revenue</span>
+            <h3 id="dash-revenue" class="text-2xl font-extrabold text-slate-800">&#8369;0.00</h3>
+        </div>
+    </div>
+</div>

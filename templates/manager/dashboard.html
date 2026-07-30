@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bon Laundry Station - Admin/Manager Access</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .active-tab {
+            background-color: #00B4F4 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(0, 180, 244, 0.2);
+            font-weight: 700;
+        }
+        .active-tab svg { opacity: 1 !important; }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 antialiased overflow-hidden">
+
+    <div class="flex h-screen w-screen">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="w-64 bg-white border-r border-slate-100 flex flex-col justify-between p-4 h-full flex-shrink-0">
+            <div>
+                <!-- Branding Header -->
+                <div class="flex items-center space-x-3 px-4 py-5 mb-6">
+                    <div class="w-9 h-9 bg-[#00B4F4] rounded-full opacity-90 flex items-center justify-center text-white font-bold text-xs">BL</div>
+                    <div>
+                        <h1 class="text-base font-bold text-slate-900 leading-none">Bon Laundry</h1>
+                        <span class="text-[10px] text-slate-400 tracking-widest uppercase font-bold">Station</span>
+                    </div>
+                </div>
+                
+                <!-- Navigation Tabs -->
+                <nav class="space-y-1" id="sidebar-nav">
+                    <button onclick="switchTab('dashboard')" id="btn-dashboard" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition active-tab">
+                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('pos')" id="btn-pos" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition">
+                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        <span>POS System</span>
+                    </button>
+                    <button onclick="switchTab('sales')" id="btn-sales" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition">
+                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                        <span>Sales History</span>
+                    </button>
+                    <button onclick="switchTab('appointment')" id="btn-appointment" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition">
+                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        <span>Appointment</span>
+                    </button>
+                    <button onclick="switchTab('queue')" id="btn-queue" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition">
+                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 12h10"/><path d="M7 8h10"/><path d="M7 16h10"/><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+                        <span>Queue</span>
+                    </button>
+                    <button onclick="switchTab('analytics')" id="btn-analytics" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition">
+                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        <span>PA & Analytics</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Bottom Settings -->
+            <div>
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition">
+                    <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT WRAPPER -->
+        <div class="flex-1 flex flex-col h-full overflow-hidden">
+            
+            <!-- GLOBAL TOP BAR -->
+            <header class="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-8 flex-shrink-0 z-10">
+                <h2 id="page-title" class="text-base font-bold text-slate-800 tracking-tight">Dashboard</h2>
+                <div class="flex items-center space-x-3">
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-slate-800 leading-tight">Genesis Samson</p>
+                        <span class="text-[9px] font-bold text-[#00B4F4] tracking-wider uppercase">Admin Access</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                </div>
+            </header>
+
+            <!-- VIEW CONTAINER -->
+            <main class="flex-1 overflow-y-auto p-8">
+                
+                <!-- 1. DASHBOARD VIEW -->
+                <div id="view-dashboard" class="space-y-6 tab-view">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17"/></svg>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Active Queue</span>
+                                <h3 class="text-2xl font-extrabold text-slate-800">12</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[24px] border-[#00B4F4] border p-6 shadow-sm flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-50 flex items-center justify-center text-[#00B4F4]">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Est. Wait Time</span>
+                                <h3 class="text-2xl font-extrabold text-[#00B4F4]">38 mins</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Machines Ready</span>
+                                <h3 class="text-2xl font-extrabold text-slate-800">5 / 13</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Today's Revenue</span>
+                                <h3 class="text-2xl font-extrabold text-slate-800">&#8369;3,240.00</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm space-y-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-sm font-bold text-slate-800">Live Machine Activity</h4>
+                                <span class="px-2.5 py-1 text-[9px] font-bold text-green-600 bg-green-50 rounded-full tracking-wider uppercase">Live Sync</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
+                                    <div class="flex items-center space-x-4">
+                                        <span class="text-xs font-bold text-[#00B4F4]">JO-0042</span>
+                                        <span class="text-xs font-semibold text-slate-700">Maria Santos</span>
+                                    </div>
+                                    <span class="px-2.5 py-1 text-[9px] font-bold text-cyan-600 bg-cyan-50 rounded-md uppercase">Washing</span>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
+                                    <div class="flex items-center space-x-4">
+                                        <span class="text-xs font-bold text-[#00B4F4]">JO-0043</span>
+                                        <span class="text-xs font-semibold text-slate-700">John Doe</span>
+                                    </div>
+                                    <span class="px-2.5 py-1 text-[9px] font-bold text-orange-600 bg-orange-50 rounded-md uppercase">Drying</span>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
+                                    <div class="flex items-center space-x-4">
+                                        <span class="text-xs font-bold text-[#00B4F4]">JO-0044</span>
+                                        <span class="text-xs font-semibold text-slate-700">Genesis Samson</span>
+                                    </div>
+                                    <span class="px-2.5 py-1 text-[9px] font-bold text-slate-400 bg-slate-100 rounded-md uppercase">Pending</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between min-h-[16rem]">
+                            <div>
+                                <div class="flex items-center space-x-2 text-[#00B4F4] mb-4">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                    <span class="text-[10px] font-black tracking-wider uppercase">Peak Forecast</span>
+                                </div>
+                                <h2 class="text-5xl font-black text-slate-800 tracking-tight">2:30 PM</h2>
+                                <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase block mt-1">Predicted Peak Today</span>
+                            </div>
+                            <div class="space-y-2 pt-6 border-t border-slate-50">
+                                <div class="flex justify-between text-[10px] font-bold text-slate-800 uppercase">
+                                    <span>Estimated Load</span>
+                                    <span class="text-[#00B4F4]">85%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#00B4F4] rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. POS SYSTEM VIEW -->
+                <div id="view-pos" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 items-start tab-view">
+                    <div class="lg:col-span-2 bg-white rounded-[24px] border border-slate-100 p-8 shadow-sm space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-slate-800">New Transaction</h3>
+                            <span class="text-xs font-bold text-slate-400 font-mono">INV-2026-001</span>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Service Selection</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="border-2 border-[#00B4F4] bg-white rounded-[20px] p-5 relative overflow-hidden cursor-pointer shadow-sm shadow-cyan-400/5">
+                                    <h4 class="text-sm font-bold text-[#00B4F4]">Self-Service</h4>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">Wash & Dry (8kg)</p>
+                                </div>
+                                <div class="border border-slate-100 bg-white rounded-[20px] p-5 cursor-pointer hover:bg-slate-50/50 transition">
+                                    <h4 class="text-sm font-bold text-slate-700">Drop-Off Bundle</h4>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">Classic (8kg)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Customer Name</label>
+                            <input type="text" placeholder="Enter name..." class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 transition">
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between min-h-[22rem]">
+                        <div class="space-y-6">
+                            <h4 class="text-sm font-bold text-slate-900">Order Summary</h4>
+                            <div class="space-y-3 text-xs font-semibold text-slate-600">
+                                <div class="flex justify-between">
+                                    <span>Self-Service (8kg)</span>
+                                    <span class="font-bold text-slate-800">&#8369;145.00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Service Charge (Rush)</span>
+                                    <span class="font-bold text-slate-800">&#8369;70.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4 pt-6 border-t border-slate-100">
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-lg font-black text-slate-900">Total</span>
+                                <span class="text-2xl font-black text-[#00B4F4]">&#8369;215.00</span>
+                            </div>
+                            <button class="w-full bg-[#00B4F4] text-white font-bold py-3.5 px-4 rounded-xl hover:bg-cyan-500 transition flex items-center justify-center space-x-2 text-xs shadow-md shadow-cyan-400/10">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2m2 4h6a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2zm8-12V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v4"/></svg>
+                                <span>Complete & Print Receipt</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. SALES HISTORY VIEW -->
+                <div id="view-sales" class="hidden bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm tab-view">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-sm font-bold text-slate-800">Recent Transactions</h3>
+                        <button class="text-xs font-bold text-[#00B4F4] hover:underline">Download Report (CSV)</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-[10px] font-bold text-slate-400 border-b border-slate-50 uppercase tracking-wider">
+                                    <th class="pb-3 font-semibold">Timestamp</th>
+                                    <th class="pb-3 font-semibold">Ref ID</th>
+                                    <th class="pb-3 font-semibold">Customer</th>
+                                    <th class="pb-3 font-semibold text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="font-semibold text-slate-600 divide-y divide-slate-50">
+                                <tr>
+                                    <td class="py-4">10:45 AM</td>
+                                    <td class="py-4 text-slate-800 font-bold">TRX-9901</td>
+                                    <td class="py-4">Maria Santos</td>
+                                    <td class="py-4 text-right text-[#00B4F4] font-bold">&#8369;450.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4">09:30 AM</td>
+                                    <td class="py-4 text-slate-800 font-bold">TRX-9902</td>
+                                    <td class="py-4">John Doe</td>
+                                    <td class="py-4 text-right text-[#00B4F4] font-bold">&#8369;180.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 4. APPOINTMENT VIEW -->
+                <div id="view-appointment" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 items-start tab-view">
+                    <div class="lg:col-span-2 space-y-4">
+                        <h3 class="text-sm font-bold text-slate-800 mb-2">Upcoming Appointments</h3>
+                        <div class="bg-white rounded-[24px] border border-slate-100 p-5 shadow-sm flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 rounded-xl bg-cyan-50 flex items-center justify-center text-[#00B4F4]">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-800">John Doe</h4>
+                                    <p class="text-xs font-bold text-[#00B4F4] mt-0.5">3:00 PM &mdash; Drop-off</p>
+                                </div>
+                            </div>
+                            <button class="bg-slate-50 text-[10px] font-black tracking-wider uppercase text-slate-400 px-4 py-2 rounded-xl hover:bg-slate-100 transition">Check-in</button>
+                        </div>
+                    </div>
+                    <div class="bg-[#00B4F4] text-white rounded-[28px] p-6 shadow-md flex flex-col justify-between min-h-[22rem]">
+                        <div class="space-y-3">
+                            <h3 class="text-2xl font-black tracking-tight">Book Slot</h3>
+                            <p class="text-xs text-cyan-50/80 leading-relaxed max-w-[200px]">Schedule a new laundry session for priority machine access.</p>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-white/10 border border-white/10 rounded-2xl p-4">
+                                <span class="text-[9px] font-bold tracking-wider uppercase text-cyan-200/90 block mb-0.5">Next Available</span>
+                                <h4 class="text-lg font-black">4:15 PM Today</h4>
+                            </div>
+                            <button class="w-full bg-white text-[#00B4F4] font-black py-3.5 px-4 rounded-xl text-xs hover:bg-cyan-50 transition">Create Booking</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. QUEUE VIEW -->
+                <div id="view-queue" class="hidden space-y-6 tab-view">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17"/></svg>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Total In Queue</span>
+                                <h3 class="text-2xl font-extrabold text-slate-800">12</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Available Machines</span>
+                                <h3 class="text-2xl font-extrabold text-slate-800">5</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[24px] border-[#00B4F4] border p-6 shadow-sm flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-50 flex items-center justify-center text-[#00B4F4]">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Estimated Wait</span>
+                                <h3 class="text-2xl font-extrabold text-[#00B4F4]">~25m</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-sm font-bold text-slate-800">Queue Management</h3>
+                            <button class="bg-[#00B4F4] text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-cyan-500 transition flex items-center space-x-1.5 shadow-md shadow-cyan-400/10">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                                <span>Add to Queue</span>
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto text-xs font-semibold text-slate-600">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="text-[10px] font-bold text-slate-400 border-b border-slate-50 uppercase tracking-wider">
+                                        <th class="pb-3 font-semibold">Pos</th>
+                                        <th class="pb-3 font-semibold">Customer</th>
+                                        <th class="pb-3 font-semibold">Service Type</th>
+                                        <th class="pb-3 font-semibold">Assigned</th>
+                                        <th class="pb-3 font-semibold">Status</th>
+                                        <th class="pb-3 font-semibold text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50">
+                                    <tr>
+                                        <td class="py-4"><span class="bg-slate-50 px-2 py-1 rounded-md text-[10px] font-bold text-slate-500">#1</span></td>
+                                        <td class="py-4">
+                                            <div class="font-bold text-slate-800">Maria Santos</div>
+                                            <span class="text-[9px] text-slate-400 font-mono">Q-001</span>
+                                        </td>
+                                        <td class="py-4">Wash & Dry (8kg)</td>
+                                        <td class="py-4 text-[#00B4F4] font-bold">W-04</td>
+                                        <td class="py-4"><span class="px-2 py-0.5 text-[9px] font-bold text-green-600 bg-green-50 rounded-full tracking-wider uppercase">In Progress</span></td>
+                                        <td class="py-4 text-right text-slate-400"><button class="hover:text-slate-600">&rarr;</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. PA & ANALYTICS VIEW -->
+                <div id="view-analytics" class="hidden space-y-6 tab-view">
+                    <!-- Hero Analytics Banner -->
+                    <div class="w-full bg-[#0B1528] text-white rounded-[28px] p-8 relative overflow-hidden shadow-sm flex flex-col justify-between h-56 min-h-[14rem]">
+                        <div class="absolute inset-0 opacity-5 pointer-events-none flex items-center justify-end pr-10">
+                            <svg class="w-96 h-full text-white" fill="none" stroke="currentColor" stroke-width="24" viewBox="0 0 100 100"><path d="M10 80 Q 35 10, 60 70 T 110 20" stroke-linecap="round"/></svg>
+                        </div>
+                        <div class="flex items-center space-x-2 text-[#00B4F4]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            <span class="text-[10px] font-black tracking-widest uppercase">Predictive Analytics Engine</span>
+                        </div>
+                        <div class="my-auto z-10">
+                            <h3 id="live-hero-title" class="text-4xl font-extrabold tracking-tight mb-2">Friday Peak Demand</h3>
+                            <p id="live-hero-desc" class="text-xs text-slate-400 max-w-xl leading-relaxed">
+                                System analysis predicts an 85% load increase between 2:00 PM and 6:00 PM based on monthly patterns.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Footfall Optimization Charts & Matrices -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Predictive Footfall Chart Container -->
+                        <div class="lg:col-span-2 bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm">
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-800">Footfall Distribution & Forecast</h4>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">Comparing historical averages with today's predictive matrix values</p>
+                                </div>
+                                <span class="px-2.5 py-1 text-[9px] font-bold text-[#00B4F4] bg-cyan-50 rounded-full tracking-wider uppercase">Hourly Load Matrix</span>
+                            </div>
+                            <div class="h-64 relative">
+                                <canvas id="chart-predictive-footfall"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Ghost Slot Allocator -->
+                        <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between">
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-2 text-[#00B4F4]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                                    <span class="text-[10px] font-black tracking-wider uppercase">Ghost Slots Allocator</span>
+                                </div>
+                                <h4 class="text-sm font-bold text-slate-800">Optimized Dynamic Dead-zones</h4>
+                                <p class="text-xs text-slate-500 leading-relaxed">
+                                    Pre-allocated digital slots configured autonomously to prevent buffer overlaps during predicted grid peaks.
+                                </p>
+                                <div class="pt-2 space-y-2">
+                                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                                        <span class="text-xs font-semibold text-slate-600">Buffer Threshold</span>
+                                        <span class="text-xs font-bold text-slate-800">15 mins</span>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                                        <span class="text-xs font-semibold text-slate-600">Active Allocations</span>
+                                        <span class="text-xs font-bold text-[#00B4F4]">4 Available</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="w-full bg-slate-900 text-white font-bold py-3 px-4 rounded-xl text-xs hover:bg-slate-800 transition shadow-sm mt-4">
+                                Adjust Reservation Matrix
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- UI Core Routing Logic & Analytics Graph Engine -->
+    <script>
+        function fetchRealtimeData() {
+    // Palitan ang URL kung saan man nakalocate ang API endpoint mo
+    fetch('/api/dashboard-stats') 
+        .then(response => response.json())
+        .then(data => {
+            // Ini-update ang mga text elements sa UI
+            document.querySelector('#view-dashboard h3.text-slate-800').textContent = data.active_queue;
+            document.querySelector('#view-dashboard h3.text-[#00B4F4]').textContent = data.est_wait_time + " mins";
+            
+            // Dito mo rin pwede i-update ang data ng Chart.js
+            myChart.data.datasets[1].data = data.predictive_load_array;
+            myChart.update();
+        })
+        .catch(error => console.error('Error fetching dashboard data:', error));
+}
+
+// Mag-pe-fetch ng data kada 5 segundo
+setInterval(fetchRealtimeData, 5000);
+        // Tab router configuration mapping
+        function switchTab(tabId) {
+            // Document query target bounds setup
+            const tabs = document.querySelectorAll('.tab-view');
+            const buttons = document.querySelectorAll('#sidebar-nav button');
+            const pageTitle = document.getElementById('page-title');
+
+            // View cycle toggles
+            tabs.forEach(tab => tab.classList.add('hidden'));
+            buttons.forEach(btn => btn.classList.remove('active-tab'));
+
+            // View rendering bound selections
+            const activeTab = document.getElementById(`view-${tabId}`);
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            
+            if (activeTab) activeTab.classList.remove('hidden');
+            if (activeBtn) activeBtn.classList.add('active-tab');
+
+            // Header title updates matching page configurations
+            const titles = {
+                'dashboard': 'Dashboard',
+                'pos': 'POS System',
+                'sales': 'Sales History',
+                'appointment': 'Appointment Tracking',
+                'queue': 'Live Queue Management',
+                'analytics': 'PA & Analytics Overview'
+            };
+            if (pageTitle && titles[tabId]) {
+                pageTitle.textContent = titles[tabId];
+            }
+        }
+
+        // Initialize Chart Data Layer when the DOM tree mounts securely
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('chart-predictive-footfall');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM', '8 PM'],
+                    datasets: [
+                        {
+                            label: 'Historical Pattern Count',
+                            data: [20, 35, 55, 40, 60, 85, 45],
+                            borderColor: '#cbd5e1',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Predictive Live Load',
+                            data: [25, 42, 70, 48, 85, 95, 50],
+                            borderColor: '#00B4F4',
+                            borderWidth: 3,
+                            backgroundColor: (context) => {
+                                const chart = context.chart;
+                                const {ctx, chartArea} = chart;
+                                if (!chartArea) return null;
+                                const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                                gradient.addColorStop(0, 'rgba(0, 180, 244, 0.2)');
+                                gradient.addColorStop(1, 'rgba(0, 180, 244, 0.0)');
+                                return gradient;
+                            },
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                boxHeight: 4,
+                                usePadding: true,
+                                font: {
+                                    family: 'Plus Jakarta Sans',
+                                    size: 11,
+                                    weight: '600'
+                                },
+                                color: '#64748b'
+                            }
+                        },
+                        tooltip: {
+                            padding: 12,
+                            backgroundColor: '#0B1528',
+                            titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: '700' },
+                            bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' }, color: '#94a3b8' }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' }, color: '#94a3b8' },
+                            border: { dash: [4, 4] }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

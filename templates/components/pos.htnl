@@ -1,0 +1,4 @@
+<div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm">
+    <h2 class="text-xl font-extrabold text-slate-800 mb-2">POS Station Terminal</h2>
+    <p class="text-sm text-slate-500">I-process dito ang drop-off, payments, at pagpili ng load weight category ng customer.</p>
+</div>
