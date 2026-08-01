@@ -8,7 +8,7 @@ from models.schemas import Transaction, PredictionLog
 
 class AnalyticsEngine:
     @staticmethod
-    def train_and_predict_peak_hour():
+    def train_and_predict_peak_hour(record_log=False):
         """
         Extracts historical transaction volume from MySQL, applies a quadratic 
         Polynomial Regression model based on hour-of-day features to capture 
@@ -28,7 +28,7 @@ class AnalyticsEngine:
             if len(transactions) < 5:
                 return {
                     "predicted_peak": "2:00 PM (Default)",
-                    "mape": 0.0,
+                    "mape": None,
                     "insight": "Insufficient historical data to calculate predictive analytics trends. Gathering data...",
                     "chart_labels": chart_labels,
                     "chart_data": [0.0] * len(operational_hours)
@@ -75,11 +75,8 @@ class AnalyticsEngine:
                 absolute_percentage_errors = np.abs((y[valid_indices] - actual_fitted[valid_indices]) / y[valid_indices])
                 mape = np.mean(absolute_percentage_errors) * 100
                 
-                # Apply an operational ceiling cap for clean presentation metrics if dataset sample size is low
-                if mape > 45.0:
-                    mape = 15.4 + (len(transactions) % 5)
             else:
-                mape = 12.5
+                mape = None
 
             # Format the output time display string cleanly for UI rendering
             time_suffix = "AM" if predicted_peak_hour < 12 else "PM"
@@ -95,14 +92,15 @@ class AnalyticsEngine:
             hist_display = historical_peak_hour if historical_peak_hour <= 12 else historical_peak_hour - 12
 
             # 5. Log the performance outcome into tbl_prediction_logs for validation
-            log_entry = PredictionLog(
-                prediction_target="Peak_Demand_Hour",
-                predicted_value=predicted_time_str,
-                actual_value=f"{hist_display}:00 {hist_suffix}", 
-                mape_score=round(mape, 2)
-            )
-            db.add(log_entry)
-            db.commit()
+            if record_log:
+                log_entry = PredictionLog(
+                    prediction_target="Peak_Demand_Hour",
+                    predicted_value=predicted_time_str,
+                    actual_value=f"{hist_display}:00 {hist_suffix}",
+                    mape_score=round(mape, 2) if mape is not None else None
+                )
+                db.add(log_entry)
+                db.commit()
 
             # Dynamic, rule-based generation of text insights for the dashboard directives
             insight = f"Peak footfall expected at {predicted_time_str}. "
@@ -115,7 +113,7 @@ class AnalyticsEngine:
 
             return {
                 "predicted_peak": predicted_time_str,
-                "mape": round(mape, 2),
+                "mape": round(mape, 2) if mape is not None else None,
                 "insight": insight,
                 "chart_labels": chart_labels,
                 "chart_data": [round(float(v), 2) for v in predicted_weights]
@@ -126,7 +124,7 @@ class AnalyticsEngine:
             print(f"Predictive analytics pipeline failure: {str(e)}")
             return {
                 "predicted_peak": "1:00 PM",
-                "mape": 14.20,
+                "mape": None,
                 "insight": "Running standard statistical distribution curves due to a calculation variance adjustment.",
                 "chart_labels": [f"{12 if h == 12 else (h-12 if h > 12 else h)}:00 {'PM' if h >= 12 else 'AM'}" for h in range(8, 21)],
                 "chart_data": [4.2, 5.5, 8.0, 11.5, 14.0, 12.5, 9.0, 6.5, 3.0, 1.5, 0.0, 0.0, 0.0]

@@ -1,4 +1,5 @@
 # services/queuing.py
+from math import ceil
 from config.database import SessionLocal
 from models.schemas import Queue, SystemSettings, MachineStatus
 
@@ -22,16 +23,14 @@ class QueueManager:
             # Count total machines operational in the shop
             total_machines = db.query(MachineStatus).filter(MachineStatus.status != 'Maintenance').count()
             
-            # Count how many people are currently waiting or processing
-            active_queue_count = db.query(Queue).filter(Queue.status.in_(['Waiting', 'Processing'])).count()
-
-            if total_machines == 0:
-                return 0 # No active machines, wait time calculation defaults
-
-            # Basic logic: (Active customers in line / available machine lanes) * time per complete process cycle
-            estimated_wait = (active_queue_count / total_machines) * avg_cycle_time
-            
-            return int(estimated_wait)
+            waiting_count = db.query(Queue).filter(Queue.status == 'Waiting').count()
+            available_machines = db.query(MachineStatus).filter(MachineStatus.status == 'Available').count()
+            if waiting_count == 0:
+                return 0
+            lanes = available_machines or total_machines
+            if lanes == 0:
+                return 0
+            return ceil(waiting_count / lanes) * avg_cycle_time
         finally:
             db.close()
 

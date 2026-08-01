@@ -4,6 +4,42 @@ from config.database import SessionLocal
 from models.schemas import SystemSettings
 
 class POSProcessor:
+    SERVICES = {
+        'self_8': ('Self-Service Wash & Dry (8kg)', Decimal('145.00'), Decimal('8')),
+        'self_13': ('Self-Service Wash & Dry (13kg)', Decimal('240.00'), Decimal('13')),
+        'classic': ('Drop-Off Classic (8kg)', Decimal('130.00'), Decimal('8')),
+        'saver': ('Drop-Off Saver (8kg)', Decimal('160.00'), Decimal('8')),
+        'signature': ('Drop-Off Signature (8kg)', Decimal('200.00'), Decimal('8')),
+        'premium': ('Drop-Off Premium (8kg)', Decimal('260.00'), Decimal('8')),
+    }
+    ADDONS = {
+        'superwash_self': ('Superwash Self-Service', Decimal('105.00')),
+        'superwash_dropoff': ('Superwash Drop-Off', Decimal('35.00')),
+        'fold': ('Fold', Decimal('40.00')),
+        'sort': ('Sort', Decimal('30.00')),
+        'add_dry': ('Add Dry', Decimal('70.00')),
+        'delivery': ('Delivery', Decimal('100.00')),
+        'rush_24h': ('Drop-Off Service Charge (24 hrs)', Decimal('120.00')),
+        'rush_2days': ('Drop-Off Service Charge (2 days)', Decimal('70.00')),
+    }
+
+    @classmethod
+    def calculate_service_total(cls, service_code, weight_input, addon_codes=None):
+        if service_code not in cls.SERVICES:
+            return {'success': False, 'message': 'Select a valid laundry service.'}
+        try:
+            weight = Decimal(str(weight_input))
+        except Exception:
+            return {'success': False, 'message': 'Enter a valid load weight.'}
+        label, base_price, max_weight = cls.SERVICES[service_code]
+        if weight <= 0 or weight > max_weight:
+            return {'success': False, 'message': f'{label} accepts loads from 0.1kg to {max_weight}kg.'}
+        addon_codes = addon_codes or []
+        if any(code not in cls.ADDONS for code in addon_codes):
+            return {'success': False, 'message': 'An invalid add-on was selected.'}
+        addons_total = sum((cls.ADDONS[code][1] for code in addon_codes), Decimal('0.00'))
+        return {'success': True, 'weight': float(weight), 'total_amount': float(base_price + addons_total),
+                'service_label': label, 'addons': [cls.ADDONS[code][0] for code in addon_codes]}
     @staticmethod
     def validate_and_calculate(weight_input):
         """

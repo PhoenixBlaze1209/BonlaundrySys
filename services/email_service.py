@@ -1,0 +1,31 @@
+import os
+import smtplib
+from email.message import EmailMessage
+
+
+class EmailService:
+    @staticmethod
+    def send_receipt(recipient, transaction_id, total_amount, service_label):
+        username = os.getenv('MAIL_USERNAME')
+        password = os.getenv('MAIL_APP_PASSWORD')
+        if not username or not password:
+            return {'sent': False, 'message': 'Receipt not sent: SMTP is not configured.'}
+
+        message = EmailMessage()
+        message['Subject'] = f'Bon Laundry receipt — TRX-{transaction_id:04d}'
+        message['From'] = os.getenv('MAIL_FROM', username)
+        message['To'] = recipient
+        message.set_content(
+            f'Thank you for choosing Bon Laundry.\n\n'
+            f'Service: {service_label}\n'
+            f'Transaction: TRX-{transaction_id:04d}\n'
+            f'Amount paid: PHP {total_amount:,.2f}\n'
+        )
+        try:
+            with smtplib.SMTP(os.getenv('MAIL_HOST', 'smtp.gmail.com'), int(os.getenv('MAIL_PORT', '587')), timeout=15) as server:
+                server.starttls()
+                server.login(username, password)
+                server.send_message(message)
+            return {'sent': True, 'message': 'Receipt email sent.'}
+        except (OSError, smtplib.SMTPException) as error:
+            return {'sent': False, 'message': f'Receipt email could not be sent: {error}'}
