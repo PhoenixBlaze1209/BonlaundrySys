@@ -29,7 +29,7 @@
             <div>
                 <!-- Branding Header -->
                 <div class="flex items-center space-x-3 px-4 py-5 mb-6">
-                    <div class="w-9 h-9 bg-[#00B4F4] rounded-full opacity-90 flex items-center justify-center text-white font-bold text-xs">BL</div>
+                    <img src="{{ url_for('logo') }}" alt="Bon Laundry logo" class="w-10 h-10 rounded-full object-cover bg-[#00B4F4]">
                     <div>
                         <h1 class="text-base font-bold text-slate-900 leading-none">Bon Laundry</h1>
                         <span class="text-[10px] text-slate-400 tracking-widest uppercase font-bold">Station</span>
@@ -42,6 +42,7 @@
                         <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
                         <span>Dashboard</span>
                     </button>
+                    {% if role != 'Customer' %}
                     <button onclick="switchTab('pos')" id="btn-pos" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition">
                         <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                         <span>POS System</span>
@@ -52,10 +53,12 @@
                         <span>Sales History</span>
                     </button>
                     {% endif %}
+                    {% endif %}
                     <button onclick="switchTab('appointment')" id="btn-appointment" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition">
                         <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                         <span>Appointment</span>
                     </button>
+                    {% if role != 'Customer' %}
                     <button onclick="switchTab('queue')" id="btn-queue" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition">
                         <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 12h10"/><path d="M7 8h10"/><path d="M7 16h10"/><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
                         <span>Queue</span>
@@ -65,6 +68,7 @@
                         <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                         <span>PA & Analytics</span>
                     </button>
+                    {% endif %}
                     {% endif %}
                 </nav>
             </div>
@@ -91,7 +95,7 @@
                 <h2 id="page-title" class="text-base font-bold text-slate-800 tracking-tight">Dashboard</h2>
                 <div class="flex items-center space-x-3">
                     <div class="text-right">
-                        <p class="text-xs font-bold text-slate-800 leading-tight">{{ manager_name or staff_name or 'User' }}</p>
+                        <p class="text-xs font-bold text-slate-800 leading-tight">{{ manager_name or staff_name or customer_name or 'User' }}</p>
                         <span class="text-[9px] font-bold text-[#00B4F4] tracking-wider uppercase">{{ role }} Access</span>
                     </div>
                     <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
@@ -205,7 +209,7 @@
                         </div>
                         <div class="space-y-3">
                             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Service Selection</label>
-                            <select id="pos-service" onchange="updatePOSPreview()" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm">
+                            <select id="pos-service" onchange="updatePOSPreview(true)" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm">
                                 <option value="self_8" data-price="145">Self-Service Wash & Dry — ₱145 / 8kg</option>
                                 <option value="self_13" data-price="240">Self-Service Wash & Dry — ₱240 / 13kg</option>
                                 <option value="classic" data-price="130">Drop-Off Classic (Wash, Dry, Fold) — ₱130 / 8kg</option>
@@ -215,11 +219,11 @@
                             </select>
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Customer Email (optional)</label>
-                            <input id="pos-customer-email" type="email" placeholder="customer@email.com, or leave blank for walk-in" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 transition">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Receipt Email (optional)</label>
+                            <input id="pos-customer-email" type="email" placeholder="Send receipt to any valid email, or leave blank for walk-in" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 transition">
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-2"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Load Weight (kg)</label><input id="pos-weight" type="number" min="0.1" step="0.1" placeholder="0.0" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 transition"></div>
+                            <div class="space-y-2"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Load Weight (kg)</label><input id="pos-weight" type="number" min="0.1" step="0.1" value="8" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 transition"><p class="text-[10px] text-slate-400">Defaults to the selected bundle capacity.</p></div>
                             <div class="space-y-2"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Payment</label><select id="pos-payment-status" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm"><option value="Paid">Paid</option><option value="Pending">Pending</option></select></div>
                         </div>
                     </div>
@@ -285,7 +289,7 @@
                             </div>
                             <button class="bg-slate-50 text-[10px] font-black tracking-wider uppercase text-slate-400 px-4 py-2 rounded-xl hover:bg-slate-100 transition">Check-in</button>
                         </div>
-                        <div class="space-y-2"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Add-ons / Service Charge</label><select id="pos-addon" multiple onchange="updatePOSPreview()" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm h-28"><option value="superwash_self" data-price="105">Superwash Self-Service — ₱105</option><option value="superwash_dropoff" data-price="35">Superwash Drop-Off — ₱35</option><option value="fold" data-price="40">Fold — ₱40</option><option value="sort" data-price="30">Sort — ₱30</option><option value="add_dry" data-price="70">Add Dry — ₱70</option><option value="delivery" data-price="100">Delivery — ₱100</option><option value="rush_24h" data-price="120">Drop-Off Service Charge (24 hrs) — ₱120</option><option value="rush_2days" data-price="70">Drop-Off Service Charge (2 days) — ₱70</option></select><p class="text-[10px] text-slate-400">Hold Ctrl/Cmd to select multiple add-ons.</p></div>
+                        <div class="space-y-2"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Add-ons / Service Charge</label><select id="pos-addon" multiple onchange="updatePOSPreview(false)" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm h-28"><option value="superwash_self" data-price="105">Superwash Self-Service — ₱105</option><option value="superwash_dropoff" data-price="35">Superwash Drop-Off — ₱35</option><option value="fold" data-price="40">Fold — ₱40</option><option value="sort" data-price="30">Sort — ₱30</option><option value="add_dry" data-price="70">Add Dry — ₱70</option><option value="delivery" data-price="100">Delivery — ₱100</option><option value="rush_24h" data-price="120">Drop-Off Service Charge (24 hrs) — ₱120</option><option value="rush_2days" data-price="70">Drop-Off Service Charge (2 days) — ₱70</option></select><p class="text-[10px] text-slate-400">Hold Ctrl/Cmd to select multiple add-ons.</p></div>
                         </div>
                     </div>
                     <div class="bg-[#00B4F4] text-white rounded-[28px] p-6 shadow-md flex flex-col justify-between min-h-[22rem]">
@@ -295,7 +299,7 @@
                         </div>
                         <div class="space-y-4">
                             <form id="appointment-form" class="space-y-2">
-                                <input name="customer_email" required type="email" placeholder="Customer email" class="w-full rounded-xl px-3 py-2 text-xs text-slate-800">
+                                {% if role != 'Customer' %}<input name="customer_email" required type="email" placeholder="Customer email" class="w-full rounded-xl px-3 py-2 text-xs text-slate-800">{% endif %}
                                 <input id="appointment-time" name="schedule_time" required type="datetime-local" onchange="loadAvailability()" class="w-full rounded-xl px-3 py-2 text-xs text-slate-800">
                                 <select name="service_type" class="w-full rounded-xl px-3 py-2 text-xs text-slate-800"><option value="Wash-Dry-Fold">Wash, Dry, Fold</option><option value="Wash-Only">Wash Only</option><option value="Dry-Only">Dry Only</option></select>
                                 <p id="availability-status" class="text-[10px] text-cyan-100">Choose a time to check availability.</p>
@@ -339,12 +343,13 @@
 
                     <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-sm font-bold text-slate-800">Queue Management</h3>
+                            <div><h3 class="text-sm font-bold text-slate-800">Queue Management</h3><p class="text-[10px] text-slate-400 mt-1">POS checkout assigns the next compatible machine automatically. Add to Queue is for an unassigned walk-in.</p></div>
                             <button onclick="addWalkInQueue()" class="bg-[#00B4F4] text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-cyan-500 transition flex items-center space-x-1.5 shadow-md shadow-cyan-400/10">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                                 <span>Add to Queue</span>
                             </button>
                         </div>
+                        <p id="queue-action-message" class="text-xs text-slate-500 mt-3"></p>
                         <div class="overflow-x-auto text-xs font-semibold text-slate-600">
                             <table class="w-full text-left">
                                 <thead>
@@ -464,7 +469,8 @@
 
     <!-- UI Core Routing Logic & Analytics Graph Engine -->
     <script>
-        const isManager = {{ 'true' if role == 'Manager' else 'false' }};
+        const currentRole = '{{ role }}';
+        const isManager = currentRole === 'Manager';
         let predictiveChart;
 
         function renderActivities(activities) {
@@ -531,17 +537,24 @@
                 document.getElementById('pos-reference').textContent = `TRX-${String(sale.transaction_id).padStart(4, '0')}`;
                 document.getElementById('pos-total').textContent = `₱${sale.total_amount.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
                 document.getElementById('pos-weight-summary').textContent = `${sale.weight_kg} kg • ${sale.payment_status}`;
-                alert(`${result.message}\n${sale.email.message}`);
+                const queueMessage = sale.queue.machine
+                    ? `Assigned to ${sale.queue.machine} (Queue #${sale.queue.queue_number}).`
+                    : `Queue #${sale.queue.queue_number} is waiting. Estimated wait: ${sale.queue.estimated_waiting_time} mins.`;
+                alert(`${result.message}\n${queueMessage}\n${sale.email.message}`);
                 fetchRealtimeData();
             } catch (error) { alert(error.message); }
         }
 
-        function updatePOSPreview() {
+        function updatePOSPreview(syncCapacity = false) {
             const service = document.getElementById('pos-service');
             const addons = Array.from(document.getElementById('pos-addon').selectedOptions);
             const total = Number(service.selectedOptions[0].dataset.price) + addons.reduce((sum, option) => sum + Number(option.dataset.price), 0);
             document.getElementById('pos-total').textContent = `₱${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
             document.getElementById('pos-weight-summary').textContent = `${service.selectedOptions[0].textContent.split(' — ')[0]}${addons.length ? ` + ${addons.length} add-on(s)` : ''}`;
+            const capacity = service.value === 'self_13' ? 13 : 8;
+            const weight = document.getElementById('pos-weight');
+            weight.max = capacity;
+            if (syncCapacity || !weight.value || Number(weight.value) > capacity) weight.value = capacity;
         }
 
         async function loadSales() {
@@ -554,7 +567,7 @@
         async function loadAppointments() {
             try {
                 const result = await api('/api/appointments');
-                document.getElementById('appointment-list').innerHTML = result.data.map(item => `<div class="bg-white rounded-[24px] border border-slate-100 p-5 shadow-sm flex items-center justify-between"><div><h4 class="text-sm font-bold text-slate-800">${item.customer}</h4><p class="text-xs font-bold text-[#00B4F4] mt-0.5">${new Date(item.schedule_time).toLocaleString()} — ${item.service_type}</p></div><button onclick="checkInAppointment(${item.appointment_id})" class="bg-slate-50 text-[10px] font-black tracking-wider uppercase text-slate-500 px-4 py-2 rounded-xl hover:bg-slate-100">${item.status === 'Confirmed' ? 'Checked in' : 'Check-in'}</button></div>`).join('') || '<p class="text-xs text-slate-400">No appointments scheduled.</p>';
+                document.getElementById('appointment-list').innerHTML = result.data.map(item => `<div class="bg-white rounded-[24px] border border-slate-100 p-5 shadow-sm flex items-center justify-between"><div><h4 class="text-sm font-bold text-slate-800">${item.customer}</h4><p class="text-xs font-bold text-[#00B4F4] mt-0.5">${new Date(item.schedule_time).toLocaleString()} — ${item.service_type} (${item.status})</p></div>${currentRole === 'Customer' ? '' : `<button onclick="checkInAppointment(${item.appointment_id})" class="bg-slate-50 text-[10px] font-black tracking-wider uppercase text-slate-500 px-4 py-2 rounded-xl hover:bg-slate-100">${item.status === 'Confirmed' ? 'Checked in' : 'Check-in'}</button>`}</div>`).join('') || '<p class="text-xs text-slate-400">No appointments scheduled.</p>';
             } catch (error) { console.error(error); }
         }
 
@@ -576,7 +589,8 @@
             event.preventDefault();
             try {
                 const form = event.currentTarget;
-                const result = await api('/api/appointments', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(Object.fromEntries(new FormData(form)))});
+                const url = currentRole === 'Customer' ? '/customer/book' : '/api/appointments';
+                const result = await api(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(Object.fromEntries(new FormData(form)))});
                 alert(result.message); form.reset(); document.getElementById('availability-status').textContent = 'Choose a time to check availability.'; await loadAppointments(); fetchRealtimeData();
             } catch (error) { alert(error.message); }
         }
@@ -592,7 +606,15 @@
             } catch (error) { console.error(error); }
         }
 
-        async function addWalkInQueue() { try { await api('/api/queue', {method: 'POST'}); await loadQueue(); fetchRealtimeData(); } catch (error) { alert(error.message); } }
+        async function addWalkInQueue() {
+            const message = document.getElementById('queue-action-message');
+            try {
+                const result = await api('/api/queue', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}'});
+                message.className = 'text-xs text-green-600 mt-3';
+                message.textContent = `${result.message} Queue #${result.data.queue_number} is waiting.`;
+                await loadQueue(); fetchRealtimeData();
+            } catch (error) { message.className = 'text-xs text-rose-600 mt-3'; message.textContent = error.message; }
+        }
         async function advanceQueue(id) { try { await api(`/api/queue/${id}/advance`, {method: 'POST'}); await loadQueue(); fetchRealtimeData(); } catch (error) { alert(error.message); } }
 
         async function createAccount(event) {
@@ -719,7 +741,7 @@
             });
             fetchRealtimeData();
             setInterval(fetchRealtimeData, 30000);
-            updatePOSPreview();
+            if (document.getElementById('pos-service')) updatePOSPreview(true);
             const accountForm = document.getElementById('account-form');
             if (accountForm) accountForm.addEventListener('submit', createAccount);
             const appointmentForm = document.getElementById('appointment-form');

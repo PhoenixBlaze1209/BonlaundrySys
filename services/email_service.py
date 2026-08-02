@@ -1,11 +1,25 @@
 import os
 import smtplib
 from email.message import EmailMessage
+from pathlib import Path
+
+
+def _load_local_smtp_environment():
+    """Load local development SMTP settings without committing credentials."""
+    env_file = Path(__file__).resolve().parent.parent / '.env'
+    if not env_file.exists():
+        return
+    for line in env_file.read_text(encoding='utf-8').splitlines():
+        line = line.strip()
+        if line and not line.startswith('#') and '=' in line:
+            key, value = line.split('=', 1)
+            os.environ.setdefault(key.strip(), value.strip())
 
 
 class EmailService:
     @staticmethod
     def send_receipt(recipient, transaction_id, total_amount, service_label):
+        _load_local_smtp_environment()
         username = os.getenv('MAIL_USERNAME')
         password = os.getenv('MAIL_APP_PASSWORD')
         if not username or not password:

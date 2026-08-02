@@ -160,7 +160,8 @@ def customer_home():
         return render_template(
             'customer/dashboard.html',
             customer_name=session.get('user_name'),
-            my_queue=my_queue
+            my_queue=my_queue,
+            role='Customer'
         )
     finally:
         db.close()
@@ -169,17 +170,18 @@ def customer_home():
 @dashboard_bp.route('/api/dashboard/summary')
 def dashboard_summary():
     """Shared operational feed. Financial and prediction data are manager-only."""
-    denied = _api_access('Manager', 'Staff')
+    denied = _api_access('Manager', 'Staff', 'Customer')
     if denied:
         return denied
     db = SessionLocal()
     try:
         is_manager = _has_role('Manager')
+        is_customer = _has_role('Customer')
         return jsonify({
             "status": "success",
             "data": {
                 "metrics": _dashboard_metrics(db, include_revenue=is_manager),
-                "activities": _live_activity(db),
+                "activities": [] if is_customer else _live_activity(db),
                 "forecast": AnalyticsEngine.train_and_predict_peak_hour() if is_manager else None,
             }
         })
@@ -235,7 +237,7 @@ def manager_transactions():
 
 @dashboard_bp.route('/api/transactions')
 def transactions_api():
-    denied = _api_access('Manager', 'Staff')
+    denied = _api_access('Manager', 'Staff', 'Customer')
     if denied:
         return denied
     db = SessionLocal()
@@ -305,7 +307,10 @@ def appointments_api():
         rows = (db.query(Appointment, User.name, Queue.queue_id, Queue.status)
                 .outerjoin(User, Appointment.customer_id == User.user_id)
                 .outerjoin(Queue, Queue.appointment_id == Appointment.appointment_id)
-                .order_by(Appointment.schedule_time.asc()).limit(50).all())
+                .order_by(Appointment.schedule_time.asc()))
+        if _has_role('Customer'):
+            rows = rows.filter(Appointment.customer_id == session.get('user_id'))
+        rows = rows.limit(50).all()
         return jsonify({'status': 'success', 'data': [{
             'appointment_id': appointment.appointment_id, 'customer': name or 'Walk-in customer',
             'schedule_time': appointment.schedule_time.isoformat(), 'service_type': appointment.service_type,
@@ -370,7 +375,7 @@ def queue_api():
             queue = Queue(queue_number=last + 1, status='Waiting', estimated_waiting_time=_dashboard_metrics(db)['est_wait_time_mins'])
             db.add(queue)
             db.commit()
-            return jsonify({'status': 'success', 'message': 'Walk-in added to queue.', 'data': {'queue_id': queue.queue_id}}), 201
+            return jsonify({'status': 'success', 'message': 'Walk-in added to queue.', 'data': {'queue_id': queue.queue_id, 'queue_number': queue.queue_number}}), 201
         rows = (db.query(Queue, Appointment, User, MachineStatus)
                 .outerjoin(Appointment, Queue.appointment_id == Appointment.appointment_id)
                 .outerjoin(User, Appointment.customer_id == User.user_id)

@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, redirect, url_for, jsonify
+from flask import Flask, redirect, url_for, jsonify, send_from_directory
 from config.database import engine, Base, SessionLocal
 # Import ALL models here so Base knows they exist for auto-generation
 from models.schemas import User, Appointment, MachineStatus, Transaction, Queue, SystemSettings, PredictionLog
@@ -32,6 +32,11 @@ def ensure_machine_inventory():
 
 
 ensure_machine_inventory()
+
+
+@app.route('/logo.webp')
+def logo():
+    return send_from_directory(app.root_path, 'logo.webp')
 
 # Register our role-based interface blueprints
 app.register_blueprint(auth_bp)

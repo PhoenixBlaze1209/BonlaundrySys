@@ -27,11 +27,13 @@ class POSProcessor:
     def calculate_service_total(cls, service_code, weight_input, addon_codes=None):
         if service_code not in cls.SERVICES:
             return {'success': False, 'message': 'Select a valid laundry service.'}
+        label, base_price, max_weight = cls.SERVICES[service_code]
+        # Bundle pricing is fixed by the selected capacity. A blank POS weight is
+        # treated as a full bundle instead of rejecting a valid walk-in sale.
         try:
-            weight = Decimal(str(weight_input))
+            weight = Decimal(str(weight_input)) if weight_input not in (None, '') else max_weight
         except Exception:
             return {'success': False, 'message': 'Enter a valid load weight.'}
-        label, base_price, max_weight = cls.SERVICES[service_code]
         if weight <= 0 or weight > max_weight:
             return {'success': False, 'message': f'{label} accepts loads from 0.1kg to {max_weight}kg.'}
         addon_codes = addon_codes or []
