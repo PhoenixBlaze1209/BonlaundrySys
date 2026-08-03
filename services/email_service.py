@@ -18,6 +18,21 @@ def _load_local_smtp_environment():
 
 class EmailService:
     @staticmethod
+    def send_password_reset(recipient, token):
+        _load_local_smtp_environment()
+        username, password = os.getenv('MAIL_USERNAME'), os.getenv('MAIL_APP_PASSWORD')
+        if not username or not password:
+            return False
+        message = EmailMessage()
+        message['Subject'], message['From'], message['To'] = 'Bon Laundry password reset', os.getenv('MAIL_FROM', username), recipient
+        message.set_content(f'Use this password reset token within 30 minutes: {token}')
+        try:
+            with smtplib.SMTP(os.getenv('MAIL_HOST', 'smtp.gmail.com'), int(os.getenv('MAIL_PORT', '587')), timeout=15) as server:
+                server.starttls(); server.login(username, password); server.send_message(message)
+            return True
+        except (OSError, smtplib.SMTPException):
+            return False
+    @staticmethod
     def send_receipt(recipient, transaction_id, total_amount, service_label):
         _load_local_smtp_environment()
         username = os.getenv('MAIL_USERNAME')

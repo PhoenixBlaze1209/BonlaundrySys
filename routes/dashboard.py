@@ -57,7 +57,7 @@ def _live_activity(db):
             .order_by(Queue.queue_number.asc()).limit(8).all())
     return [{
         "job_id": f"Q-{queue.queue_number:03d}",
-        "customer": user.name if user else "Walk-in customer",
+        "customer": queue.customer_name or (user.name if user else "Walk-in customer"),
         "status": "Washing" if queue.status == 'Processing' else "Waiting",
         "machine": f"{machine.machine_type[0]}-{machine.machine_id:02d}" if machine else "Unassigned",
     } for queue, appointment, user, machine in rows]
@@ -276,7 +276,7 @@ def transactions_csv():
 
 @dashboard_bp.route('/api/appointments', methods=['GET', 'POST'])
 def appointments_api():
-    denied = _api_access('Manager', 'Staff')
+    denied = _api_access('Manager', 'Staff', 'Customer')
     if denied:
         return denied
     db = SessionLocal()
@@ -365,12 +365,14 @@ def check_in_appointment(appointment_id):
 
 @dashboard_bp.route('/api/queue', methods=['GET', 'POST'])
 def queue_api():
-    denied = _api_access('Manager', 'Staff')
+    denied = _api_access('Manager', 'Staff', 'Customer')
     if denied:
         return denied
     db = SessionLocal()
     try:
         if request.method == 'POST':
+            if not _has_role('Manager', 'Staff'):
+                return jsonify({'status': 'error', 'message': 'Staff access is required to add walk-ins.'}), 403
             last = db.query(func.max(Queue.queue_number)).scalar() or 0
             queue = Queue(queue_number=last + 1, status='Waiting', estimated_waiting_time=_dashboard_metrics(db)['est_wait_time_mins'])
             db.add(queue)
@@ -380,9 +382,12 @@ def queue_api():
                 .outerjoin(Appointment, Queue.appointment_id == Appointment.appointment_id)
                 .outerjoin(User, Appointment.customer_id == User.user_id)
                 .outerjoin(MachineStatus, Queue.machine_id == MachineStatus.machine_id)
-                .filter(Queue.status != 'Done').order_by(Queue.queue_number.asc()).all())
+                .filter(Queue.status != 'Done').order_by(Queue.queue_number.asc()))
+        if _has_role('Customer'):
+            rows = rows.filter(Queue.customer_name == session.get('user_name'))
+        rows = rows.all()
         return jsonify({'status': 'success', 'data': [{
-            'queue_id': queue.queue_id, 'queue_number': queue.queue_number, 'customer': name or 'Walk-in customer',
+            'queue_id': queue.queue_id, 'queue_number': queue.queue_number, 'customer': queue.customer_name or name or 'Walk-in customer',
             'service_type': appointment.service_type if appointment else 'Walk-in', 'status': queue.status,
             'machine': f'{machine.machine_type[0]}-{machine.machine_id:02d}' if machine else 'Unassigned'
         } for queue, appointment, name, machine in rows]})

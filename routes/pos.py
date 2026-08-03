@@ -4,6 +4,7 @@ from config.database import SessionLocal
 from models.schemas import Transaction, User, Queue, MachineStatus
 from services.pricing import POSProcessor
 from services.email_service import EmailService
+from services.machines import refresh_machine_cycles, start_machine_cycle
 
 pos_bp = Blueprint('pos', __name__)
 
@@ -17,6 +18,9 @@ def checkout():
     payload = request.get_json(silent=True) or request.form
     customer_id = payload.get('customer_id') # Can be empty/null for walk-in guest customers
     customer_email = (payload.get('customer_email') or '').strip().lower()
+    customer_name = (payload.get('customer_name') or '').strip()
+    selected_machine_id = payload.get('machine_id')
+    cycle_type = payload.get('cycle_type')
     raw_weight = payload.get('weight')
     service_code = payload.get('service_code')
     addon_codes = payload.get('addons') or []
@@ -27,6 +31,8 @@ def checkout():
     
     if payment_status not in ('Pending', 'Paid'):
         return jsonify({"status": "error", "message": "Invalid payment status."}), 400
+    if not customer_name or not selected_machine_id:
+        return jsonify({"status": "error", "message": "Customer name and a selected machine are required."}), 400
         
     # 3. Run weight validation layer through our pricing engine
     validation_result = POSProcessor.calculate_service_total(service_code, raw_weight, addon_codes)
@@ -37,6 +43,7 @@ def checkout():
     # 4. If valid, save the transactional record directly to MySQL
     db = SessionLocal()
     try:
+        refresh_machine_cycles(db)
         receipt_email = customer_email
         if customer_email and not customer_id:
             customer = db.query(User).filter(User.email == customer_email, User.user_role == 'Customer').first()
@@ -48,27 +55,24 @@ def checkout():
             customer_id=int(customer_id) if customer_id else None,
             weight_kg=validation_result["weight"],
             total_amount=validation_result["total_amount"],
-            payment_status=payment_status
+            payment_status=payment_status, customer_name=customer_name,
+            machine_id=int(selected_machine_id), cycle_type=cycle_type
         )
         db.add(new_transaction)
-
-        # A completed POS sale is also an operational job. Assign the smallest
-        # available compatible machine immediately; otherwise keep it in queue.
-        machine = (db.query(MachineStatus)
-                   .filter(MachineStatus.status == 'Available', MachineStatus.capacity_kg >= validation_result['weight'])
-                   .order_by(MachineStatus.capacity_kg.asc(), MachineStatus.machine_id.asc()).first())
+        machine = db.get(MachineStatus, int(selected_machine_id))
+        if not machine or machine.capacity_kg < validation_result['weight']:
+            return jsonify({'status': 'error', 'message': 'Selected machine cannot handle this load.'}), 409
+        start_machine_cycle(machine, customer_name, cycle_type)
         last_queue = db.query(Queue).order_by(Queue.queue_number.desc()).first()
         next_queue_number = (last_queue.queue_number if last_queue else 0) + 1
-        queue_status = 'Processing' if machine else 'Waiting'
         queue_entry = Queue(
             queue_number=next_queue_number,
-            machine_id=machine.machine_id if machine else None,
-            status=queue_status,
-            estimated_waiting_time=0 if machine else 65
+            machine_id=machine.machine_id, status='Processing', estimated_waiting_time=0,
+            customer_name=customer_name
         )
-        if machine:
-            machine.status = 'In-Use'
         db.add(queue_entry)
+        db.flush()
+        queue_entry.transaction_id = new_transaction.transaction_id
         db.commit()
 
         email_result = {'sent': False, 'message': 'Receipt email is available for paid customer transactions only.'}
@@ -91,7 +95,7 @@ def checkout():
                 "queue": {
                     "queue_number": queue_entry.queue_number,
                     "status": queue_entry.status,
-                    "machine": f"{machine.machine_type[0]}-{machine.machine_id:02d}" if machine else None,
+                    "machine": machine.machine_name or f"Machine {machine.machine_id}",
                     "estimated_waiting_time": queue_entry.estimated_waiting_time
                 }
             }

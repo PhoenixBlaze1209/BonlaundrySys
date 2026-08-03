@@ -11,6 +11,10 @@ class User(Base):
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     user_role = Column(Enum('Manager', 'Staff', 'Customer'), nullable=False)
+    failed_login_attempts = Column(Integer, nullable=False, default=0)
+    login_locked_until = Column(DateTime, nullable=True)
+    password_reset_token = Column(String(128), nullable=True)
+    password_reset_expires_at = Column(DateTime, nullable=True)
 
 class Appointment(Base):
     __tablename__ = 'tbl_appointment'
@@ -28,6 +32,13 @@ class MachineStatus(Base):
     machine_type = Column(Enum('Washer', 'Dryer'), nullable=False)
     capacity_kg = Column(Integer, default=8)
     status = Column(Enum('Available', 'In-Use', 'Maintenance'), default='Available')
+    machine_name = Column(String(50), nullable=True)
+    price_per_cycle = Column(DECIMAL(10, 2), nullable=False, default=145.00)
+    operational_state = Column(String(20), nullable=False, default='available')
+    assigned_customer_name = Column(String(100), nullable=True)
+    cycle_type = Column(String(20), nullable=True)
+    cycle_started_at = Column(DateTime, nullable=True)
+    cycle_ends_at = Column(DateTime, nullable=True)
 
 class Transaction(Base):
     __tablename__ = 'tbl_transaction'
@@ -38,6 +49,9 @@ class Transaction(Base):
     total_amount = Column(DECIMAL(10, 2), nullable=False)
     payment_status = Column(Enum('Pending', 'Paid'), default='Pending')
     created_at = Column(TIMESTAMP, server_default=func.now())
+    customer_name = Column(String(100), nullable=True)
+    machine_id = Column(Integer, nullable=True)
+    cycle_type = Column(String(20), nullable=True)
 
 class Queue(Base):
     __tablename__ = 'tbl_queue'
@@ -48,6 +62,8 @@ class Queue(Base):
     machine_id = Column(Integer, ForeignKey('tbl_machine_status.machine_id'), nullable=True)
     status = Column(Enum('Waiting', 'Processing', 'Done'), default='Waiting')
     estimated_waiting_time = Column(Integer, default=0)
+    customer_name = Column(String(100), nullable=True)
+    transaction_id = Column(Integer, nullable=True)
 
 class SystemSettings(Base):
     __tablename__ = 'tbl_system_settings'

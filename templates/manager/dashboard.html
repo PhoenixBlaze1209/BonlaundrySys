@@ -58,7 +58,6 @@
                         <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                         <span>Appointment</span>
                     </button>
-                    {% if role != 'Customer' %}
                     <button onclick="switchTab('queue')" id="btn-queue" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition">
                         <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 12h10"/><path d="M7 8h10"/><path d="M7 16h10"/><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
                         <span>Queue</span>
@@ -69,7 +68,7 @@
                         <span>PA & Analytics</span>
                     </button>
                     {% endif %}
-                    {% endif %}
+                    {% if role != 'Customer' %}<button onclick="switchTab('machines')" id="btn-machines" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-400 rounded-xl hover:bg-slate-50 transition"><span class="w-5 text-center">⚙</span><span>Machine Status</span></button>{% endif %}
                 </nav>
             </div>
 
@@ -219,6 +218,10 @@
                             </select>
                         </div>
                         <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Customer Name</label>
+                            <input id="pos-customer-name" type="text" placeholder="Customer name" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm">
+                        </div>
+                        <div class="space-y-2">
                             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Receipt Email (optional)</label>
                             <input id="pos-customer-email" type="email" placeholder="Send receipt to any valid email, or leave blank for walk-in" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 transition">
                         </div>
@@ -226,6 +229,7 @@
                             <div class="space-y-2"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Load Weight (kg)</label><input id="pos-weight" type="number" min="0.1" step="0.1" value="8" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 transition"><p class="text-[10px] text-slate-400">Defaults to the selected bundle capacity.</p></div>
                             <div class="space-y-2"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Payment</label><select id="pos-payment-status" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm"><option value="Paid">Paid</option><option value="Pending">Pending</option></select></div>
                         </div>
+                        <div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cycle</label><select id="pos-cycle-type" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm"><option value="washing">Washing (35 min)</option><option value="drying">Drying (30 min)</option></select></div><div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Choose Available Machine</label><select id="pos-machine" class="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-3 text-sm"></select></div></div>
                     </div>
                     <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between min-h-[22rem]">
                         <div class="space-y-6">
@@ -311,6 +315,7 @@
 
                 <!-- 5. QUEUE VIEW -->
                 <div id="view-queue" class="hidden space-y-6 tab-view">
+                    <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm"><div class="flex justify-between"><div><h3 class="text-sm font-bold">Shop Busy Heatmap</h3><p id="heatmap-label" class="text-xs text-slate-400">Loading availability…</p></div><span id="heatmap-badge" class="px-3 py-1 rounded-full text-xs font-bold"></span></div><div id="queue-heatmap" class="grid grid-cols-6 md:grid-cols-10 gap-2 mt-4"></div></div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm flex flex-col justify-between h-36">
                             <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
@@ -344,10 +349,11 @@
                     <div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm">
                         <div class="flex justify-between items-center mb-6">
                             <div><h3 class="text-sm font-bold text-slate-800">Queue Management</h3><p class="text-[10px] text-slate-400 mt-1">POS checkout assigns the next compatible machine automatically. Add to Queue is for an unassigned walk-in.</p></div>
-                            <button onclick="addWalkInQueue()" class="bg-[#00B4F4] text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-cyan-500 transition flex items-center space-x-1.5 shadow-md shadow-cyan-400/10">
+                            {% if role != 'Customer' %}<button onclick="addWalkInQueue()" class="bg-[#00B4F4] text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-cyan-500 transition flex items-center space-x-1.5 shadow-md shadow-cyan-400/10">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                                 <span>Add to Queue</span>
                             </button>
+                            {% endif %}
                         </div>
                         <p id="queue-action-message" class="text-xs text-slate-500 mt-3"></p>
                         <div class="overflow-x-auto text-xs font-semibold text-slate-600">
@@ -381,10 +387,9 @@
                 </div>
 
                 {% if role == 'Manager' %}
-                <div id="view-settings" class="hidden max-w-xl bg-white rounded-[24px] border border-slate-100 p-8 shadow-sm tab-view">
-                    <h3 class="text-lg font-bold text-slate-800">Manager Settings</h3>
-                    <p class="text-xs text-slate-400 mt-1 mb-6">Create staff, customer, or manager accounts. This capability is manager-only.</p>
-                    <form id="account-form" class="space-y-4">
+                <div id="view-settings" class="hidden bg-white rounded-[24px] border border-slate-100 p-8 shadow-sm tab-view">
+                    <div class="flex gap-8"><aside class="w-40 border-r text-sm space-y-3"><p class="font-bold">Settings</p><p class="text-[#00B4F4]">Accounts</p><p class="text-slate-500">Machines & Pricing</p><p class="text-slate-500">Machine Availability</p></aside><section class="flex-1"><h3 class="text-lg font-bold text-slate-800">Accounts</h3><p class="text-xs text-slate-400 mt-1 mb-6">Create staff, customer, or manager accounts.</p>
+                    <form id="account-form" class="space-y-4 max-w-md">
                         <input name="name" required placeholder="Full name" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm">
                         <input name="email" required type="email" placeholder="Email address" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm">
                         <input name="password" required type="password" placeholder="Temporary password" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm">
@@ -392,7 +397,10 @@
                         <button class="w-full bg-[#00B4F4] text-white font-bold py-3 rounded-xl text-sm">Add New Account</button>
                         <p id="account-form-message" class="text-xs"></p>
                     </form>
+                    <h3 class="text-lg font-bold text-slate-800 mt-8">Machines & Availability</h3><p class="text-xs text-slate-400">Edit price/capacity or mark a machine as maintenance/not available.</p><div id="machine-settings-list" class="space-y-2 mt-4"></div></section></div>
                 </div>
+
+                <div id="view-machines" class="hidden space-y-6 tab-view"><div class="bg-white rounded-[24px] border border-slate-100 p-6 shadow-sm"><h3 class="text-lg font-bold">Machine Status</h3><p class="text-xs text-slate-400">Live customer assignment and remaining cycle time.</p><div id="machine-status-grid" class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 mt-5"></div></div></div>
                 {% endif %}
 
                 <!-- 6. PA & ANALYTICS VIEW -->
@@ -528,11 +536,14 @@
         async function checkoutPOS() {
             const weight = document.getElementById('pos-weight').value;
             const customer_email = document.getElementById('pos-customer-email').value;
+            const customer_name = document.getElementById('pos-customer-name').value;
             const payment_status = document.getElementById('pos-payment-status').value;
             const service_code = document.getElementById('pos-service').value;
             const addons = Array.from(document.getElementById('pos-addon').selectedOptions).map(option => option.value);
+            const machine_id = document.getElementById('pos-machine').value;
+            const cycle_type = document.getElementById('pos-cycle-type').value;
             try {
-                const result = await api('/pos/checkout', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({weight, customer_email, payment_status, service_code, addons})});
+                const result = await api('/pos/checkout', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({weight, customer_email, customer_name, payment_status, service_code, addons, machine_id, cycle_type})});
                 const sale = result.data;
                 document.getElementById('pos-reference').textContent = `TRX-${String(sale.transaction_id).padStart(4, '0')}`;
                 document.getElementById('pos-total').textContent = `₱${sale.total_amount.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
@@ -542,6 +553,7 @@
                     : `Queue #${sale.queue.queue_number} is waiting. Estimated wait: ${sale.queue.estimated_waiting_time} mins.`;
                 alert(`${result.message}\n${queueMessage}\n${sale.email.message}`);
                 fetchRealtimeData();
+                loadQueue(); loadMachines();
             } catch (error) { alert(error.message); }
         }
 
@@ -555,6 +567,35 @@
             const weight = document.getElementById('pos-weight');
             weight.max = capacity;
             if (syncCapacity || !weight.value || Number(weight.value) > capacity) weight.value = capacity;
+            loadMachines();
+        }
+
+        async function loadMachines() {
+            try {
+                const result = await api('/api/machines');
+                const machines = result.data;
+                const selected = document.getElementById('pos-machine');
+                if (selected) {
+                    const required = Number(document.getElementById('pos-weight')?.value || 0);
+                    selected.innerHTML = machines.filter(machine => machine.status === 'available' && machine.capacity_kg >= required).map(machine => `<option value="${machine.machine_id}">${machine.name} (${machine.capacity_kg}kg, ₱${machine.price_per_cycle})</option>`).join('') || '<option value="">No compatible machines available</option>';
+                }
+                const grid = document.getElementById('machine-status-grid');
+                if (grid) grid.innerHTML = machines.map(machine => `<div class="border rounded-2xl p-4 ${machine.status === 'available' ? 'border-green-200 bg-green-50' : machine.status === 'maintenance' || machine.status === 'not_available' ? 'border-rose-200 bg-rose-50' : 'border-cyan-200 bg-cyan-50'}"><p class="font-bold text-sm">${machine.name}</p><p class="text-xs capitalize mt-1">${machine.status}</p><p class="text-xs text-slate-500">${machine.customer_name || 'No customer assigned'}</p><p class="text-xs font-semibold">${machine.remaining_minutes ? `${machine.remaining_minutes} min remaining` : `${machine.capacity_kg}kg • ₱${machine.price_per_cycle}`}</p></div>`).join('');
+                const settingsList = document.getElementById('machine-settings-list');
+                if (settingsList) settingsList.innerHTML = machines.map(machine => `<div class="grid grid-cols-4 gap-2 items-center text-xs border p-2 rounded-xl"><input id="machine-name-${machine.machine_id}" value="${machine.name}" class="border p-1 rounded"><input id="machine-price-${machine.machine_id}" type="number" value="${machine.price_per_cycle}" class="border p-1 rounded"><select id="machine-state-${machine.machine_id}" class="border p-1 rounded"><option value="available" ${machine.status === 'available' ? 'selected' : ''}>available</option><option value="maintenance" ${machine.status === 'maintenance' ? 'selected' : ''}>maintenance</option><option value="not_available" ${machine.status === 'not_available' ? 'selected' : ''}>not available</option></select><button onclick="saveMachine(${machine.machine_id})" class="bg-slate-900 text-white rounded p-1">Save</button></div>`).join('');
+                const heatmap = document.getElementById('queue-heatmap');
+                if (heatmap) {
+                    const busy = machines.filter(machine => machine.status !== 'available').length, ratio = machines.length ? busy / machines.length : 0;
+                    const level = ratio < .4 ? ['Light', 'bg-green-100 text-green-700'] : ratio < .75 ? ['Moderate', 'bg-amber-100 text-amber-700'] : ['Heavy', 'bg-rose-100 text-rose-700'];
+                    heatmap.innerHTML = machines.map(machine => `<div title="${machine.name}: ${machine.status}" class="h-8 rounded ${machine.status === 'available' ? 'bg-green-400' : machine.status === 'maintenance' || machine.status === 'not_available' ? 'bg-slate-400' : 'bg-rose-400'}"></div>`).join('');
+                    document.getElementById('heatmap-label').textContent = `${busy} of ${machines.length} machines occupied or unavailable.`;
+                    document.getElementById('heatmap-badge').className = `px-3 py-1 rounded-full text-xs font-bold ${level[1]}`; document.getElementById('heatmap-badge').textContent = `${level[0]} busy`;
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        async function saveMachine(id) {
+            try { await api(`/api/machines/${id}`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({machine_name: document.getElementById(`machine-name-${id}`).value, price_per_cycle: document.getElementById(`machine-price-${id}`).value, operational_state: document.getElementById(`machine-state-${id}`).value})}); loadMachines(); loadQueue(); } catch (error) { alert(error.message); }
         }
 
         async function loadSales() {
@@ -602,7 +643,7 @@
                 document.getElementById('queue-count').textContent = metrics.active_queue;
                 document.getElementById('queue-machines').textContent = metrics.machines_ready;
                 document.getElementById('queue-wait').textContent = `~${metrics.est_wait_time_mins}m`;
-                document.getElementById('queue-table-body').innerHTML = queueResult.data.map(item => `<tr><td class="py-4"><span class="bg-slate-50 px-2 py-1 rounded-md text-[10px] font-bold text-slate-500">#${item.queue_number}</span></td><td class="py-4 font-bold text-slate-800">${item.customer}</td><td class="py-4">${item.service_type}</td><td class="py-4 text-[#00B4F4] font-bold">${item.machine}</td><td class="py-4">${item.status}</td><td class="py-4 text-right"><button onclick="advanceQueue(${item.queue_id})" class="text-[#00B4F4] font-bold">Advance →</button></td></tr>`).join('') || '<tr><td colspan="6" class="py-6 text-center text-slate-400">Queue is clear.</td></tr>';
+                document.getElementById('queue-table-body').innerHTML = queueResult.data.map(item => `<tr><td class="py-4"><span class="bg-slate-50 px-2 py-1 rounded-md text-[10px] font-bold text-slate-500">#${item.queue_number}</span></td><td class="py-4 font-bold text-slate-800">${item.customer}</td><td class="py-4">${item.service_type}</td><td class="py-4 text-[#00B4F4] font-bold">${item.machine}</td><td class="py-4">${item.status}</td><td class="py-4 text-right">${currentRole === 'Customer' ? '' : `<button onclick="advanceQueue(${item.queue_id})" class="text-[#00B4F4] font-bold">Advance →</button>`}</td></tr>`).join('') || '<tr><td colspan="6" class="py-6 text-center text-slate-400">Queue is clear.</td></tr>';
             } catch (error) { console.error(error); }
         }
 
@@ -658,7 +699,9 @@
             }
             if (tabId === 'sales') loadSales();
             if (tabId === 'appointment') loadAppointments();
-            if (tabId === 'queue') loadQueue();
+            if (tabId === 'queue') { loadQueue(); loadMachines(); }
+            if (tabId === 'machines') loadMachines();
+            if (tabId === 'settings') loadMachines();
         }
 
         // Initialize Chart Data Layer when the DOM tree mounts securely
@@ -742,6 +785,7 @@
             fetchRealtimeData();
             setInterval(fetchRealtimeData, 30000);
             if (document.getElementById('pos-service')) updatePOSPreview(true);
+            setInterval(loadMachines, 30000);
             const accountForm = document.getElementById('account-form');
             if (accountForm) accountForm.addEventListener('submit', createAccount);
             const appointmentForm = document.getElementById('appointment-form');
