@@ -327,6 +327,19 @@ def machine_payload(machine, queued_customers=None):
     }
 
 
+def is_bulky_garment_category(category_name: str) -> bool:
+    """
+    Returns True if garment/fabric type is blankets, bed liners/linens, or towels.
+    Only bed liners, blankets, and towels use the bulky machine allocation logic:
+      - 6kg est weight -> 8kg Regular machine
+      - 8kg est weight (or >6kg) -> 13kg Titan machine
+    """
+    if not category_name:
+        return False
+    s = str(category_name).lower()
+    return any(k in s for k in ('blanket', 'bed liner', 'bed linen', 'towel', 'comforter', 'duvet', 'linens'))
+
+
 def parse_order_loads(load_details, total_machines=1, default_service_type='Wash-Dry-Fold', weight=None):
     """
     Parses load_details string into structured per-load requirement objects.
@@ -354,10 +367,6 @@ def parse_order_loads(load_details, total_machines=1, default_service_type='Wash
         if m:
             idx = int(m.group(1))
             body = (m.group(2) if m.group(2) is not None else m.group(3)) or ''
-            is_titan = ('13' in body.lower()) or ('titan' in body.lower()) or ('13' in (default_service_type or '').lower())
-            if w_float and w_float > 8.0 and (total_machines or 1) == 1:
-                is_titan = True
-            cap = 13 if is_titan else 8
             
             # Extract package if in parentheses at end of body
             pkg_m = re.search(r'\((.*)\)\s*$', body)
@@ -369,7 +378,42 @@ def parse_order_loads(load_details, total_machines=1, default_service_type='Wash
             else:
                 cat = cleaned.strip(' -:')
             if not cat:
-                cat = 'Delicates & Clothes' if cap == 8 else 'Bulky Items / Mixed'
+                cat = 'Delicates & Clothes'
+
+            # Extract per-load est weight if noted e.g. "(6kg Est. Weight)" or "(8.0kg Est. Weight)"
+            w_match = re.search(r'(\d+(?:\.\d+)?)\s*kg\s*est', body, flags=re.IGNORECASE)
+            load_w = float(w_match.group(1)) if w_match else (w_float if (total_machines or 1) == 1 else None)
+            
+            is_bulky = is_bulky_garment_category(cat) or is_bulky_garment_category(body)
+            has_explicit_titan = ('13' in body.lower()) or ('titan' in body.lower()) or ('13' in (default_service_type or '').lower())
+            has_explicit_regular = ('8kg' in body.lower()) or ('regular' in body.lower())
+            
+            if is_bulky:
+                # Bulky item logic: 6kg -> 8kg Regular; 8kg or >6kg -> 13kg Titan
+                if load_w is not None:
+                    is_titan = (load_w > 6.0)
+                elif has_explicit_titan:
+                    is_titan = True
+                elif has_explicit_regular:
+                    is_titan = False
+                elif w_float is not None:
+                    is_titan = (w_float > 6.0)
+                else:
+                    is_titan = True  # Default bulky batch to 13kg Titan unless specified as 6kg
+            else:
+                # The rest is good: <= 8kg -> 8kg Regular; > 8kg -> 13kg Titan
+                if load_w is not None:
+                    is_titan = (load_w > 8.0)
+                elif has_explicit_titan:
+                    is_titan = True
+                elif has_explicit_regular:
+                    is_titan = False
+                elif w_float is not None:
+                    is_titan = (w_float > 8.0)
+                else:
+                    is_titan = False
+
+            cap = 13 if is_titan else 8
             
             loads.append({
                 'load_index': idx,
@@ -382,16 +426,23 @@ def parse_order_loads(load_details, total_machines=1, default_service_type='Wash
 
     if not loads:
         n = max(1, total_machines or 1)
+        is_bulky = is_bulky_garment_category(details) or is_bulky_garment_category(default_service_type)
         for i in range(1, n + 1):
-            is_titan = ('13' in details.lower()) or ('titan' in details.lower()) or ('13' in (default_service_type or '').lower())
-            if w_float and w_float > 8.0 and n == 1:
-                is_titan = True
+            if is_bulky:
+                if w_float is not None and n == 1:
+                    is_titan = (w_float > 6.0)
+                else:
+                    is_titan = ('13' in details.lower()) or ('titan' in details.lower()) or ('13' in (default_service_type or '').lower())
+            else:
+                is_titan = ('13' in details.lower()) or ('titan' in details.lower()) or ('13' in (default_service_type or '').lower())
+                if w_float and w_float > 8.0 and n == 1:
+                    is_titan = True
             cap = 13 if is_titan else 8
             loads.append({
                 'load_index': i,
                 'capacity_kg': cap,
                 'label': f"Load {i} ({cap}kg {'Titan' if cap == 13 else 'Regular'})",
-                'category': 'General Laundry',
+                'category': 'Bed Linens, Blankets & Towels' if is_bulky else 'General Laundry',
                 'service_type': default_service_type,
                 'raw': f"Load {i} ({cap}kg)"
             })

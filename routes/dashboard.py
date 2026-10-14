@@ -2,6 +2,7 @@
 import re
 import secrets
 import urllib.parse
+from io import BytesIO
 from datetime import datetime, time, timedelta
 from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify, request, Response
 from config.database import SessionLocal
@@ -15,7 +16,7 @@ from services.machines import (
     refresh_machine_cycles, is_machine_available, start_machine_cycle,
     start_next_queued_job, recommend_machine_for_order, estimated_wait_for_machine,
     is_walkin_machine, parse_order_loads, service_tier, queue_cycle_type, begin_dry_stage,
-    package_includes_dry
+    package_includes_dry, is_bulky_garment_category
 )
 from services.email_service import EmailService
 from decimal import Decimal
@@ -24,6 +25,161 @@ from services.audit_service import AuditService, AuditAction
 from services.payments import compute_service_price, validate_counter_payment, apply_counter_payment
 
 dashboard_bp = Blueprint('dashboard', __name__)
+
+
+def _pdf_safe_text(value):
+    """Keep report values compatible with the built-in PDF Helvetica font."""
+    text = str(value or '')
+    return text.encode('latin-1', 'replace').decode('latin-1').replace('\\', '\\\\').replace('(', '\\(').replace(')', '\\)')
+
+
+def _build_sales_tally_pdf(rows, generated_at):
+    """Create a dependency-free, print-ready PDF sales report."""
+    page_width, page_height = 792, 612  # US letter, landscape
+    margin, footer_y = 36, 28
+    streams, commands, page_number, cursor_y = [], [], 0, page_height - 44
+
+    def text(x, y, size, value, bold=False, color=None):
+        face = 'F2' if bold else 'F1'
+        color_cmd = '' if color is None else f'{color[0]:.3f} {color[1]:.3f} {color[2]:.3f} rg '
+        commands.append(f'BT {color_cmd}/{face} {size} Tf 1 0 0 1 {x} {y} Tm ({_pdf_safe_text(value)}) Tj ET')
+
+    def line(x1, y1, x2, y2, width=0.5, color=(0.82, 0.84, 0.83)):
+        commands.append(f'{color[0]:.3f} {color[1]:.3f} {color[2]:.3f} RG {width} w {x1} {y1} m {x2} {y2} l S')
+
+    def rect(x, y, width, height, color):
+        commands.append(f'{color[0]:.3f} {color[1]:.3f} {color[2]:.3f} rg {x} {y} {width} {height} re f')
+
+    def new_page():
+        nonlocal commands, page_number, cursor_y
+        if commands:
+            text(margin, footer_y, 8, 'Bon Laundry Station  |  Confidential operational report', color=(0.35, 0.40, 0.42))
+            text(page_width - 92, footer_y, 8, f'Page {page_number}', color=(0.35, 0.40, 0.42))
+            streams.append('\n'.join(commands))
+        page_number += 1
+        commands, cursor_y = [], page_height - 44
+        rect(0, page_height - 30, page_width, 30, (0.075, 0.145, 0.192))
+        text(margin, page_height - 20, 13, 'BON LAUNDRY STATION', bold=True, color=(1, 1, 0.98))
+        text(page_width - 212, page_height - 20, 8, 'SALES & TALLY REPORT', bold=True, color=(0.82, 0.91, 0.94))
+
+    def section_heading(title):
+        nonlocal cursor_y
+        if cursor_y < 74:
+            new_page()
+        text(margin, cursor_y, 11, title.upper(), bold=True, color=(0.075, 0.145, 0.192))
+        line(margin, cursor_y - 5, page_width - margin, cursor_y - 5, 0.8, (0.05, 0.43, 0.61))
+        cursor_y -= 22
+
+    def table(headers, widths, data, alignments=None):
+        nonlocal cursor_y
+        alignments = alignments or ['left'] * len(headers)
+
+        def draw_header():
+            nonlocal cursor_y
+            if cursor_y < 66:
+                new_page()
+            rect(margin, cursor_y - 14, sum(widths), 18, (0.92, 0.92, 0.89))
+            x = margin
+            for header, width in zip(headers, widths):
+                text(x + 4, cursor_y - 8, 7, header.upper(), bold=True, color=(0.28, 0.33, 0.34))
+                x += width
+            cursor_y -= 20
+
+        draw_header()
+        for row in data:
+            if cursor_y < 52:
+                new_page()
+                draw_header()
+            x = margin
+            for value, width, alignment in zip(row, widths, alignments):
+                raw = _pdf_safe_text(value)
+                clipped = raw if len(raw) <= max(1, int(width / 4.1)) else raw[:max(1, int(width / 4.1) - 1)] + '...'
+                estimated_width = len(clipped) * 4.0
+                tx = x + 4 if alignment == 'left' else x + max(4, width - estimated_width - 4)
+                text(tx, cursor_y, 7.5, clipped, color=(0.10, 0.15, 0.16))
+                x += width
+            line(margin, cursor_y - 5, page_width - margin, cursor_y - 5)
+            cursor_y -= 16
+
+    total_sales = sum(float(tx.total_amount or 0) for tx, _ in rows)
+    paid_sales = sum(float(tx.total_amount or 0) for tx, _ in rows if tx.payment_status == 'Paid')
+    pending_sales = total_sales - paid_sales
+    total_weight = sum(float(tx.weight_kg or 0) for tx, _ in rows)
+    daily = {}
+    for tx, _ in rows:
+        tx_date = tx.created_at.date() if tx.created_at else None
+        if not tx_date:
+            continue
+        record = daily.setdefault(tx_date, {'orders': 0, 'weight': 0.0, 'paid': 0.0, 'pending': 0.0, 'gross': 0.0})
+        amount = float(tx.total_amount or 0)
+        record['orders'] += 1
+        record['weight'] += float(tx.weight_kg or 0)
+        record['gross'] += amount
+        record['paid' if tx.payment_status == 'Paid' else 'pending'] += amount
+
+    new_page()
+    text(margin, cursor_y, 18, 'Sales & Tally Report', bold=True, color=(0.075, 0.145, 0.192))
+    text(margin, cursor_y - 15, 8, f'Generated {generated_at.strftime("%B %d, %Y at %I:%M %p")}', color=(0.35, 0.40, 0.42))
+    cursor_y -= 42
+    section_heading('Report Summary')
+    summary = [
+        ('Total receipts', str(len(rows))),
+        ('Total load weight', f'{total_weight:,.2f} kg'),
+        ('Paid collected', f'PHP {paid_sales:,.2f}'),
+        ('Pending / unpaid', f'PHP {pending_sales:,.2f}'),
+        ('Gross sales', f'PHP {total_sales:,.2f}'),
+    ]
+    table(['Measure', 'Value'], [290, 240], summary, ['left', 'right'])
+    cursor_y -= 10
+    section_heading('Daily Reconciliation')
+    daily_data = [
+        (day.strftime('%b %d, %Y'), value['orders'], f"{value['weight']:,.2f} kg", f"PHP {value['paid']:,.2f}", f"PHP {value['pending']:,.2f}", f"PHP {value['gross']:,.2f}", 'Balanced' if value['pending'] == 0 else 'Pending')
+        for day, value in sorted(daily.items(), reverse=True)
+    ] or [('No recorded sales', '', '', '', '', '', '')]
+    table(['Date', 'Orders', 'Weight', 'Paid', 'Pending', 'Gross', 'Status'], [130, 55, 75, 95, 95, 95, 70], daily_data, ['left', 'right', 'right', 'right', 'right', 'right', 'left'])
+    cursor_y -= 10
+    section_heading('Itemized Receipts Ledger')
+    ledger_data = [
+        (
+            tx.created_at.strftime('%Y-%m-%d %I:%M %p') if tx.created_at else '—',
+            f'TRX-{tx.transaction_id:04d}',
+            name or tx.customer_name or 'Walk-in customer',
+            f'{float(tx.weight_kg or 0):.2f} kg / {tx.cycle_type or "washing"}',
+            f'{tx.payment_status or "—"} / {tx.payment_method or "—"}',
+            tx.processed_by or '—',
+            f'PHP {float(tx.total_amount or 0):,.2f}',
+        )
+        for tx, name in rows
+    ] or [('No recorded receipts', '', '', '', '', '', '')]
+    table(['Date & Time', 'Receipt', 'Customer', 'Load', 'Payment', 'Handled by', 'Amount'], [110, 62, 120, 105, 100, 100, 73], ledger_data, ['left', 'left', 'left', 'left', 'left', 'left', 'right'])
+    new_page()
+
+    # Assemble a valid PDF document with standard Type 1 Helvetica fonts.
+    page_object_start = 5
+    objects = [
+        '<< /Type /Catalog /Pages 2 0 R >>',
+        f'<< /Type /Pages /Kids [{" ".join(f"{page_object_start + i} 0 R" for i in range(len(streams)))}] /Count {len(streams)} >>',
+        '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+        '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>',
+    ]
+    content_object_start = page_object_start + len(streams)
+    for index, _ in enumerate(streams):
+        objects.append(f'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {page_width} {page_height}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents {content_object_start + index} 0 R >>')
+    for stream in streams:
+        objects.append(f'<< /Length {len(stream.encode("latin-1"))} >>\nstream\n{stream}\nendstream')
+
+    output = BytesIO()
+    output.write(b'%PDF-1.4\n%\xe2\xe3\xcf\xd3\n')
+    offsets = [0]
+    for index, obj in enumerate(objects, start=1):
+        offsets.append(output.tell())
+        output.write(f'{index} 0 obj\n{obj}\nendobj\n'.encode('latin-1'))
+    xref = output.tell()
+    output.write(f'xref\n0 {len(objects) + 1}\n0000000000 65535 f \n'.encode('ascii'))
+    for offset in offsets[1:]:
+        output.write(f'{offset:010d} 00000 n \n'.encode('ascii'))
+    output.write(f'trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF'.encode('ascii'))
+    return output.getvalue()
 
 
 def _has_role(*roles):
@@ -786,6 +942,28 @@ def transactions_csv():
                 f'{tx.payment_reference or ""},"{tx.processed_by or ""}"'
             )
         return Response('\n'.join(lines), mimetype='text/csv', headers={'Content-Disposition': 'attachment; filename=transactions.csv'})
+    finally:
+        db.close()
+
+
+@dashboard_bp.route('/api/manager/sales-tally.pdf')
+def sales_tally_pdf():
+    """Download the full Sales & Tally ledger as a print-ready PDF report."""
+    denied = _api_access('Manager', 'Super Admin')
+    if denied:
+        return denied
+    db = SessionLocal()
+    try:
+        rows = (db.query(Transaction, User.name)
+                .outerjoin(User, Transaction.customer_id == User.user_id)
+                .order_by(Transaction.created_at.desc()).all())
+        report = _build_sales_tally_pdf(rows, datetime.now())
+        filename = f'sales-tally-{datetime.now().strftime("%Y%m%d")}.pdf'
+        return Response(
+            report,
+            mimetype='application/pdf',
+            headers={'Content-Disposition': f'attachment; filename={filename}'}
+        )
     finally:
         db.close()
 
@@ -1661,7 +1839,9 @@ def api_alter_order():
         except (ValueError, TypeError):
             total_machines = 1
 
-        machine_capacity = int(payload.get('machine_capacity') or (13 if (actual_weight and actual_weight > 8 and total_machines == 1) else 8))
+        is_bulky = is_bulky_garment_category(service_type) or is_bulky_garment_category(appt.load_details)
+        weight_threshold = 6.0 if is_bulky else 8.0
+        machine_capacity = int(payload.get('machine_capacity') or (13 if (actual_weight and actual_weight > weight_threshold and total_machines == 1) else 8))
 
         # Add-ons parsing
         addons_raw = payload.get('addons') or []
@@ -2115,4 +2295,3 @@ def manager_audit_logs():
     search = request.args.get('search', type=str)
     result = AuditService.get_logs(page=page, limit=limit, staff_id=staff_id, action=action, search=search)
     return jsonify({'status': 'success', 'data': result})
-

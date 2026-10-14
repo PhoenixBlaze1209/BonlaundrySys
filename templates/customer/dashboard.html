@@ -1910,17 +1910,60 @@
 
         // Multi-Load / Machine Configuration State (Separation of Clothes, Delicates, Titan capacity, Per-Machine Service)
         let wizardLoads = [
-            { id: 1, capacity: 8, machine_type: 'Regular (8kg)', category: 'Everyday Clothes & Casuals', service_type: 'Drop-off Service (Wash, Dry, Fold)', note: '' }
+            { id: 1, capacity: 8, machine_type: 'Regular (8kg)', category: 'Everyday Clothes & Casuals', est_weight: 8, service_type: 'Drop-off Service (Wash, Dry, Fold)', note: '' }
         ];
 
         const LAUNDRY_CATEGORIES = [
             'Everyday Clothes & Casuals',
             'Undergarments, Bras & Delicates',
             'Bed Linens, Blankets & Towels',
+            'Blankets & Comforters',
+            'Bed Liners & Bed Sheets',
+            'Towels & Bath Linens',
             'Whites & Uniforms',
             'Heavy Denim & Jackets',
             'Other / Mixed Fabrics'
         ];
+
+        function isBulkyItem(category) {
+            if (!category) return false;
+            const c = category.toLowerCase();
+            return c.includes('blanket') || c.includes('bed liner') || c.includes('bed linen') || c.includes('towel') || c.includes('comforter') || c.includes('linens');
+        }
+
+        function applyBulkyMachineLogic(load) {
+            if (!load) return;
+            const bulky = isBulkyItem(load.category);
+            const w = Number(load.est_weight) || (bulky ? 8 : 8);
+            
+            if (bulky) {
+                // Bed liners, blankets, and towels logic:
+                // 6kg est weight -> directs to 8kg Regular machine
+                // 8kg (or >6kg) est weight -> directs to 13kg Titan machine
+                if (w <= 6) {
+                    load.capacity = 8;
+                    load.machine_type = 'Regular (8kg)';
+                    load.est_weight = 6;
+                } else {
+                    load.capacity = 13;
+                    load.machine_type = 'Titan Heavy-Duty (13kg)';
+                    load.est_weight = 8;
+                }
+            } else {
+                // All other garments:
+                // <= 8kg -> directs to 8kg Regular machine
+                // > 8kg -> directs to 13kg Titan machine
+                if (w <= 8) {
+                    load.capacity = 8;
+                    load.machine_type = 'Regular (8kg)';
+                    load.est_weight = 8;
+                } else {
+                    load.capacity = 13;
+                    load.machine_type = 'Titan Heavy-Duty (13kg)';
+                    load.est_weight = 13;
+                }
+            }
+        }
 
         function getLoadPackage(load) {
             const svc = load.service_type || document.querySelector('input[name="service_type"]:checked')?.value || 'Drop-off Service (Wash, Dry, Fold)';
@@ -1944,9 +1987,11 @@
                 const isSingle = wizardLoads.length === 1;
                 const pkg = getLoadPackage(load);
                 const loadPrice = getLoadCost(load);
+                const bulky = isBulkyItem(load.category);
+                const estW = Number(load.est_weight) || (bulky ? (isTitan ? 8 : 6) : (isTitan ? 13 : 8));
 
                 return `
-                <div class="bg-white p-4 sm:p-5 rounded-2xl border-2 ${isTitan ? 'border-sky-400 ring-1 ring-sky-200 bg-sky-50/15' : 'border-slate-200'} shadow-xs transition-all space-y-3">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border-2 ${isTitan ? 'border-sky-400 ring-1 ring-sky-200 bg-sky-50/15' : 'border-slate-200'} shadow-xs transition-all space-y-3.5">
                     <!-- Machine Header -->
                     <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                         <div class="flex items-center gap-2 flex-wrap">
@@ -1955,6 +2000,9 @@
                             ${isTitan 
                                 ? '<span class="px-2 py-0.5 text-[9px] font-extrabold uppercase rounded-md bg-amber-100 text-amber-800 border border-amber-200">13kg Titan Capacity</span>' 
                                 : '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-slate-100 text-slate-600">8kg Standard</span>'}
+                            <span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                ⚖️ ${estW}kg Est. Weight
+                            </span>
                             <span class="px-2 py-0.5 text-[9px] font-extrabold rounded-md bg-sky-100 text-sky-800 border border-sky-200">
                                 ${pkg.icon} ${pkg.shortName}
                             </span>
@@ -2000,30 +2048,73 @@
                             `}
                         </div>
 
-                        <!-- 2. Machine Capacity -->
+                        <!-- 2. Garment / Fabric Type -->
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Machine Capacity</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button type="button" onclick="setLoadCapacity(${index}, 8)" class="px-2.5 py-1.5 rounded-xl text-xs font-bold border-2 transition text-left cursor-pointer ${!isTitan ? 'border-sky-500 bg-sky-50/80 text-[#0284c7]' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}">
-                                    <div class="font-extrabold flex items-center gap-1">8kg Regular ${!isTitan ? '<span class="text-emerald-500 text-[10px]">✓</span>' : ''}</div>
-                                    <div class="text-[9px] font-normal opacity-80">Up to 8kg load</div>
-                                </button>
-                                <button type="button" onclick="setLoadCapacity(${index}, 13)" class="px-2.5 py-1.5 rounded-xl text-xs font-bold border-2 transition text-left cursor-pointer ${isTitan ? 'border-sky-500 bg-sky-50/80 text-[#0284c7]' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}">
-                                    <div class="font-extrabold flex items-center gap-1">13kg Titan ${isTitan ? '<span class="text-emerald-500 text-[10px]">✓</span>' : ''}</div>
-                                    <div class="text-[9px] font-normal opacity-80">Heavy / Bulky</div>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 3. Garment / Fabric Type -->
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Garment / Fabric Type</label>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>Garment / Fabric Type</span>
+                                ${bulky ? '<span class="text-amber-600 font-extrabold text-[9px] bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">Bulky Rule</span>' : ''}
+                            </label>
                             <select onchange="setLoadCategory(${index}, this.value)" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:bg-white focus:ring-2 focus:ring-[#0284c7] cursor-pointer">
                                 ${LAUNDRY_CATEGORIES.map(cat => `
                                     <option value="${cat}" ${load.category === cat ? 'selected' : ''}>${cat}</option>
                                 `).join('')}
                             </select>
-                            <div class="text-[10px] text-slate-400 mt-1 truncate">e.g. Delicates &amp; bras separated</div>
+                            <div class="text-[10px] text-slate-400 mt-1 truncate">
+                                ${bulky ? 'Blanket / bed liner / towel drum rule applies' : 'Everyday clothes, delicates &amp; mixed'}
+                            </div>
+                        </div>
+
+                        <!-- 3. Estimated Weight & Machine Capacity Routing -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>Est. Weight &amp; Machine</span>
+                                <span class="font-extrabold text-[9px] ${isTitan ? 'text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200' : 'text-[#0284c7] bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200'}">
+                                    Directs: ${isTitan ? '13kg Titan' : '8kg Regular'}
+                                </span>
+                            </label>
+                            ${bulky ? `
+                            <!-- Bulky items weight selector: 6kg -> 8kg Regular machine; 8kg -> 13kg Titan machine -->
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" onclick="setLoadEstWeight(${index}, 6)" class="px-2.5 py-1.5 rounded-xl text-xs font-bold border-2 transition text-left cursor-pointer ${!isTitan ? 'border-sky-500 bg-sky-50/80 text-[#0284c7]' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}">
+                                    <div class="font-extrabold flex items-center justify-between">
+                                        <span>6kg Est. Weight</span>
+                                        ${!isTitan ? '<span class="text-emerald-500 text-[10px]">✓</span>' : ''}
+                                    </div>
+                                    <div class="text-[9px] font-normal opacity-80 mt-0.5">Directs to 8kg Regular</div>
+                                </button>
+                                <button type="button" onclick="setLoadEstWeight(${index}, 8)" class="px-2.5 py-1.5 rounded-xl text-xs font-bold border-2 transition text-left cursor-pointer ${isTitan ? 'border-amber-500 bg-amber-50/80 text-amber-800' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}">
+                                    <div class="font-extrabold flex items-center justify-between">
+                                        <span>8kg Est. Weight</span>
+                                        ${isTitan ? '<span class="text-amber-600 text-[10px]">✓</span>' : ''}
+                                    </div>
+                                    <div class="text-[9px] font-normal opacity-80 mt-0.5">Directs to 13kg Titan</div>
+                                </button>
+                            </div>
+                            <div class="mt-1.5 px-2 py-1 rounded-lg bg-amber-50 border border-amber-200 text-[9px] text-amber-900 leading-tight">
+                                💡 <strong>Bulky Item Drum Rule:</strong> 6kg blankets fit in 8kg Regular drum. 8kg blankets require 13kg Titan drum for proper wash tumbling.
+                            </div>
+                            ` : `
+                            <!-- Regular items weight selector: 8kg -> 8kg Regular machine; 13kg -> 13kg Titan machine -->
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" onclick="setLoadEstWeight(${index}, 8)" class="px-2.5 py-1.5 rounded-xl text-xs font-bold border-2 transition text-left cursor-pointer ${!isTitan ? 'border-sky-500 bg-sky-50/80 text-[#0284c7]' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}">
+                                    <div class="font-extrabold flex items-center justify-between">
+                                        <span>8kg Standard</span>
+                                        ${!isTitan ? '<span class="text-emerald-500 text-[10px]">✓</span>' : ''}
+                                    </div>
+                                    <div class="text-[9px] font-normal opacity-80 mt-0.5">Directs to 8kg Regular</div>
+                                </button>
+                                <button type="button" onclick="setLoadEstWeight(${index}, 13)" class="px-2.5 py-1.5 rounded-xl text-xs font-bold border-2 transition text-left cursor-pointer ${isTitan ? 'border-sky-500 bg-sky-50/80 text-[#0284c7]' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}">
+                                    <div class="font-extrabold flex items-center justify-between">
+                                        <span>13kg Titan</span>
+                                        ${isTitan ? '<span class="text-emerald-500 text-[10px]">✓</span>' : ''}
+                                    </div>
+                                    <div class="text-[9px] font-normal opacity-80 mt-0.5">Directs to 13kg Titan</div>
+                                </button>
+                            </div>
+                            <div class="mt-1.5 text-[10px] text-slate-400 truncate">
+                                Standard clothing load: up to 8kg fits in 8kg Regular washer
+                            </div>
+                            `}
                         </div>
                     </div>
                 </div>
@@ -2059,7 +2150,9 @@
             const readableDetails = wizardLoads.map((l, i) => {
                 const p = getLoadPackage(l);
                 const cost = getLoadCost(l);
-                return `Load ${i + 1} [${l.capacity}kg ${l.capacity === 13 ? 'Titan' : 'Regular'}: ${l.category} (${p.shortName} - ₱${cost})]`;
+                const bulky = isBulkyItem(l.category);
+                const w = l.est_weight || (bulky ? (l.capacity === 13 ? 8 : 6) : (l.capacity === 13 ? 13 : 8));
+                return `Load ${i + 1} [${l.capacity}kg ${l.capacity === 13 ? 'Titan' : 'Regular'}: ${l.category} (${w}kg Est. Weight) (${p.shortName} - ₱${cost})]`;
             }).join('; ');
 
             // Update hidden inputs
@@ -2070,12 +2163,17 @@
             const capInput = document.getElementById('wizard-machine-capacity-input');
 
             const totalCapacity = wizardLoads.reduce((sum, l) => sum + (Number(l.capacity) || 8), 0);
+            const totalEstWeight = wizardLoads.reduce((sum, l) => {
+                const b = isBulkyItem(l.category);
+                const defW = b ? (l.capacity === 13 ? 8 : 6) : (l.capacity === 13 ? 13 : 8);
+                return sum + (Number(l.est_weight) || defW);
+            }, 0);
             const maxCapacity = Math.max(...wizardLoads.map(l => Number(l.capacity) || 8));
 
             if (loadsInput) loadsInput.value = JSON.stringify(wizardLoads);
             if (totalInput) totalInput.value = totalMachines;
             if (detailsInput) detailsInput.value = `${totalMachines} Machine${totalMachines > 1 ? 's' : ''}: ${readableDetails}`;
-            if (estWeightInput) estWeightInput.value = totalCapacity.toFixed(1);
+            if (estWeightInput) estWeightInput.value = totalEstWeight.toFixed(1);
             if (capInput) capInput.value = maxCapacity;
 
             calculateWizardPrice();
@@ -2089,14 +2187,30 @@
 
         function setLoadCapacity(index, capacity) {
             if (!wizardLoads[index]) return;
-            wizardLoads[index].capacity = capacity;
-            wizardLoads[index].machine_type = capacity === 13 ? 'Titan Heavy-Duty (13kg)' : 'Regular (8kg)';
+            const load = wizardLoads[index];
+            const bulky = isBulkyItem(load.category);
+            if (bulky) {
+                load.est_weight = (capacity === 13 ? 8 : 6);
+            } else {
+                load.est_weight = (capacity === 13 ? 13 : 8);
+            }
+            applyBulkyMachineLogic(load);
+            renderWizardLoads();
+        }
+
+        function setLoadEstWeight(index, weight) {
+            if (!wizardLoads[index]) return;
+            const load = wizardLoads[index];
+            load.est_weight = Number(weight);
+            applyBulkyMachineLogic(load);
             renderWizardLoads();
         }
 
         function setLoadCategory(index, category) {
             if (!wizardLoads[index]) return;
-            wizardLoads[index].category = category;
+            const load = wizardLoads[index];
+            load.category = category;
+            applyBulkyMachineLogic(load);
             renderWizardLoads();
         }
 
@@ -2109,20 +2223,21 @@
 
             if (count === 1) {
                 wizardLoads = [
-                    { id: 1, capacity: 8, machine_type: 'Regular (8kg)', category: 'Everyday Clothes & Casuals', service_type: defaultPkg, note: '' }
+                    { id: 1, capacity: 8, machine_type: 'Regular (8kg)', category: 'Everyday Clothes & Casuals', est_weight: 8, service_type: defaultPkg, note: '' }
                 ];
             } else if (count === 2) {
                 wizardLoads = [
-                    { id: 1, capacity: 8, machine_type: 'Regular (8kg)', category: 'Everyday Clothes & Casuals', service_type: defaultPkg, note: '' },
-                    { id: 2, capacity: 8, machine_type: 'Regular (8kg)', category: 'Undergarments, Bras & Delicates', service_type: isSelf ? defaultPkg : 'Premium Complete Care (Sort & Superwash)', note: '' }
+                    { id: 1, capacity: 8, machine_type: 'Regular (8kg)', category: 'Everyday Clothes & Casuals', est_weight: 8, service_type: defaultPkg, note: '' },
+                    { id: 2, capacity: 8, machine_type: 'Regular (8kg)', category: 'Undergarments, Bras & Delicates', est_weight: 8, service_type: isSelf ? defaultPkg : 'Premium Complete Care (Sort & Superwash)', note: '' }
                 ];
             } else if (count === 3) {
                 wizardLoads = [
-                    { id: 1, capacity: 8, machine_type: 'Regular (8kg)', category: 'Everyday Clothes & Casuals', service_type: defaultPkg, note: '' },
-                    { id: 2, capacity: 8, machine_type: 'Regular (8kg)', category: 'Undergarments, Bras & Delicates', service_type: isSelf ? defaultPkg : 'Premium Complete Care (Sort & Superwash)', note: '' },
-                    { id: 3, capacity: 13, machine_type: 'Titan Heavy-Duty (13kg)', category: 'Bed Linens, Blankets & Towels', service_type: isSelf ? defaultPkg : 'Drop-off Service (Wash, Dry, Fold)', note: '' }
+                    { id: 1, capacity: 8, machine_type: 'Regular (8kg)', category: 'Everyday Clothes & Casuals', est_weight: 8, service_type: defaultPkg, note: '' },
+                    { id: 2, capacity: 8, machine_type: 'Regular (8kg)', category: 'Undergarments, Bras & Delicates', est_weight: 8, service_type: isSelf ? defaultPkg : 'Premium Complete Care (Sort & Superwash)', note: '' },
+                    { id: 3, capacity: 13, machine_type: 'Titan Heavy-Duty (13kg)', category: 'Bed Linens, Blankets & Towels', est_weight: 8, service_type: isSelf ? defaultPkg : 'Drop-off Service (Wash, Dry, Fold)', note: '' }
                 ];
             }
+            wizardLoads.forEach(l => applyBulkyMachineLogic(l));
             renderWizardLoads();
         }
 
@@ -2132,27 +2247,29 @@
             const isSelf = mode === 'Self-Service';
             let defaultCat = 'Everyday Clothes & Casuals';
             let defaultPkg = isSelf ? 'Self-Service Wash & Dry' : 'Saver Package (+1 Det, +1 Fabcon)';
-            let defaultCap = 8;
+            let defaultEstWeight = 8;
             if (nextId === 2) {
                 defaultCat = 'Undergarments, Bras & Delicates';
                 defaultPkg = isSelf ? 'Self-Service Wash & Dry' : 'Premium Complete Care (Sort & Superwash)';
             } else if (nextId === 3) {
                 defaultCat = 'Bed Linens, Blankets & Towels';
                 defaultPkg = isSelf ? 'Self-Service Wash & Dry' : 'Drop-off Service (Wash, Dry, Fold)';
-                defaultCap = 13;
             } else if (nextId === 4) {
                 defaultCat = 'Whites & Uniforms';
                 defaultPkg = isSelf ? 'Self-Service Wash & Dry' : 'Signature Package (Complete Det & Fabcon)';
             }
 
-            wizardLoads.push({
+            const newLoad = {
                 id: nextId,
-                capacity: defaultCap,
-                machine_type: defaultCap === 13 ? 'Titan Heavy-Duty (13kg)' : 'Regular (8kg)',
+                capacity: 8,
+                machine_type: 'Regular (8kg)',
                 category: defaultCat,
+                est_weight: defaultEstWeight,
                 service_type: defaultPkg,
                 note: ''
-            });
+            };
+            applyBulkyMachineLogic(newLoad);
+            wizardLoads.push(newLoad);
             renderWizardLoads();
         }
 
@@ -2640,6 +2757,8 @@
                     const isTitan = load.capacity === 13;
                     const pkg = getLoadPackage(load);
                     const loadCost = getLoadCost(load);
+                    const bulky = isBulkyItem(load.category);
+                    const w = load.est_weight || (bulky ? (isTitan ? 8 : 6) : (isTitan ? 13 : 8));
 
                     return `
                     <div class="flex items-center justify-between text-xs py-2 px-3.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
@@ -2648,6 +2767,9 @@
                             <span class="text-white font-medium">${load.category}</span>
                             <span class="text-[10px] px-2 py-0.5 rounded-full ${isTitan ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30' : 'bg-sky-400/20 text-sky-300 border border-sky-400/30'} font-bold">
                                 ${isTitan ? '13kg Titan' : '8kg Regular'}
+                            </span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-400/20 text-indigo-200 border border-indigo-400/30 font-bold">
+                                ⚖️ ${w}kg Est. Weight
                             </span>
                             <span class="text-[10px] px-2 py-0.5 rounded-full bg-teal-400/20 text-teal-300 border border-teal-400/30 font-semibold">
                                 ${pkg.icon} ${pkg.shortName}
@@ -2790,8 +2912,12 @@
                         let capTexts = [];
                         if (titanCount > 0) capTexts.push(`${titanCount}x 13kg Titan Drum`);
                         if (regularCount > 0) capTexts.push(`${regularCount}x 8kg Regular Drum`);
-                        const totalCap = wizardLoads.reduce((sum, l) => sum + (Number(l.capacity) || 8), 0);
-                        summaryEl.innerHTML = `<span>🧺 Selected Fleet:</span> <span class="font-extrabold text-[#0284c7]">${capTexts.join(', ')} (${totalCap.toFixed(1)} kg Est. Weight)</span>`;
+                        const totalEstWeight = wizardLoads.reduce((sum, l) => {
+                            const b = isBulkyItem(l.category);
+                            const defW = b ? (l.capacity === 13 ? 8 : 6) : (l.capacity === 13 ? 13 : 8);
+                            return sum + (Number(l.est_weight) || defW);
+                        }, 0);
+                        summaryEl.innerHTML = `<span>🧺 Selected Fleet:</span> <span class="font-extrabold text-[#0284c7]">${capTexts.join(', ')} (${totalEstWeight.toFixed(1)} kg Est. Weight)</span>`;
                     }
 
                     // Hide form and stepper, reveal ticket

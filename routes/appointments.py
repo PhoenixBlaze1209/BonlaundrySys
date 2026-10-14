@@ -10,7 +10,7 @@ from decimal import Decimal
 from services.queuing import QueueManager
 from services.email_service import EmailService
 from services.sms_service import SMSService
-from services.machines import refresh_machine_cycles
+from services.machines import refresh_machine_cycles, is_bulky_garment_category
 from services.payments import compute_service_price
 
 appointments_bp = Blueprint('appointments', __name__)
@@ -129,9 +129,17 @@ def create_order():
         except (ValueError, TypeError):
             estimated_weight = None
 
-    # Guarantee machine capacity chosen by customer matches estimated weight:
-    # If customer selected a 13kg Titan machine (or multi-load), match estimated weight to chosen capacity
-    if loads_capacity:
+    # Compute loads estimated weight if present in loads_list
+    loads_est_weight = None
+    if loads_list:
+        try:
+            loads_est_weight = sum(float(ld.get('est_weight', ld.get('capacity', 8)) or 8) for ld in loads_list)
+        except (ValueError, TypeError):
+            loads_est_weight = None
+
+    if loads_est_weight is not None and loads_est_weight > 0:
+        estimated_weight = round(loads_est_weight, 2)
+    elif loads_capacity:
         if not estimated_weight or (estimated_weight <= 8.0 and loads_capacity > 8.0):
             estimated_weight = round(loads_capacity, 2)
     elif direct_capacity and direct_capacity >= 13:
@@ -152,13 +160,29 @@ def create_order():
             cap = int(ld.get('capacity', 8) or 8)
             cat = ld.get('category', 'Clothes')
             pkg = ld.get('service_type') or service_type
+            ld_est = ld.get('est_weight')
+            
+            # Bulky machine allocation logic:
+            # 6kg blankets -> 8kg Regular; 8kg (or >6kg) blankets -> 13kg Titan
+            if is_bulky_garment_category(cat):
+                if ld_est is not None:
+                    cap = 13 if float(ld_est) > 6.0 else 8
+            ld['capacity'] = cap
+            
             mac_label = "13kg Titan" if cap >= 13 else "8kg Regular"
-            parts.append(f"Load {idx} [{mac_label}: {cat} ({pkg})]")
+            weight_tag = f" ({ld_est}kg Est. Weight)" if ld_est is not None else ""
+            parts.append(f"Load {idx} [{mac_label}: {cat}{weight_tag} ({pkg})]")
         load_details = f"{len(loads_list)} Machines: " + "; ".join(parts)
         if estimated_weight:
             load_details += f" | Est. Weight: {estimated_weight}kg"
     elif not load_details:
-        if estimated_weight and estimated_weight > 13.0 and total_machines <= 1:
+        is_bulky = is_bulky_garment_category(service_type) or is_bulky_garment_category(payload.get('category')) or is_bulky_garment_category(payload.get('garment_type'))
+        if is_bulky:
+            # Bulky items: 6kg -> 8kg Regular; 8kg or >6kg -> 13kg Titan
+            is_titan_bulk = estimated_weight is not None and estimated_weight > 6.0
+            cap_str = '13kg Titan' if is_titan_bulk else '8kg Regular'
+            load_details = f"{total_machines} Machine{'s' if total_machines > 1 else ''} ({cap_str}: Bulky Blankets/Linens/Towels) | Est. Weight: {estimated_weight}kg"
+        elif estimated_weight and estimated_weight > 13.0 and total_machines <= 1:
             total_machines = max(2, int((estimated_weight + 7.9) // 8))
             load_details = f"{total_machines} Machines (8kg Regular) | Est. Weight: {estimated_weight}kg"
         elif estimated_weight and estimated_weight > 8.0 and total_machines <= 1:
@@ -264,8 +288,12 @@ def create_order():
             loads=loads_list, total_machines=total_machines,
             addons=addons_list
         )
-        if not loads_list and estimated_weight and estimated_weight > 8.0 and estimated_weight <= 13.0 and 'titan' not in service_type.lower():
-            computed_price += Decimal('95.00')
+        if not loads_list and estimated_weight and 'titan' not in service_type.lower():
+            is_bulky = is_bulky_garment_category(service_type) or is_bulky_garment_category(load_details)
+            if is_bulky and estimated_weight > 6.0 and estimated_weight <= 13.0:
+                computed_price += Decimal('95.00')
+            elif (not is_bulky) and estimated_weight > 8.0 and estimated_weight <= 13.0:
+                computed_price += Decimal('95.00')
 
         new_appointment = Appointment(
             customer_id=logged_user_id if logged_user_id else None,

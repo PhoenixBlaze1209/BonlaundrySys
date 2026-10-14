@@ -2136,16 +2136,28 @@
                                 </button>
                             </div>
 
-                            <a href="/api/manager/transactions.csv"
-                                class="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                    <polyline points="7 10 12 15 17 10" />
-                                    <line x1="12" x2="12" y1="15" y2="3" />
-                                </svg>
-                                <span>Export CSV</span>
-                            </a>
+                            <div class="flex items-center gap-2">
+                                <!-- <a href="/api/manager/transactions.csv"
+                                    class="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="7 10 12 15 17 10" />
+                                        <line x1="12" x2="12" y1="15" y2="3" />
+                                    </svg>
+                                    <span>Export CSV</span>
+                                </a> -->
+                                <a href="/api/manager/sales-tally.pdf"
+                                    class="inline-flex items-center gap-1.5 bg-[#0D6D9B] hover:bg-[#0a587d] text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="7 10 12 15 17 10" />
+                                        <line x1="12" x2="12" y1="15" y2="3" />
+                                    </svg>
+                                    <span>Export PDF</span>
+                                </a>
+                            </div>
                         </div>
 
                         <!-- 3.1 Daily Tally Table Section -->
@@ -2353,6 +2365,19 @@
                             </div>
                         </div>
 
+                        <div class="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1" role="tablist" aria-label="Appointment work areas">
+                            <button type="button" id="btn-appt-workflow-lobby" onclick="switchAppointmentWorkflowTab('lobby')" role="tab" aria-selected="true"
+                                class="rounded-lg bg-white px-4 py-2 text-xs font-bold text-slate-900 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-[#0D6D9B] focus:ring-offset-2">
+                                Order Lobby
+                            </button>
+                            <button type="button" id="btn-appt-workflow-ready" onclick="switchAppointmentWorkflowTab('ready')" role="tab" aria-selected="false"
+                                class="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 transition hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0D6D9B] focus:ring-offset-2">
+                                Ready to Assign
+                                <span id="appt-workflow-ready-count" class="ml-1.5 rounded-full bg-sky-100 px-1.5 py-0.5 font-mono-num text-[10px] font-bold text-[#0D6D9B]">0</span>
+                            </button>
+                        </div>
+
+                        <div id="appointment-lobby-panel" class="space-y-6" role="tabpanel" aria-labelledby="btn-appt-workflow-lobby">
                         <!-- 5 Quick KPI Cards for Rapid Overview & 1-Click Filtering -->
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                             <div onclick="setLobbyFilter('all', document.getElementById('lobby-pill-all'))"
@@ -2466,6 +2491,20 @@
                         <div id="appointment-pagination-container"
                             class="hidden pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
                         </div>
+                        </div>
+
+                        <!-- Paid orders waiting for a machine assignment -->
+                        <section id="ready-to-assign-module" class="hidden rounded-xl border border-sky-200 bg-sky-50/40 p-4 sm:p-5" role="tabpanel" aria-labelledby="btn-appt-workflow-ready">
+                            <div class="border-b border-sky-200/80 pb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-[#0D6D9B]" aria-hidden="true"></span>
+                                    <h4 id="ready-to-assign-title" class="text-sm font-black text-[#132531]">Ready to Assign</h4>
+                                    <span id="ready-to-assign-count" class="rounded-full bg-[#0D6D9B] px-2 py-0.5 text-[10px] font-bold text-white font-mono-num">0</span>
+                                </div>
+                                <p class="mt-1 text-xs font-medium text-slate-600">Paid orders waiting for an available machine.</p>
+                            </div>
+                            <div id="ready-to-assign-list" class="mt-3 space-y-2" aria-live="polite"></div>
+                        </section>
                     </div>
                 </div>
 
@@ -4297,6 +4336,7 @@
 
         // APPOINTMENTS & ORDER LOBBY WORKFLOW (WITH SKELETON LOADERS, FILTERS & MODAL INSPECTION)
         let currentApptTab = 'active';
+        let currentAppointmentWorkflowTab = 'lobby';
         let loadedAppointmentsData = [];
         let totalCompletedCount = 0;
         let completedDisplayLimit = 60;
@@ -4313,6 +4353,9 @@
         }
 
         function switchAppointmentTab(tab) {
+            if (tab !== 'active' && currentAppointmentWorkflowTab === 'ready') {
+                switchAppointmentWorkflowTab('lobby');
+            }
             currentApptTab = tab;
             apptCurrentPage = 1;
             if (tab === 'completed') {
@@ -4346,6 +4389,33 @@
             loadAppointments(tab);
         }
 
+        function switchAppointmentWorkflowTab(tab) {
+            currentAppointmentWorkflowTab = tab;
+            const lobby = document.getElementById('appointment-lobby-panel');
+            const ready = document.getElementById('ready-to-assign-module');
+            const lobbyButton = document.getElementById('btn-appt-workflow-lobby');
+            const readyButton = document.getElementById('btn-appt-workflow-ready');
+            const activeClass = 'rounded-lg bg-white px-4 py-2 text-xs font-bold text-slate-900 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-[#0D6D9B] focus:ring-offset-2';
+            const inactiveClass = 'rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 transition hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0D6D9B] focus:ring-offset-2';
+
+            if (lobby) lobby.classList.toggle('hidden', tab === 'ready');
+            if (ready) ready.classList.toggle('hidden', tab !== 'ready');
+            if (lobbyButton) {
+                lobbyButton.className = tab === 'lobby' ? activeClass : inactiveClass;
+                lobbyButton.setAttribute('aria-selected', String(tab === 'lobby'));
+            }
+            if (readyButton) {
+                readyButton.className = tab === 'ready' ? activeClass : inactiveClass;
+                readyButton.setAttribute('aria-selected', String(tab === 'ready'));
+            }
+
+            if (tab === 'ready' && currentApptTab !== 'active') {
+                switchAppointmentTab('active');
+                return;
+            }
+            renderReadyToAssignWorklist();
+        }
+
         function setLobbyFilter(filterKey, element) {
             currentLobbyFilter = filterKey;
             apptCurrentPage = 1;
@@ -4361,6 +4431,59 @@
         function filterAppointmentCards() {
             apptCurrentPage = 1;
             renderFilteredAppointments();
+        }
+
+        function isOrderReadyToAssign(item) {
+            const isPaid = (item.payment_status || '').toLowerCase() === 'paid';
+            const isWaiting = (item.queue_status || '').toLowerCase() === 'waiting';
+            const hasMachine = Boolean(item.machine_name && item.machine_name !== 'Unassigned');
+            const isClosed = item.status === 'Completed' || item.status === 'Cancelled';
+            return isPaid && isWaiting && !hasMachine && !isClosed;
+        }
+
+        function renderReadyToAssignWorklist() {
+            const module = document.getElementById('ready-to-assign-module');
+            const count = document.getElementById('ready-to-assign-count');
+            const workflowCount = document.getElementById('appt-workflow-ready-count');
+            const list = document.getElementById('ready-to-assign-list');
+            if (!module || !count || !list) return;
+
+            const readyOrders = (Array.isArray(loadedAppointmentsData) ? loadedAppointmentsData : [])
+                .filter(isOrderReadyToAssign)
+                .sort((a, b) => {
+                    const aDate = a.schedule_time ? new Date(a.schedule_time).getTime() : 0;
+                    const bDate = b.schedule_time ? new Date(b.schedule_time).getTime() : 0;
+                    return (aDate - bDate) || ((a.appointment_id || 0) - (b.appointment_id || 0));
+                });
+
+            count.textContent = readyOrders.length;
+            if (workflowCount) workflowCount.textContent = readyOrders.length;
+
+            if (!readyOrders.length) {
+                list.innerHTML = '<p class="rounded-lg border border-dashed border-sky-200 bg-white/70 px-3 py-3 text-xs font-medium text-slate-500">No paid orders are waiting for a machine.</p>';
+                return;
+            }
+
+            list.innerHTML = readyOrders.map(item => {
+                const machines = Number(item.total_machines || 1);
+                const load = item.load_details || `${machines} machine${machines === 1 ? '' : 's'} required`;
+                return `
+                    <div class="flex flex-col gap-3 rounded-lg border border-sky-200 bg-white px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between">
+                        <button type="button" onclick="openOrderDetailsModalById(${item.appointment_id})" class="min-w-0 text-left focus:outline-none focus:ring-2 focus:ring-[#0D6D9B] focus:ring-offset-2 rounded">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="font-mono-num text-[11px] font-bold text-[#0D6D9B]">${esc(item.order_code || `ORD-${item.appointment_id}`)}</span>
+                                <span class="text-sm font-black text-slate-900">${esc(item.customer || 'Customer')}</span>
+                                <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">Paid</span>
+                            </div>
+                            <p class="mt-1 truncate text-xs font-medium text-slate-600">${esc(item.service_type || 'Laundry Service')} · ${esc(load)}</p>
+                        </button>
+                        <button type="button" onclick="assignReadyOrder(${item.appointment_id})" class="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#0D6D9B] px-3.5 py-2 text-xs font-bold text-white transition hover:bg-[#0a587d] focus:outline-none focus:ring-2 focus:ring-[#0D6D9B] focus:ring-offset-2">
+                            <span>Assign &amp; Start</span>
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
+                        </button>
+                    </div>
+                `;
+            }).join('');
         }
 
         function renderFilteredAppointments() {
@@ -4656,6 +4779,7 @@
                 const kpiTransit = document.getElementById('appt-kpi-transit');
                 if (kpiTransit) kpiTransit.textContent = transitOrders.length;
 
+                renderReadyToAssignWorklist();
                 renderFilteredAppointments();
             } catch (err) {
                 console.error('Appointments load error:', err);
@@ -4905,6 +5029,28 @@
                 type: 'default',
                 onConfirm: async () => {
                     const res = await api(`/api/appointments/${id}/check-in`, { method: 'POST' });
+                    showToast(res.message, 'success');
+                    await Promise.all([loadAppointments(), fetchRealtimeData(), loadQueue(), loadMachines()]);
+                }
+            });
+        }
+
+        function assignReadyOrder(appointmentId) {
+            const order = loadedAppointmentsData.find(item => item.appointment_id === appointmentId);
+            if (!order || !isOrderReadyToAssign(order)) {
+                showToast('This order is no longer waiting for machine assignment. Refreshing the worklist.', 'info');
+                loadAppointments();
+                return;
+            }
+
+            showConfirmModal({
+                title: 'Assign & Start Machine',
+                message: `Assign an available machine and start the cycle for "${order.customer || 'this customer'}"?`,
+                consequence: 'Payment is verified. This reserves the next eligible machine and starts its cycle timer.',
+                confirmText: 'Assign & Start',
+                type: 'default',
+                onConfirm: async () => {
+                    const res = await api(`/api/appointments/${appointmentId}/check-in`, { method: 'POST' });
                     showToast(res.message, 'success');
                     await Promise.all([loadAppointments(), fetchRealtimeData(), loadQueue(), loadMachines()]);
                 }
