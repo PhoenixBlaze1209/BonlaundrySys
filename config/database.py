@@ -3,8 +3,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+import os
+
 # Update credentials based on your local MySQL setup
-DATABASE_URL = "mysql+pymysql://root:@localhost:3307/bon_laundry_db"
+DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:@127.0.0.1:3307/bon_laundry_db")
 engine = create_engine(
     DATABASE_URL, 
     pool_recycle=3600, 

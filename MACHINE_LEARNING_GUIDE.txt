@@ -1,0 +1,200 @@
+================================================================================
+          BON LAUNDRY SYSTEM - MACHINE LEARNING & AI ARCHITECTURE GUIDE
+================================================================================
+Document Type   : Technical Documentation & Thesis Defense Reference
+System Name     : Bon Laundry Management and Prediction System
+Generated For   : User & Defense Panel Review
+================================================================================
+
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+1. Executive Summary & ML Architecture
+2. Supervised Learning: 2nd-Degree Polynomial Footfall & Peak-Hour Prediction
+3. Unsupervised Learning: Behavioral Pattern Mining & Customer Habit Clustering
+4. Other AI & Algorithmic Paradigms:
+   - 4.1 Heuristic Optimization & Constraint-Satisfaction Machine Allocation
+   - 4.2 Natural Language Processing (NLP) & Intent Classification Chatbot
+5. Summary Table: ML Categories & System Integration
+6. Defense FAQs & Quick Explanation Guide
+
+================================================================================
+1. EXECUTIVE SUMMARY & ML ARCHITECTURE
+================================================================================
+The Bon Laundry System integrates modern Artificial Intelligence (AI) and 
+Machine Learning (ML) techniques across its operational layers. Instead of 
+relying solely on static rulebooks, the system utilizes historical data, 
+statistical curve-fitting, customer behavior clustering, and real-time state 
+optimization to streamline laundry shop operations.
+
+The ML architecture operates across three main tiers:
+  A. Predictive Layer (Supervised Learning)  -> services/analytics_engine.py
+  B. Pattern Discovery Layer (Unsupervised)   -> services/analytics_engine.py
+  C. Optimization & NLP Layer (Heuristics)   -> services/bot_ai.py & machines.py
+
+================================================================================
+2. SUPERVISED LEARNING (PREDICTIVE REGRESSION)
+================================================================================
+Concept:
+Supervised learning uses labeled training datasets (input features paired with 
+known ground-truth target labels) to learn a mathematical function capable of 
+making accurate predictions on new or unseen inputs.
+
+Implementation in Bon Laundry:
+File: services/analytics_engine.py -> train_and_predict_peak_hour()
+
+A. Inputs / Features (X) vs Target Labels (Y):
+   - Input Feature (X): Operational Hour of the day (e.g., 8:00 AM to 8:00 PM, 
+     represented numerically as 8, 9, 10, ..., 20).
+   - Target Label (Y): Number of Customer Transactions / Footfall Checkouts 
+     recorded in tbl_transaction during that specific hour.
+
+B. Algorithm Used:
+   - 2nd-Degree Polynomial Regression (Quadratic Curve Fitting):
+     Formula: y = a*X^2 + b*X + c
+   - Why not standard Linear Regression? Customer arrivals in a laundry shop 
+     are non-linear; demand typically peaks during lunch hours (12 PM - 2 PM) 
+     or early evening (5 PM - 7 PM) and drops during mid-morning and late night. 
+     A 2nd-degree polynomial curve naturally models the rise, peak, and taper.
+
+C. Mathematical Modeling & Code Snippet:
+   -----------------------------------------------------------------------------
+   # Feature and label extraction from historical transaction logs
+   X = hourly_agg['hour'].values          # Feature (e.g., [8, 9, 10, ... 20])
+   y = hourly_agg['footfall'].values      # Historical Checkouts per hour
+
+   # Fit a quadratic polynomial using least squares
+   poly_coefficients = np.polyfit(X, y, deg=2)
+
+   # Generate predicted footfall across all operational hours
+   predicted_footfall = np.polyval(poly_coefficients, operational_hours)
+   predicted_peak_hour = int(operational_hours[np.argmax(predicted_footfall)])
+   -----------------------------------------------------------------------------
+
+D. Model Evaluation Metric:
+   - Metric: Mean Absolute Percentage Error (MAPE)
+   - Formula: MAPE = (1/n) * SUM(|Actual - Predicted| / Actual) * 100%
+   - Validation & Logging: Every prediction calculation logs its predicted peak, 
+     historical actual peak, and calculated MAPE score into `tbl_prediction_logs` 
+     for transparency, auditability, and validation.
+
+E. Operational Decision-Making:
+   - Automated Staff Reallocation: If the model predicts a peak at 2:00 PM, the 
+     system triggers dashboard recommendations: "Afternoon volume surge likely. 
+     Shift staff breaks to morning blocks."
+   - Machine Readiness: Alerts staff to prioritize finishing wash cycles before 
+     the predicted rush hour.
+
+================================================================================
+3. UNSUPERVISED LEARNING (BEHAVIORAL CLUSTERING & HABIT MINING)
+================================================================================
+Concept:
+Unsupervised learning discovers hidden patterns, groupings, and structures in 
+data without requiring pre-labeled training targets or human supervision.
+
+Implementation in Bon Laundry:
+File: services/analytics_engine.py -> get_ghost_slots()
+
+A. Input Data (Unlabeled):
+   - Raw transaction history containing Customer ID/Name, Day of Week, 
+     Time of Day, Weight (kg), and Cycle Type (Wash vs. Dry).
+   - No explicit labels exist indicating "VIP", "Morning Regular", or "Titan User".
+
+B. Mechanism (Habit & Preference Pattern Discovery):
+   - The engine automatically aggregates and profiles each customer's historical 
+     footprints over multiple visits (minimum 3 visits threshold).
+   - Unsupervised Multi-Attribute Profiling:
+     1. Time-of-Day Mode: Discovers the customer's typical arrival time window.
+     2. Day-of-Week Frequency: Clusters visits by day (e.g., "Saturdays Regular").
+     3. Load Size & Service Preference: Calculates the customer's average weight 
+        and preferred cycle type (Washer vs Dryer).
+
+C. Operational Output - "Ghost Slot Reservation":
+   - The system anticipates when a customer is likely to visit.
+   - It matches their clustered preference profile to the currently lowest-queued, 
+     capacity-compatible machine in the fleet.
+   - Result: Staff can one-click reserve or dispatch a machine ("Ghost Slot") 
+     before the customer arrives, eliminating waiting queues.
+
+================================================================================
+4. OTHER AI & ALGORITHMIC PARADIGMS
+================================================================================
+
+4.1 HEURISTIC OPTIMIZATION & CONSTRAINT-SATISFACTION SCHEDULING
+File: services/analytics_engine.py & services/machines.py -> assign_ghost_slot()
+
+A. Concept:
+   - Uses multi-factor constraint optimization to solve real-time resource 
+     allocation problems across the 19-machine fleet (14 Regular Washers, 5 Titan Dryers).
+
+B. Optimization Criteria (Objective Function):
+   When allocating an incoming laundry batch, the engine evaluates candidates by:
+   1. Compatibility Constraint: Machine type matches (Washer vs Dryer) and 
+      Machine Capacity (kg) >= Customer Laundry Weight.
+   2. Operational State Constraint: Machine must be physically 'available' 
+      (not under maintenance/out-of-order).
+   3. Queue Minimization: Priority given to idle machines (Wait Time = 0).
+   4. Fleet Wear-and-Tear Balancing: If multiple machines are idle, the machine 
+      with the lower cumulative `usage_count` is selected to balance equipment life.
+
+4.2 NATURAL LANGUAGE PROCESSING (NLP) & INTENT RECOGNITION
+File: services/bot_ai.py (Telegram / Web Chatbot)
+
+A. Concept:
+   - Processes human text input from customers to understand intent and provide 
+     instant, context-aware service and order updates.
+
+B. NLP Components:
+   1. Tokenization & Normalization: Cleans, strips, and lowercases Tagalog/English/Taglish queries.
+   2. Fuzzy Keyword & Intent Mapping: Matches user utterances to predefined knowledge bases 
+      (e.g., matching ["magkano", "price", "rates", "bayad", "presyo"] to Pricing Intent).
+   3. Entity Extraction via Regular Expressions (Regex):
+      - Order Code Extraction: Identifies patterns like `ORD-XXXXXX` or `APT-XXXXXX`.
+      - Phone Number Extraction: Recognizes Philippine mobile numbers (`09XXXXXXXXX`, `+639XXXXXXXXX`).
+      - Address / Building Extraction: Extracts Urban Deca Homes, Ortigas building and unit details.
+   4. Dynamic State Machine: Guides users through step-by-step appointment booking, 
+      pickup requests, and real-time live queue tracking.
+
+================================================================================
+5. SUMMARY TABLE: ML CATEGORIES IN BON LAUNDRY
+================================================================================
++-------------------------+-----------------------------------+-------------------------------------+
+| Paradigm                | Algorithm / Technique             | System Feature                      |
++-------------------------+-----------------------------------+-------------------------------------+
+| Supervised Learning     | 2nd-Degree Polynomial Regression  | Hourly Footfall & Peak Rush         |
+|                         | with MAPE accuracy tracking       | Hour Prediction (Dashboard)         |
++-------------------------+-----------------------------------+-------------------------------------+
+| Unsupervised Learning   | Behavioral Pattern Mining &       | Ghost Slot Recommender &            |
+|                         | Frequency Clustering              | Habitual Profile Discovery          |
++-------------------------+-----------------------------------+-------------------------------------+
+| Heuristic Optimization  | Multi-Factor Constraint           | Dynamic Machine Dispatch &          |
+|                         | Satisfaction Algorithm            | Fleet Usage Balancing               |
++-------------------------+-----------------------------------+-------------------------------------+
+| Natural Language Proc.  | Fuzzy Intent Mapping, Tokenizing, | Automated Customer Telegram/Web Bot |
+| (NLP & Conversational)  | and Regex Entity Extraction       | with Live Order Tracking            |
++-------------------------+-----------------------------------+-------------------------------------+
+
+================================================================================
+6. DEFENSE FAQS & QUICK TALKING POINTS
+================================================================================
+Q1: "Why did you choose Polynomial Regression instead of Deep Learning or Neural Networks?"
+Answer:
+"Customer footfall data follows clear diurnal hourly patterns (peak rush hours around lunch and
+evening). Polynomial regression (degree 2) provides high mathematical explainability, avoids
+overfitting on small-to-medium business datasets, runs instantaneously with zero server latency,
+and produces easily auditable MAPE scores stored directly in tbl_prediction_logs."
+
+Q2: "How is Unsupervised Learning demonstrated in your system?"
+Answer:
+"Through our Ghost Slot Recommender. The system ingests unlabeled customer checkout records and
+clusters customer habits (frequency of visits, regular hour windows, day-of-week habits, and
+average kilogram loads) to proactively recommend optimal machine reservations without needing
+pre-tagged training labels."
+
+Q3: "How does the system ensure prediction accuracy?"
+Answer:
+"The system calculates the Mean Absolute Percentage Error (MAPE) comparing actual historical checkouts
+against the fitted polynomial curve, storing prediction logs in MySQL to track model reliability."
+
+================================================================================
+End of Document
+================================================================================

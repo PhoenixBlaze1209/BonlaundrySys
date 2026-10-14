@@ -1,0 +1,94 @@
+================================================================================
+GOOGLE AUTHENTICATION ARCHITECTURE & SECURITY ANALYSIS
+Bon Laundry Station
+================================================================================
+
+1. HOW GOOGLE AUTH WORKS IN THE APPLICATION
+--------------------------------------------------------------------------------
+In Bon Laundry Station, authentication is handled exclusively through Google 
+OAuth 2.0 (Authorization Code Flow). Traditional email and password login forms 
+are disabled. The primary logic resides in routes/auth.py.
+
+AUTHENTICATION WORKFLOW:
+
+Step 1: Initiating Sign-In (/auth/google/login)
+  - The user clicks "Continue with Google".
+  - The system generates a 16-byte random state token (secrets.token_urlsafe(16))
+    and stores it in session['oauth_state'] for CSRF prevention.
+  - The application builds an OAuth authorization URL with required OpenID scopes 
+    ('openid email profile') and redirects the browser to 
+    https://accounts.google.com/o/oauth2/v2/auth.
+
+Step 2: Google Authorization & Redirect
+  - The user authenticates with Google and grants permission.
+  - Google redirects the user back to the application callback URL 
+    (/auth/google/callback) with an authorization code and the state parameter.
+
+Step 3: Callback Processing & Server-Side Token Exchange (/auth/google/callback)
+  - Anti-CSRF Check: The server verifies that the received state matches 
+    session['oauth_state'].
+  - Token Exchange: The server executes a backend HTTP POST request 
+    (https://oauth2.googleapis.com/token) to exchange the code and 
+    GOOGLE_CLIENT_SECRET for an access_token.
+  - User Profile Retrieval: Using the access_token, the server requests user 
+    profile details (email, name, sub [Google User ID], picture) from 
+    https://www.googleapis.com/oauth2/v3/userinfo.
+
+Step 4: Account Resolution & Role Assignment (_login_or_register_google_user)
+  - Priority 1 (Google ID): Checks if a record with matching google_id exists 
+    in the database.
+  - Priority 2 (Pre-Registered Email): If no google_id match is found, it checks 
+    by email. If a Manager pre-registered a Staff or Manager account via 
+    /manager/accounts, logging in links their google_id and grants their 
+    assigned role.
+  - Priority 3 (Auto-Registration): If no account matches, the visitor is 
+    auto-provisioned as a new Customer.
+
+Step 5: Session Establishment & Audit Logging
+  - Populates Flask session keys (user_id, user_name, user_email, user_role, 
+    avatar_url).
+  - Logs the login event to AuditService.
+  - Redirects the user to their role-specific home page (get_role_home).
+
+
+2. SECURITY COMPARISON: GOOGLE OAUTH 2.0 VS. CUSTOM LOGIN MODULE
+--------------------------------------------------------------------------------
+Standardizing on Google OAuth 2.0 provides significant security advantages over 
+a traditional custom password-based login system:
+
+1. Zero Password Storage Risks
+   - Passwords are set to None in the database.
+   - Even if the database is exposed or leaked, no password hashes or plaintext 
+     credentials exist to be cracked.
+
+2. Automated Protection Against Brute-Force & Credential Stuffing
+   - Custom logins require implementing rate limiting, IP blocking, CAPTCHA, 
+     and lockout timers.
+   - Google OAuth delegates login protection to Google's multi-billion dollar 
+     threat detection systems.
+
+3. Built-in Multi-Factor Authentication (MFA/2FA)
+   - Users automatically benefit from Google 2FA (Authenticator app, security 
+     keys, device prompts) without requiring custom MFA implementation.
+
+4. Elimination of Broken Password Reset Logic
+   - Password reset handlers in custom login modules are frequent targets for 
+     account takeover bugs (e.g., weak tokens, Host header spoofing). Google 
+     manages account recovery safely.
+
+5. Built-in CSRF Prevention
+   - Use of a cryptographically secure state parameter prevents authorization 
+     code injection attacks.
+
+6. Server-to-Server Verification
+   - The token exchange occurs strictly between the backend server and Google's 
+     OAuth endpoints, preventing client-side spoofing of user tokens.
+
+
+================================================================================
+SUMMARY
+================================================================================
+By standardizing on Google OAuth 2.0, Bon Laundry Station removes the risks 
+associated with storing credentials, managing password resets, and defending 
+against brute-force attacks, while streamlining user onboarding and maintaining 
+Role-Based Access Control (RBAC).

@@ -1,0 +1,118 @@
+{
+  "name": "Bon Laundry Station - Smart Telegram AI Dispatcher",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-bot-credentials",
+          "name": "Bon Laundry Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Safely extract Telegram message payload\nconst item = $input.first().json;\n\nlet chatId = null;\nlet text = '';\nlet callbackData = '';\nlet userName = '';\nlet hasPhoto = false;\n\nif (item.callback_query) {\n  chatId = item.callback_query.message.chat.id;\n  callbackData = item.callback_query.data || '';\n  userName = item.callback_query.from.first_name || 'Customer';\n  text = item.callback_query.data || '';\n} else if (item.message) {\n  chatId = item.message.chat.id;\n  text = (item.message.text || item.message.caption || '').trim();\n  userName = item.message.from.first_name || 'Customer';\n  if (item.message.photo || item.message.document) {\n    hasPhoto = true;\n  }\n}\n\nreturn [{\n  json: {\n    chat_id: chatId,\n    text: text,\n    callback_data: callbackData,\n    user_name: userName,\n    has_photo: hasPhoto\n  }\n}];"
+      },
+      "id": "format-payload",
+      "name": "Format Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:5000/api/bot/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": {{ $json.chat_id }},\n  \"text\": \"{{ $json.text }}\",\n  \"callback_data\": \"{{ $json.callback_data }}\",\n  \"user_name\": \"{{ $json.user_name }}\",\n  \"has_photo\": {{ $json.has_photo }}\n}",
+        "options": {}
+      },
+      "id": "http-ai-dispatcher",
+      "name": "AI Bot Dispatcher (Flask)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Format Payload').item.json.chat_id }}",
+        "text": "={{ $json.telegram_message }}",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "reply_markup": "={{ $json.reply_markup }}"
+        }
+      },
+      "id": "send-telegram-reply",
+      "name": "Send Telegram Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-bot-credentials",
+          "name": "Bon Laundry Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Format Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Payload": {
+      "main": [
+        [
+          {
+            "node": "AI Bot Dispatcher (Flask)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Bot Dispatcher (Flask)": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

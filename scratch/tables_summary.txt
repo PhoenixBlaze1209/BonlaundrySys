@@ -1,0 +1,70 @@
+Sections: 1
+Section 0: w=8.5, h=11.0, top=1.0, bot=1.0, left=1.0, right=1.0
+
+Tables: 8
+
+--- Table 0 (8 rows x 2 cols) ---
+  Row 0: Metadata Attribute | Specification Details
+  Row 1: System Name | Web-Based Laundry Management System with Machine Learning for Demand Forecasting & Fleet Optimization
+  Row 2: Subsystem / Portal | Customer Account Portal (User-Side Client Application)
+  Row 3: Target Facility | Bon Laundry Station — Urban Deca Homes, Ortigas Commercial Area
+  Row 4: Author / Role | Senior System Analyst & Lead Technical Writer
+  Row 5: Document Identifier | FS-CAP-2026-V1.0
+  Row 6: Authentication Framework | Google OAuth 2.0 Single Sign-On (Role: Customer)
+  Row 7: Release Date | September 2026
+
+--- Table 1 (11 rows x 3 cols) ---
+  Row 0: UI Component | Display State / Value | Functional & Technical Description
+  Row 1: Module Header | Live 19-Machine Fleet Lobby | Identifies the module and features an animated green pulse dot indicating active WebSocket/polling connectivity.
+  Row 2: Fleet Description | Real-time status of 14 Regular Washers (8kg) and 5 Titan Dryers (13kg) | Summarizes physical hardware capacity and operational machine composition.
+  Row 3: Availability Badges | 19 Available (Emerald) / 0 In Cycle (Sky Blue) | Real-time summary pills that instantly communicate total ready capacity vs. currently running hardware.
+  Row 4: Manual Refresh Action | Sync Button (Circular Arrow) | Triggers client-side fleet lobby refresh via JavaScript fetch without reloading the entire webpage.
+  Row 5: Machine Status Pills | Available (Green) / In-Use (Blue) / Maintenance (Red) | Color-coded pill badges reflecting the operational_state attribute in the MachineStatus table.
+  Row 6: Capacity Rating | 8kg / 13kg | Specifies unit load rating (8kg for standard front-load washers, 13kg for heavy-duty Titan dryers).
+  Row 7: Machine Designation | Machine 1 to Machine 19 | Unique hardware identifier physically labeled on the station floor for clear patron orientation.
+  Row 8: Machine Classification | Washer / Dryer | Categorizes hardware function, preventing customer confusion between washing and drying bays.
+  Row 9: Preventive Run Counter | Total Runs: 17 to 25 | Displays cumulative operational cycles executed, supporting transparency and backend maintenance scheduling.
+  Row 10: Cycle Tariff | ₱145 (Washer) / ₱240 (Dryer) | Clear per-cycle base pricing for self-service machine reservations.
+
+--- Table 2 (1 rows x 1 cols) ---
+  Row 0: System Analyst Insight: Machine Sorting Algorithm & Customer Transparency The Fleet Lobby sorts machine cards using a tiered priority algorithm: (1) Available units appear first to highlight ready capacity, (2) Dryers (Titan) are grouped distinctly from Washers, and (3) Machines are indexed sequentially by ID. Displaying the 'Total Runs' metric builds customer trust by demonstrating that equipment is well-maintained and cycled equitably across the facility.
+
+--- Table 3 (8 rows x 4 cols) ---
+  Row 0: Package Name | Rate / Capacity | Included Deliverables & Features | Target Patron Profile
+  Row 1: Classic Care | ₱130 / 8kg | Commercial Washer Cycle, High-Heat Dryer Cycle, Neat Flat Folding, Standard Detergent, 24-Hour Express Turnaround. | Budget-conscious residents, students, and casual weekly loads.
+  Row 2: Saver Package | ₱160 / 8kg | Complete Wash, Dry, and Fold bundle + 1 packet Ariel/Tide detergent + 1 packet Downy fabric conditioner + 1 plastic packaging. Ready in 24h. | Patrons seeking an all-inclusive bundle without bringing their own consumables.
+  Row 3: Signature Package (Best Value) | ₱200 / 8kg | Complete Wash, Dry, and Fold + 2 detergents + 2 Downy fabric conditioners + specialized stain pre-treatment + Priority Queue processing. | Customers washing dirty workwear, children's clothes, or stained items needing scent and deep cleaning.
+  Row 4: Premium Care (VIP Care) | ₱260 / 8kg | Garment color sorting (whites separated from coloreds), extended superwash cycle, gentle cycle for delicates, individual garment care, hypoallergenic soap, express finish. | Executives, high-end garment owners, delicate fabrics, and infant/sensitive skin apparel.
+  Row 5: Self-Service DIY Wash | ₱145 / cycle | Independent access to 8kg commercial washer. Customer loads machine, operates cycle, and handles detergents. | Do-it-yourself patrons seeking immediate machine control and privacy.
+  Row 6: Self-Service Titan Dryer | ₱240 / cycle | Independent access to 13kg heavy-duty Titan commercial dryer for comforters, blankets, and bulky laundry. | Patrons with king/queen beddings, heavy curtains, or multi-hamper drying requirements.
+  Row 7: Deca Condo Delivery | ₱40 flat fee | Door-to-door condominium courier service directly to the resident's specific building and unit in Urban Deca Homes. | Busy residents, work-from-home tenants, and patrons avoiding hamper transit.
+
+--- Table 4 (1 rows x 1 cols) ---
+  Row 0: System Analyst Insight: Dynamic State Pre-population via JavaScript When the user clicks 'Select & Book' on the Signature Package, the frontend executes `selectServiceAndBook('Signature Package (Complete Det & Fabcon)')`. This function automatically sets `currentWizardStep = 1`, checks the matching radio button, recalculates the subtotal, triggers the UI border highlight, and invokes `switchTab('book')`, creating an effortless, unified shopping-to-booking experience.
+
+--- Table 5 (5 rows x 3 cols) ---
+  Row 0: Wizard Step | Step Title | Input Requirements & Operational Workflow
+  Row 1: Step 1 (Active) | Service & Mode | Selection of laundry package card, configuration of laundry loads/separation (1, 2, or 3+ machines), and choice of service mode (Counter Drop-Off, Self-Service Kiosk, or Condo Delivery).
+  Row 2: Step 2 | Schedule & Window | Selection of target date (Today/Tomorrow shortcuts), selection of a guaranteed two-hour operational arrival window, turnaround SLA selection, and conditional condominium unit/building inputs.
+  Row 3: Step 3 | Contact & Payment | Verification of customer full name, input of 11-digit Philippine mobile phone number (09XXXXXXXXX) for SMS cycle tracking, and selection of payment method (Cash/COD, GCash QR, Maya/Card).
+  Row 4: Step 4 | Review & Ticket | Inspection of complete digital ticket preview, itemized price subtotal calculation, terms confirmation, order ticket generation, and display of QR counter check-in code.
+
+--- Table 6 (11 rows x 3 cols) ---
+  Row 0: UI Component | Visible Value in Fig. 4 | Functional & Technical Role
+  Row 1: Lookup Input Bar | Search Order ID (e.g. ORD-12345) | Allows patrons to manually search for any specific order code linked to their profile or family account.
+  Row 2: Track Button | Track (Sky Blue Button) | Executes client-side lookup or focuses the corresponding order card in the DOM list.
+  Row 3: Order Avatar Badge | ORD (Sky Box) | Visual shorthand for active drop-off and self-service appointment orders.
+  Row 4: Order Code & Status | ORD-66611 | Pending (Amber) | Unique database order identifier and payment status pill (Pending counter settlement or Paid).
+  Row 5: Appointment Metadata | Sep 19, 2026 08:00 AM • Self-Service | Scheduled drop-off or self-service reservation timestamp and selected turnaround tier.
+  Row 6: Queue Number Pill | In Queue (#82) | Indicates that the order has been verified and assigned sequential position #82 in the facility's active queue.
+  Row 7: Machine Assignment | Assigned: Auto-Allocation | Displays the specific washer/dryer allocated by the QueueManager algorithm or indicates auto-dispatch readiness.
+  Row 8: 4-Stage Stepper | Step 2: In Queue Active | Visual progress stepper indicating that Stage 1 (Received) is complete, Stage 2 (In Queue) is active, and Stages 3-4 are pending.
+  Row 9: Estimated Wait Time | Estimated wait: ~65 mins | Dynamic calculation derived from queue depth, washer cycle remaining durations, and load quantities.
+  Row 10: Cancellation Trigger | Request Cancellation (Rose Red) | Allows self-service order cancellation prior to machine loading, automatically releasing the assigned queue slot.
+
+--- Table 7 (5 rows x 5 cols) ---
+  Row 0: Module / Navigator | Frontend Trigger | Backend Route & Method | Primary Data Models | Key Operational Output
+  Row 1: Live Machine Fleet Lobby | Tab: 'Live Fleet Lobby' or button on secondary bar | GET /customer/dashboard (or /api/fleet/status) | MachineStatus, Queue | Real-time 19-machine availability grid, cycle status, and hardware usage telemetry.
+  Row 2: Services & Official Rate Card | Tab: 'Services & Rates' / 'Book Service →' | GET /customer/dashboard (client-rendered) | ServicePackages, PricingConfig | Transparent price catalog, turnaround SLAs, and 1-click booking pre-population.
+  Row 3: Book Laundry Appointment | Tab: 'Book Order' / '+ Book Laundry Appointment' | POST /customer/book -> /api/orders/create | Appointment, Queue, User | 4-step wizard, multi-machine load separation, arrival slot reservation, and digital check-in code.
+  Row 4: My Orders & Live Tracking | Tab: 'My Orders (X)' / 'Track in My Orders' | GET /customer/dashboard & GET /api/customer/my-orders | Appointment, Queue, MachineStatus | Live order status, 4-stage stepper, queue positioning (#82), estimated wait (~65m), and cancellation.

@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walk-In Order &amp; Counter Check-In — Bon Laundry Station</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade { animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .pkg-card {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        .pkg-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.1), 0 8px 10px -6px rgba(2, 132, 199, 0.05);
+        }
+        .pkg-card.pkg-selected {
+            border-color: #0284c7 !important;
+            background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%) !important;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18), 0 8px 20px -4px rgba(2, 132, 199, 0.15);
+        }
+
+        .addon-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .addon-card:hover {
+            border-color: #c4b5fd;
+        }
+        .addon-card.addon-active {
+            border-color: #7c3aed !important;
+            background: linear-gradient(180deg, #faf5ff 0%, #ffffff 100%) !important;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
+        }
+
+        .payment-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .payment-card:hover {
+            border-color: #38bdf8;
+        }
+        .payment-card.payment-selected {
+            border-color: #0284c7 !important;
+            background: #f0f9ff !important;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        /* Pulse radar animation */
+        @keyframes pulseDot {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .pulse-emerald { animation: pulseDot 2s infinite; }
+
+        @keyframes pulseAmber {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        .pulse-amber { animation: pulseAmber 2s infinite; }
+    </style>
+</head>
+<body class="min-h-full bg-slate-50 text-slate-800 antialiased flex flex-col justify-between selection:bg-sky-100 selection:text-sky-900">
+
+    <!-- Header -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 shadow-xs">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200/80 flex items-center justify-center text-[#0284c7] shadow-xs group-hover:border-sky-300 transition">
+                    <!-- Clean SVG Washing Machine Logo -->
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <rect x="3" y="2" width="18" height="20" rx="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="13" r="5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="13" r="2.5" stroke-dasharray="2 2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="7" cy="6" r="1" fill="currentColor"/>
+                        <circle cx="10" cy="6" r="1" fill="currentColor"/>
+                        <line x1="15" y1="6" x2="17" y2="6" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-base font-extrabold tracking-tight text-slate-900 block leading-tight">BON <span class="text-[#0284c7]">LAUNDRY</span></span>
+                    <span class="text-[10px] text-slate-400 font-bold tracking-widest uppercase block">Kiosk &amp; Counter Portal</span>
+                </div>
+            </a>
+            <div class="flex items-center gap-3">
+                <a id="header-back-to-verification" href="/manager/dashboard?tab=verify" class="hidden text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 hover:bg-sky-100 px-3.5 py-2 rounded-xl transition inline-flex items-center gap-1.5 shadow-2xs">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+                    <span>Back to Order Verification</span>
+                </a>
+                <a id="header-customer-signin" href="/auth/login" class="text-xs font-bold text-slate-600 hover:text-slate-900 px-3.5 py-2 rounded-xl hover:bg-slate-100 transition inline-flex items-center gap-1.5">
+                    <span>Customer Sign In</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-3xl mx-auto w-full px-4 py-6 sm:py-10 flex-1">
+        <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-[0_4px_24px_rgba(15,23,42,0.06)]">
+            
+            <!-- Intro Title -->
+            <div class="max-w-2xl mb-6 text-center sm:text-left">
+                <div class="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-bold text-[#0284c7] mb-2.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+                    <span>Instant Over-the-Counter Check-In</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Walk-In Self-Service Order</h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Select your washer capacity below, obtain your check-in code, and present it at the counter to start washing immediately.</p>
+            </div>
+
+            <!-- Live Lobby Machine Fleet Status Strip -->
+            <div id="lobby-status-strip" class="mb-8 p-4 rounded-2xl border transition-all duration-300 {{ 'bg-amber-50/90 border-amber-300' if (lobby and lobby.is_full) else 'bg-emerald-50/90 border-emerald-300' }}">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg {{ 'bg-amber-100 text-amber-800 border border-amber-300' if (lobby and lobby.is_full) else 'bg-emerald-100 text-emerald-800 border border-emerald-300' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <rect x="3" y="2" width="18" height="20" rx="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="13" r="5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="13" r="2.5" stroke-dasharray="2 2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-xs font-black text-slate-900 flex items-center gap-2">
+                                <span>Real-Time Fleet Lobby</span>
+                                <span class="w-2.5 h-2.5 rounded-full {{ 'bg-amber-500 pulse-amber' if (lobby and lobby.is_full) else 'bg-emerald-500 pulse-emerald' }}"></span>
+                            </div>
+                            <div class="text-[11px] text-slate-600 mt-0.5">
+                                {% if lobby and lobby.should_display_ewt %}
+                                <span class="font-bold text-amber-900">Lobby at capacity (All machines currently in use). Active queue processing.</span>
+                                {% else %}
+                                <span class="font-bold text-emerald-900"><span id="lobby-available-count">{{ lobby.available_count if lobby else 19 }}</span> Machines Available Now — Direct Counter Loading (No Wait)</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-left sm:text-right" id="lobby-ewt-container">
+                        {% if lobby and lobby.should_display_ewt %}
+                        <div class="inline-flex flex-col sm:items-end">
+                            <span class="text-[9px] uppercase font-extrabold tracking-wider text-amber-700">Estimated Waiting Time</span>
+                            <span class="text-xs font-black text-amber-950 bg-amber-200/90 border border-amber-400 px-2.5 py-1 rounded-lg">~{{ lobby.ewt_mins }} mins wait</span>
+                        </div>
+                        {% else %}
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-black">
+                            <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                            <span>Ready Now &bull; No Wait</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stepper (3 Clear Steps) -->
+            <div class="mb-8" id="wizard-stepper">
+                <div class="flex items-center justify-between relative max-w-md mx-auto">
+                    <div class="absolute left-8 right-8 top-5 -translate-y-1/2 h-1 bg-slate-200 -z-0 rounded-full"></div>
+                    <div id="step-progress-line" class="absolute left-8 top-5 -translate-y-1/2 h-1 bg-[#0284c7] transition-all duration-300 -z-0 rounded-full" style="width: 0%;"></div>
+                    
+                    <button type="button" onclick="tryGoToStep(1)" id="step-node-1" class="relative z-10 flex flex-col items-center group cursor-pointer">
+                        <div id="step-circle-1" class="w-10 h-10 rounded-2xl bg-[#0284c7] text-white flex items-center justify-center font-bold text-sm shadow-md ring-4 ring-sky-100 transition">1</div>
+                        <span id="step-label-1" class="text-[11px] font-bold text-[#0284c7] mt-1.5">Package</span>
+                    </button>
+                    
+                    <button type="button" onclick="tryGoToStep(2)" id="step-node-2" class="relative z-10 flex flex-col items-center group cursor-pointer">
+                        <div id="step-circle-2" class="w-10 h-10 rounded-2xl bg-white border-2 border-slate-300 text-slate-500 flex items-center justify-center font-bold text-sm transition">2</div>
+                        <span id="step-label-2" class="text-[11px] font-semibold text-slate-400 mt-1.5">Details</span>
+                    </button>
+                    
+                    <button type="button" onclick="tryGoToStep(3)" id="step-node-3" class="relative z-10 flex flex-col items-center group cursor-pointer">
+                        <div id="step-circle-3" class="w-10 h-10 rounded-2xl bg-white border-2 border-slate-300 text-slate-500 flex items-center justify-center font-bold text-sm transition">3</div>
+                        <span id="step-label-3" class="text-[11px] font-semibold text-slate-400 mt-1.5">Review</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="wizard-error-banner" class="hidden mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-3 animate-fade">
+                <svg class="w-5 h-5 flex-shrink-0 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+                <span id="wizard-error-text">Please complete all required fields.</span>
+            </div>
+
+            <!-- Booking Form -->
+            <form id="walkin-form" onsubmit="handleWalkinBooking(event)">
+
+                <!-- Hidden parameters automatically set for over-the-counter walk-in -->
+                <input type="hidden" name="order_mode" id="wizard-order-mode" value="Self-Service">
+                <input type="hidden" name="date" id="wizard-date" value="">
+                <input type="hidden" name="pickup_time" id="wizard-slot-input" value="Immediate Walk-In / Now">
+                <input type="hidden" name="turnaround_option" value="Immediate">
+                <input type="hidden" name="total_machines" value="1">
+                <input type="hidden" name="estimated_weight" id="wizard-estimated-weight" value="8.0">
+
+                <!-- ======================================================== -->
+                <!-- ===== STEP 1: PACKAGE SELECTION & OPTIONAL SUPPLIES ===== -->
+                <!-- ======================================================== -->
+                <div id="wizard-step-1" class="wizard-step space-y-6 animate-fade">
+
+                    <!-- Section 1A: 2 Packages Only (8kg & 13kg) -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <label class="block text-xs font-extrabold text-slate-900 uppercase tracking-wider">1. Select Self-Service Package</label>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Operate commercial washers and dryers yourself. Complete wash &amp; dry cycle included.</p>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-sky-50 text-[#0284c7] border border-sky-200">
+                                2 Capacities Available
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            
+                            <!-- Package 1: Self-Service 8kg -->
+                            <label id="pkg-card-8" class="pkg-card pkg-selected border-2 border-[#0284c7] bg-white rounded-2xl p-5 flex flex-col justify-between"
+                                data-service="Self-Service Wash &amp; Dry (8kg)" data-price="145" data-weight="8.0" onclick="selectPackageCard('8')">
+                                <input type="radio" name="service_type" value="Self-Service Wash &amp; Dry (8kg)" checked class="hidden" id="pkg-radio-8" onchange="onPackageRadioChanged(this)">
+                                <div>
+                                    <div class="flex items-start justify-between">
+                                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold uppercase tracking-wide">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                            <span>Standard 8kg Load</span>
+                                        </div>
+                                        <div class="text-right flex-shrink-0">
+                                            <span class="text-2xl font-black text-slate-900 leading-none">₱145</span>
+                                            <span class="text-[10px] text-slate-400 font-bold block mt-0.5">Per Cycle</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-base font-extrabold text-slate-900 mt-3">Self-Service 8kg</div>
+                                    <div class="text-xs text-slate-500 mt-0.5">Commercial Speed Queen Washer &amp; Dryer</div>
+                                    
+                                    <div class="mt-4 space-y-1.5 text-[11px] text-slate-600">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                            <span>Best for ~25–30 everyday garments / 1 basket</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                            <span>~44m Commercial Wash + ~45m High-Heat Dry</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                            <span>Direct counter activation &amp; token assignment</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Regular Fleet</span>
+                                    <span class="font-extrabold text-[#0284c7] flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full bg-[#0284c7]"></span>
+                                        <span>Selected</span>
+                                    </span>
+                                </div>
+                            </label>
+
+                            <!-- Package 2: Self-Service 13kg -->
+                            <label id="pkg-card-13" class="pkg-card border-2 border-slate-200 bg-white rounded-2xl p-5 flex flex-col justify-between"
+                                data-service="Self-Service Wash &amp; Dry (13kg)" data-price="240" data-weight="13.0" onclick="selectPackageCard('13')">
+                                <input type="radio" name="service_type" value="Self-Service Wash &amp; Dry (13kg)" class="hidden" id="pkg-radio-13" onchange="onPackageRadioChanged(this)">
+                                <div>
+                                    <div class="flex items-start justify-between">
+                                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-extrabold uppercase tracking-wide">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+                                            <span>Titan 13kg Heavy-Duty</span>
+                                        </div>
+                                        <div class="text-right flex-shrink-0">
+                                            <span class="text-2xl font-black text-slate-900 leading-none">₱240</span>
+                                            <span class="text-[10px] text-slate-400 font-bold block mt-0.5">Per Cycle</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-base font-extrabold text-slate-900 mt-3">Self-Service 13kg</div>
+                                    <div class="text-xs text-slate-500 mt-0.5">Commercial Titan Heavy-Duty Drum</div>
+                                    
+                                    <div class="mt-4 space-y-1.5 text-[11px] text-slate-600">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                            <span>Best for bulky comforters, bedsheets, blankets &amp; linens</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                            <span>~44m Commercial Wash + ~45m High-Heat Dry</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                            <span>Deep water tumbling for dense fabrics</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Titan Fleet</span>
+                                    <span class="font-bold text-slate-400 group-hover:text-slate-600 flex items-center gap-1">
+                                        <span>Click to Select</span>
+                                    </span>
+                                </div>
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <!-- Notice: Soap / Detergent Policy for Self-Service -->
+                    <div class="rounded-2xl p-4 bg-amber-50/90 border border-amber-300/80 flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800 flex-shrink-0 mt-0.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                        </div>
+                        <div class="text-xs">
+                            <div class="font-extrabold text-slate-900 flex items-center gap-2 mb-0.5">
+                                <span>Detergent Not Included in Self-Service</span>
+                                <span class="px-2 py-0.5 text-[9px] font-black uppercase rounded bg-amber-200 text-amber-900 tracking-wider">Store Policy</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-relaxed">
+                                Self-service packages provide machine wash and dry cycles only and <strong>do not include detergent or fabric conditioner</strong>. Please bring your own supplies or add convenient counter supplies below.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Section 1B: Optional Supplies & Extras -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">2. Laundry Supplies &amp; Extras</label>
+                                <span class="text-slate-400 text-xs font-normal">(Optional)</span>
+                            </div>
+                            <span class="text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full uppercase tracking-wider">Counter Pick-up</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+
+                            <!-- Detergent -->
+                            <div class="addon-card border-2 border-slate-200 bg-white rounded-2xl p-3 flex flex-col justify-between"
+                                id="addon-detergent" data-addon="Detergent" data-addon-price="20" onclick="toggleAddon('detergent')">
+                                <input type="checkbox" name="addon_detergent" value="true" class="hidden" id="chk-detergent">
+                                <div class="flex items-center justify-between">
+                                    <div class="w-7 h-7 rounded-lg bg-sky-50 text-[#0284c7] flex items-center justify-center">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693l-1.57-.393m15.6 0l1.17 4.68a2.25 2.25 0 01-2.183 2.795H5.213a2.25 2.25 0 01-2.183-2.795l1.17-4.68"/></svg>
+                                    </div>
+                                    <span class="text-xs font-black text-purple-700">+₱20</span>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="text-[11px] font-bold text-slate-900 leading-tight">Detergent Pod</div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">1 Wash Load</div>
+                                </div>
+                            </div>
+
+                            <!-- Fabcon -->
+                            <div class="addon-card border-2 border-slate-200 bg-white rounded-2xl p-3 flex flex-col justify-between"
+                                id="addon-fabcon" data-addon="Fabcon" data-addon-price="20" onclick="toggleAddon('fabcon')">
+                                <input type="checkbox" name="addon_fabcon" value="true" class="hidden" id="chk-fabcon">
+                                <div class="flex items-center justify-between">
+                                    <div class="w-7 h-7 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+                                    </div>
+                                    <span class="text-xs font-black text-purple-700">+₱20</span>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="text-[11px] font-bold text-slate-900 leading-tight">Fabcon Pod</div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">Floral Softener</div>
+                                </div>
+                            </div>
+
+                            <!-- Bleach -->
+                            <div class="addon-card border-2 border-slate-200 bg-white rounded-2xl p-3 flex flex-col justify-between"
+                                id="addon-bleach" data-addon="Bleach" data-addon-price="30" onclick="toggleAddon('bleach')">
+                                <input type="checkbox" name="addon_bleach" value="true" class="hidden" id="chk-bleach">
+                                <div class="flex items-center justify-between">
+                                    <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/></svg>
+                                    </div>
+                                    <span class="text-xs font-black text-purple-700">+₱30</span>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="text-[11px] font-bold text-slate-900 leading-tight">Stain Bleach</div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">Color-safe booster</div>
+                                </div>
+                            </div>
+
+                            <!-- Laundry Bag -->
+                            <div class="addon-card border-2 border-slate-200 bg-white rounded-2xl p-3 flex flex-col justify-between"
+                                id="addon-plastic" data-addon="Plastic Packaging" data-addon-price="10" onclick="toggleAddon('plastic')">
+                                <input type="checkbox" name="addon_plastic" value="true" class="hidden" id="chk-plastic">
+                                <div class="flex items-center justify-between">
+                                    <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
+                                    </div>
+                                    <span class="text-xs font-black text-purple-700">+₱10</span>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="text-[11px] font-bold text-slate-900 leading-tight">Laundry Bag</div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">Heavy-duty pack</div>
+                                </div>
+                            </div>
+
+                            <!-- Add Dry -->
+                            <div class="addon-card border-2 border-slate-200 bg-white rounded-2xl p-3 flex flex-col justify-between col-span-2 sm:col-span-1"
+                                id="addon-add-dry" data-addon="Add Dry" data-addon-price="70" onclick="toggleAddon('add-dry')">
+                                <input type="checkbox" name="addon_add_dry" value="true" class="hidden" id="chk-add-dry">
+                                <div class="flex items-center justify-between">
+                                    <div class="w-7 h-7 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/></svg>
+                                    </div>
+                                    <span class="text-xs font-black text-purple-700">+₱70</span>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="text-[11px] font-bold text-slate-900 leading-tight">Add Dry Booster</div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">+10 Mins Heat</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Add-ons selected summary tag pill -->
+                        <div id="addons-summary" class="hidden mt-3 p-3 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-between">
+                            <div class="flex items-center gap-2 flex-wrap" id="addons-tags"></div>
+                            <div class="text-xs font-black text-purple-700 flex-shrink-0 ml-2">+₱<span id="addons-total">0</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1 Bottom Button -->
+                    <div class="pt-4 border-t border-slate-100 flex justify-end">
+                        <button type="button" onclick="nextStep(1)" class="px-7 py-3.5 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold rounded-2xl shadow-sm transition flex items-center gap-2 group cursor-pointer">
+                            <span>Continue to Details</span>
+                            <svg class="w-4 h-4 group-hover:translate-x-0.5 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- ======================================================== -->
+                <!-- ===== STEP 2: OVER-THE-COUNTER SCHEDULE & DETAILS ===== -->
+                <!-- ======================================================== -->
+                <div id="wizard-step-2" class="wizard-step hidden space-y-6 animate-fade">
+
+                    <!-- Section 2A: Over-The-Counter Schedule (Live Clock & Current Time) -->
+                    <div class="bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-800">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
+                            <div>
+                                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider mb-1">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-emerald"></span>
+                                    <span>Counter Now &bull; Live Check-In</span>
+                                </div>
+                                <h3 class="text-base font-extrabold text-white">Over-The-Counter Immediate Service</h3>
+                                <p class="text-xs text-slate-300 mt-0.5">Walk-in order created for immediate presentation at the store counter.</p>
+                            </div>
+                            <div class="sm:text-right bg-white/5 rounded-xl p-3 border border-white/10">
+                                <span class="text-[10px] uppercase font-bold text-sky-300 block tracking-wider">Live Check-In Clock</span>
+                                <div id="wizard-live-clock" class="text-xl sm:text-2xl font-black text-white mono leading-tight tracking-wider">00:00:00 AM</div>
+                                <div id="wizard-date-display" class="text-[11px] text-slate-300 font-semibold mt-0.5">Today</div>
+                            </div>
+                        </div>
+                        <div class="pt-3 text-[11px] text-slate-300 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>No advance appointment booking required. Counter attendants verify orders right away upon queue ticket presentation.</span>
+                        </div>
+                    </div>
+
+                    <!-- Section 2B: Customer Information -->
+                    <div>
+                        <label class="block text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3">Customer Information</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">
+                                    Your Full Name <span class="text-rose-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                                    </div>
+                                    <input type="text" id="wizard-name" name="name" required placeholder="e.g. Juan dela Cruz"
+                                        class="w-full pl-10 pr-3.5 py-3 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold outline-none focus:bg-white focus:ring-2 focus:ring-[#0284c7] transition">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="text-xs font-semibold text-slate-700">Mobile Phone <span class="text-rose-500">*</span></label>
+                                    <span id="phone-validation-hint" class="text-[10px] text-slate-400">PH Mobile (09XXXXXXXXX)</span>
+                                </div>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+                                    </div>
+                                    <input type="tel" id="wizard-phone" name="phone_number" required placeholder="09XXXXXXXXX" maxlength="11" oninput="validatePhoneLive(this)"
+                                        class="w-full pl-10 pr-3.5 py-3 mono bg-white border border-slate-300 rounded-xl text-xs font-bold tracking-wider outline-none focus:ring-2 focus:ring-[#0284c7] transition">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2C: Payment Preference -->
+                    <div>
+                        <label class="block text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3">Counter Payment Preference</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            
+                            <label class="payment-card payment-selected border-2 border-[#0284c7] bg-sky-50 rounded-2xl p-4 flex flex-col justify-between" onclick="selectPaymentMethod(this)">
+                                <input type="radio" name="payment_method" value="Cash" checked class="hidden" onchange="onPaymentMethodRadio(this)">
+                                <div>
+                                    <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+                                    </div>
+                                    <div class="text-xs font-extrabold text-slate-900">Cash at Counter</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5">Pay cash upon verification</div>
+                                </div>
+                            </label>
+
+                            <label class="payment-card border-2 border-slate-200 bg-white rounded-2xl p-4 flex flex-col justify-between hover:border-slate-300" onclick="selectPaymentMethod(this)">
+                                <input type="radio" name="payment_method" value="GCash" class="hidden" onchange="onPaymentMethodRadio(this)">
+                                <div>
+                                    <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+                                    </div>
+                                    <div class="text-xs font-extrabold text-slate-900">GCash QR</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5">Scan store QR code at counter</div>
+                                </div>
+                            </label>
+
+                            <label class="payment-card border-2 border-slate-200 bg-white rounded-2xl p-4 flex flex-col justify-between hover:border-slate-300" onclick="selectPaymentMethod(this)">
+                                <input type="radio" name="payment_method" value="Maya / Card" class="hidden" onchange="onPaymentMethodRadio(this)">
+                                <div>
+                                    <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                                    </div>
+                                    <div class="text-xs font-extrabold text-slate-900">Maya / Cards</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5">Debit, credit, or digital wallet</div>
+                                </div>
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <!-- Equipment Protection & Pocket Check Notice (Required by system rules) -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/90 border border-amber-300/80 text-xs text-slate-700 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800 flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                            </div>
+                            <div class="space-y-0.5 flex-1">
+                                <div class="font-bold text-slate-900 text-xs flex items-center gap-2">
+                                    <span>Equipment Protection &amp; Pocket Check Notice</span>
+                                    <span class="px-2 py-0.5 text-[9px] font-black uppercase rounded bg-amber-200 text-amber-900">Mandatory</span>
+                                </div>
+                                <p class="text-[11px] leading-relaxed text-slate-600">
+                                    Always inspect and empty all pockets of coins, keys, hairpins, clips, and foreign objects before loading. <strong>Any machine damage resulting from foreign items is the sole liability of the customer.</strong>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                            <div class="p-2.5 bg-white/80 rounded-xl border border-amber-200">
+                                <div class="font-bold text-slate-900 text-[11px] flex items-center gap-1.5 mb-0.5">
+                                    <svg class="w-3.5 h-3.5 text-amber-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
+                                    <span>~44m Wash / ~45m Dry</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500 leading-tight">Timer starts immediately upon machine activation.</p>
+                            </div>
+                            <div class="p-2.5 bg-white/80 rounded-xl border border-amber-200">
+                                <div class="font-bold text-slate-900 text-[11px] flex items-center gap-1.5 mb-0.5">
+                                    <svg class="w-3.5 h-3.5 text-amber-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>5–10 Mins Grace</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500 leading-tight">Please retrieve laundry promptly once cycles finish.</p>
+                            </div>
+                            <div class="p-2.5 bg-rose-50/80 rounded-xl border border-rose-200">
+                                <div class="font-bold text-rose-900 text-[11px] flex items-center gap-1.5 mb-0.5">
+                                    <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                                    <span>₱100 Late Penalty</span>
+                                </div>
+                                <p class="text-[10px] text-rose-700 leading-tight">Penalty applies if clothes remain unattended past grace.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 Stepper Buttons -->
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <button type="button" onclick="goToStep(1)" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+                            <span>Back</span>
+                        </button>
+                        <button type="button" onclick="nextStep(2)" class="px-7 py-3.5 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold rounded-2xl shadow-sm transition flex items-center gap-2 group cursor-pointer">
+                            <span>Continue to Review</span>
+                            <svg class="w-4 h-4 group-hover:translate-x-0.5 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- ======================================================== -->
+                <!-- ===== STEP 3: ORDER REVIEW & TICKET GENERATION ===== -->
+                <!-- ======================================================== -->
+                <div id="wizard-step-3" class="wizard-step hidden space-y-6 animate-fade">
+
+                    <!-- Receipt Summary Card -->
+                    <div class="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-800">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-5">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 rounded-xl bg-sky-500/20 flex items-center justify-center text-sky-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <rect x="3" y="2" width="18" height="20" rx="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <circle cx="12" cy="13" r="5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-extrabold text-white">Bon Laundry Station</div>
+                                    <div class="text-[10px] text-sky-300 font-semibold">Over-The-Counter Check-In Draft</div>
+                                </div>
+                            </div>
+                            <span class="text-[10px] uppercase font-mono font-bold tracking-widest px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/20">
+                                Counter Ready
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs mb-5">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Service Type</span>
+                                <span id="review-mode" class="font-extrabold text-white">Self-Service</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Selected Package</span>
+                                <span id="review-service" class="font-extrabold text-white">Self-Service Wash &amp; Dry (8kg)</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Machine Capacity</span>
+                                <span id="review-capacity" class="font-extrabold text-sky-300">8kg Standard Drum</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Check-In Schedule</span>
+                                <span id="review-schedule" class="font-extrabold text-emerald-400">Today &bull; Counter Now</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Payment Method</span>
+                                <span id="review-payment" class="font-extrabold text-white">Cash at Counter</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Supplies &amp; Add-Ons</span>
+                                <span id="review-addons" class="font-extrabold text-purple-300">None</span>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-white/10 pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="text-xs text-slate-300">
+                                Customer: <strong id="review-customer" class="text-white">—</strong> (<span id="review-phone" class="mono text-sky-300">—</span>)
+                            </div>
+                            <div class="text-left sm:text-right">
+                                <span class="text-[10px] uppercase tracking-widest text-slate-400 block">Total Due at Counter</span>
+                                <span id="review-total-price" class="text-3xl font-black text-emerald-400 mono leading-tight">₱145.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Equipment Liability Agreement (Required by test rules) -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/90 border border-amber-300/80 text-xs text-slate-700 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800 flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                            </div>
+                            <div class="space-y-1 flex-1">
+                                <div class="font-extrabold text-slate-900 text-xs flex items-center gap-2">
+                                    <span>Customer Equipment Liability Agreement</span>
+                                    <span class="px-2 py-0.5 text-[9px] font-black uppercase rounded bg-amber-200 text-amber-900">Mandatory</span>
+                                </div>
+                                <p class="text-[11px] leading-relaxed text-slate-600">
+                                    I certify that all garment pockets have been inspected and emptied of coins, keys, hairpins, and sharp metal objects. In the event of drum damage or machine breakdown caused by foreign objects, <strong>the customer who loaded the machine shall be held solely liable for repair expenses</strong>.
+                                </p>
+                                <label class="flex items-start gap-2.5 pt-2 cursor-pointer select-none">
+                                    <input type="checkbox" id="walkin-liability-checkbox" name="liability_agreed" value="true" required checked
+                                        class="mt-0.5 w-4 h-4 text-[#0284c7] rounded border-slate-300 focus:ring-sky-500">
+                                    <span class="text-[11px] font-bold text-slate-900 leading-snug">
+                                        I have inspected all pockets and agree to the equipment liability policy and unattended laundry rules.
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 Stepper Buttons -->
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <button type="button" onclick="goToStep(2)" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+                            <span>Back</span>
+                        </button>
+                        <button type="submit" id="book-submit-btn" class="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl shadow-lg transition flex items-center gap-2 cursor-pointer transform active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                            <span>Generate Counter Check-In Pass</span>
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+            <!-- ======================================================== -->
+            <!-- ===== SUCCESS TICKET (COUNTER PASS) ===== -->
+            <!-- ======================================================== -->
+            <div id="wizard-success-ticket" class="hidden space-y-6 animate-fade">
+                <div class="max-w-md mx-auto bg-white rounded-3xl border-2 border-emerald-500 shadow-xl overflow-hidden text-center">
+                    
+                    <!-- Ticket Header -->
+                    <div class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-6">
+                        <div class="w-12 h-12 rounded-full bg-white/20 mx-auto flex items-center justify-center text-white mb-2 shadow-inner">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                        </div>
+                        <h3 class="text-xl font-black">Check-In Pass Generated!</h3>
+                        <p class="text-xs text-emerald-100 mt-0.5">Please walk to the counter to start your wash cycle.</p>
+                    </div>
+
+                    <!-- Ticket Body -->
+                    <div class="p-6 space-y-5">
+                        
+                        <!-- Order Code Display -->
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-1">Your Counter Check-In Code</span>
+                            <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-50 border-2 border-slate-200">
+                                <span id="ticket-order-code" class="mono text-3xl font-black text-slate-900 tracking-wider">ORD-000000</span>
+                                <button type="button" onclick="copyOrderCode()" title="Copy Code" class="p-1.5 text-slate-400 hover:text-[#0284c7] transition rounded-lg hover:bg-slate-200 cursor-pointer">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                </button>
+                            </div>
+                            <span id="copy-status-hint" class="text-[10px] font-bold text-emerald-600 block mt-1 opacity-0 transition-opacity">Copied to clipboard!</span>
+                        </div>
+
+                        <!-- QR Code -->
+                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 inline-block mx-auto shadow-xs">
+                            <img id="ticket-qr-code" src="" alt="Order QR Code" class="w-36 h-36 mx-auto rounded-lg">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mt-1.5">Counter Staff Scans Here</span>
+                        </div>
+
+                        <!-- Ticket Details Pill -->
+                        <div class="bg-sky-50 border border-sky-200 rounded-2xl p-3 flex items-center justify-between text-xs">
+                            <div class="text-left">
+                                <span class="text-[9px] uppercase font-bold text-slate-500 block leading-tight">Selected Package</span>
+                                <span id="ticket-package-name" class="font-bold text-sky-900 text-xs">Self-Service Wash &amp; Dry (8kg)</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[9px] uppercase font-bold text-slate-500 block leading-tight">Timing</span>
+                                <span id="ticket-schedule-time" class="font-extrabold text-emerald-800 text-xs">Counter Now</span>
+                            </div>
+                        </div>
+
+                        <!-- Direct to Validation Status Banner -->
+                        <div id="ticket-direct-validation-container" class="bg-sky-50 border-2 border-[#0284c7] rounded-2xl p-4 text-left shadow-xs">
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-8 h-8 rounded-xl bg-[#0284c7] text-white flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <span class="text-xs font-black text-slate-900 block leading-tight">Directing to Order Validation...</span>
+                                        <span class="text-[10px] text-slate-500 font-semibold block mt-0.5">Opening counter terminal to inspect order &amp; assign machines</span>
+                                    </div>
+                                </div>
+                                <span id="ticket-redirect-countdown" class="px-2 py-0.5 rounded-full bg-sky-200 text-sky-900 text-[10px] font-black">1s</span>
+                            </div>
+                            <div class="mt-3">
+                                <a id="ticket-direct-validation-btn" href="#" class="w-full py-2.5 px-3 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-black rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <span>Proceed to Order Validation Now</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Instructions -->
+                        <div class="bg-slate-50 rounded-2xl p-4 text-left text-xs border border-slate-100">
+                            <div class="font-bold text-slate-900 text-[11px] uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-[#0284c7]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+                                <span>Next Step at Counter:</span>
+                            </div>
+                            <p class="text-slate-600 leading-relaxed">
+                                Show this screen or your code to the counter attendant. Staff will verify your load, receive payment, and activate your washer immediately!
+                            </p>
+                        </div>
+
+                        <!-- Reset / New Order -->
+                        <div class="pt-2">
+                            <button type="button" onclick="resetWizard()" class="w-full py-3.5 px-4 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer">
+                                Create Another Order &rarr;
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+        &copy; 2026 Bon Laundry Station &bull; Over-The-Counter Self-Service Portal
+    </footer>
+
+    <!-- Script -->
+    <script>
+        let currentWizardStep = 1;
+        let selectedServicePrice = 145;
+        let selectedAddonsPrice = 0;
+        let selectedPackageCapacity = '8kg';
+        let selectedPackageName = 'Self-Service Wash & Dry (8kg)';
+        let lastCreatedOrderCode = '';
+
+        // Addon supplies definitions
+        const ADDONS = {
+            'detergent': { name: 'Detergent Pod', price: 20 },
+            'fabcon':    { name: 'Fabcon Pod',    price: 20 },
+            'bleach':    { name: 'Stain Bleach',  price: 30 },
+            'plastic':   { name: 'Laundry Bag',   price: 10 },
+            'add-dry':   { name: 'Add Dry Booster', price: 70 }
+        };
+        let activeAddons = new Set();
+
+        // Package selection
+        function selectPackageCard(cap) {
+            const card8 = document.getElementById('pkg-card-8');
+            const card13 = document.getElementById('pkg-card-13');
+            const radio8 = document.getElementById('pkg-radio-8');
+            const radio13 = document.getElementById('pkg-radio-13');
+            const weightHidden = document.getElementById('wizard-estimated-weight');
+
+            if (cap === '8') {
+                selectedPackageCapacity = '8kg';
+                selectedPackageName = 'Self-Service Wash & Dry (8kg)';
+                selectedServicePrice = 145;
+                if (radio8) radio8.checked = true;
+                if (weightHidden) weightHidden.value = '8.0';
+
+                card8.classList.add('pkg-selected', 'border-[#0284c7]');
+                card8.classList.remove('border-slate-200');
+                card13.classList.remove('pkg-selected', 'border-[#0284c7]');
+                card13.classList.add('border-slate-200');
+            } else {
+                selectedPackageCapacity = '13kg';
+                selectedPackageName = 'Self-Service Wash & Dry (13kg)';
+                selectedServicePrice = 240;
+                if (radio13) radio13.checked = true;
+                if (weightHidden) weightHidden.value = '13.0';
+
+                card13.classList.add('pkg-selected', 'border-[#0284c7]');
+                card13.classList.remove('border-slate-200');
+                card8.classList.remove('pkg-selected', 'border-[#0284c7]');
+                card8.classList.add('border-slate-200');
+            }
+            hideWizardError();
+        }
+
+        function onPackageRadioChanged(radio) {
+            if (radio.value.includes('13')) {
+                selectPackageCard('13');
+            } else {
+                selectPackageCard('8');
+            }
+        }
+
+        // Add-ons toggle
+        function toggleAddon(key) {
+            if (activeAddons.has(key)) activeAddons.delete(key);
+            else activeAddons.add(key);
+
+            const chk = document.getElementById('chk-' + key);
+            if (chk) chk.checked = activeAddons.has(key);
+
+            const card = document.getElementById('addon-' + key);
+            if (card) {
+                if (activeAddons.has(key)) {
+                    card.classList.add('addon-active');
+                    card.classList.remove('border-slate-200');
+                } else {
+                    card.classList.remove('addon-active');
+                    card.classList.add('border-slate-200');
+                }
+            }
+
+            selectedAddonsPrice = 0;
+            activeAddons.forEach(k => { if (ADDONS[k]) selectedAddonsPrice += ADDONS[k].price; });
+            updateAddonsSummary();
+            hideWizardError();
+        }
+
+        function updateAddonsSummary() {
+            const summary = document.getElementById('addons-summary');
+            const tags = document.getElementById('addons-tags');
+            const totalEl = document.getElementById('addons-total');
+            if (!summary || !tags || !totalEl) return;
+
+            if (activeAddons.size === 0) {
+                summary.classList.add('hidden');
+                return;
+            }
+            summary.classList.remove('hidden');
+            totalEl.textContent = selectedAddonsPrice;
+            tags.innerHTML = '';
+            activeAddons.forEach(k => {
+                const span = document.createElement('span');
+                span.className = 'px-2.5 py-0.5 rounded-full bg-purple-200 text-purple-800 text-[10px] font-bold';
+                span.textContent = ADDONS[k].name + ' +₱' + ADDONS[k].price;
+                tags.appendChild(span);
+            });
+        }
+
+        // Payment method selection
+        function selectPaymentMethod(cardEl) {
+            document.querySelectorAll('.payment-card').forEach(c => {
+                c.classList.remove('payment-selected', 'border-[#0284c7]', 'bg-sky-50');
+                c.classList.add('border-slate-200', 'bg-white');
+            });
+            cardEl.classList.remove('border-slate-200', 'bg-white');
+            cardEl.classList.add('payment-selected', 'border-[#0284c7]', 'bg-sky-50');
+            const radio = cardEl.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+            hideWizardError();
+        }
+
+        function onPaymentMethodRadio(radio) {
+            const parent = radio.closest('.payment-card');
+            if (parent) selectPaymentMethod(parent);
+        }
+
+        // Live Phone validation
+        function validatePhoneLive(input) {
+            const clean = input.value.replace(/\D/g, '');
+            input.value = clean;
+            const hint = document.getElementById('phone-validation-hint');
+            if (!hint) return;
+            if (clean.length === 11 && clean.startsWith('09')) {
+                hint.textContent = '✓ Valid PH Mobile';
+                hint.className = 'text-[10px] font-bold text-emerald-600';
+            } else if (clean.length > 0) {
+                hint.textContent = 'Need 11 digits (' + clean.length + '/11)';
+                hint.className = 'text-[10px] font-semibold text-amber-600';
+            } else {
+                hint.textContent = 'PH Mobile (09XXXXXXXXX)';
+                hint.className = 'text-[10px] text-slate-400';
+            }
+        }
+
+        // Stepper Navigation
+        function validateStep(step) {
+            hideWizardError();
+            if (step === 1) {
+                const service = document.querySelector('input[name="service_type"]:checked');
+                if (!service) {
+                    showWizardError('Please choose a package to proceed.');
+                    return false;
+                }
+                return true;
+            }
+            if (step === 2) {
+                const name = (document.getElementById('wizard-name')?.value || '').trim();
+                const phone = (document.getElementById('wizard-phone')?.value || '').trim();
+                if (!name) {
+                    showWizardError('Please enter your name.');
+                    return false;
+                }
+                if (!phone || !/^09\d{9}$/.test(phone)) {
+                    showWizardError('Please enter a valid 11-digit mobile number starting with 09.');
+                    return false;
+                }
+                return true;
+            }
+            return true;
+        }
+
+        function goToStep(targetStep) {
+            hideWizardError();
+            currentWizardStep = targetStep;
+
+            for (let s = 1; s <= 3; s++) {
+                const stepDiv = document.getElementById('wizard-step-' + s);
+                if (stepDiv) {
+                    if (s === targetStep) stepDiv.classList.remove('hidden');
+                    else stepDiv.classList.add('hidden');
+                }
+            }
+
+            const progressLine = document.getElementById('step-progress-line');
+            if (progressLine) {
+                progressLine.style.width = (((targetStep - 1) / 2) * 100) + '%';
+            }
+
+            for (let s = 1; s <= 3; s++) {
+                const circle = document.getElementById('step-circle-' + s);
+                const label = document.getElementById('step-label-' + s);
+                if (!circle || !label) continue;
+
+                if (s < targetStep) {
+                    circle.className = 'w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center font-bold text-sm shadow-sm transition';
+                    circle.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
+                    label.className = 'text-[11px] font-bold text-emerald-600 mt-1.5';
+                } else if (s === targetStep) {
+                    circle.className = 'w-10 h-10 rounded-2xl bg-[#0284c7] text-white flex items-center justify-center font-bold text-sm shadow-md ring-4 ring-sky-100 transition';
+                    circle.innerHTML = '' + s;
+                    label.className = 'text-[11px] font-bold text-[#0284c7] mt-1.5';
+                } else {
+                    circle.className = 'w-10 h-10 rounded-2xl bg-white border-2 border-slate-300 text-slate-500 flex items-center justify-center font-bold text-sm transition';
+                    circle.innerHTML = '' + s;
+                    label.className = 'text-[11px] font-semibold text-slate-400 mt-1.5';
+                }
+            }
+
+            if (targetStep === 3) updateReviewCard();
+            document.getElementById('wizard-stepper')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function tryGoToStep(targetStep) {
+            if (targetStep < currentWizardStep) {
+                goToStep(targetStep);
+            } else if (targetStep === currentWizardStep + 1) {
+                if (validateStep(currentWizardStep)) goToStep(targetStep);
+            }
+        }
+
+        function nextStep(current) {
+            if (validateStep(current)) goToStep(current + 1);
+        }
+
+        function updateReviewCard() {
+            const service = selectedPackageName;
+            const mode = document.getElementById('wizard-order-mode')?.value || 'Self-Service';
+            const name = document.getElementById('wizard-name')?.value || 'Walk-in Guest';
+            const phone = document.getElementById('wizard-phone')?.value || '—';
+            const pay = document.querySelector('input[name="payment_method"]:checked')?.value || 'Cash';
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            document.getElementById('review-service').textContent = service;
+            document.getElementById('review-mode').textContent = mode;
+            document.getElementById('review-capacity').textContent = selectedPackageCapacity === '13kg' ? '13kg Titan Heavy-Duty Drum' : '8kg Regular Commercial Drum';
+            document.getElementById('review-schedule').textContent = `Today at ${timeStr} (Counter Now)`;
+            document.getElementById('review-payment').textContent = pay;
+            document.getElementById('review-customer').textContent = name;
+            document.getElementById('review-phone').textContent = phone;
+
+            const reviewAddons = document.getElementById('review-addons');
+            if (activeAddons.size > 0) {
+                const names = [...activeAddons].map(k => ADDONS[k].name).join(', ');
+                reviewAddons.textContent = names + ' (+₱' + selectedAddonsPrice + ')';
+            } else {
+                reviewAddons.textContent = 'None';
+            }
+
+            const total = selectedServicePrice + selectedAddonsPrice;
+            document.getElementById('review-total-price').textContent = '₱' + total.toFixed(2);
+        }
+
+        function showWizardError(msg) {
+            const banner = document.getElementById('wizard-error-banner');
+            const text = document.getElementById('wizard-error-text');
+            if (banner && text) {
+                text.textContent = msg;
+                banner.classList.remove('hidden');
+                banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function hideWizardError() {
+            const banner = document.getElementById('wizard-error-banner');
+            if (banner) banner.classList.add('hidden');
+        }
+
+        // Live Clock & Schedule auto-update
+        function updateLiveClock() {
+            const now = new Date();
+            const clockEl = document.getElementById('wizard-live-clock');
+            const dateDisplayEl = document.getElementById('wizard-date-display');
+            const dateInput = document.getElementById('wizard-date');
+
+            if (clockEl) {
+                clockEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            }
+
+            if (dateDisplayEl) {
+                const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+                dateDisplayEl.textContent = now.toLocaleDateString('en-US', options);
+            }
+
+            if (dateInput && !dateInput.value) {
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
+            }
+        }
+        setInterval(updateLiveClock, 1000);
+
+        // Form submission
+        async function handleWalkinBooking(e) {
+            e.preventDefault();
+
+            const liabilityCheckbox = document.getElementById('walkin-liability-checkbox');
+            if (liabilityCheckbox && !liabilityCheckbox.checked) {
+                alert('Please acknowledge and agree to the Customer Equipment Liability Policy to proceed.');
+                liabilityCheckbox.focus();
+                return;
+            }
+
+            if (!validateStep(2)) {
+                goToStep(2);
+                return;
+            }
+
+            const btn = document.getElementById('book-submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg class="animate-spin w-4 h-4 text-white inline-block mr-2" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Generating Order Pass...</span>
+            `;
+
+            // Prepare current date and time
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${yyyy}-${mm}-${dd}`;
+            const timeFormatted = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            const form = document.getElementById('walkin-form');
+            const formData = new FormData(form);
+
+            formData.set('service_type', selectedPackageName);
+            formData.set('order_mode', 'Self-Service');
+            formData.set('turnaround_option', 'Immediate');
+            formData.set('date', todayStr);
+            formData.set('pickup_time', 'Immediate Walk-In / Now');
+            formData.set('total_machines', '1');
+            formData.set('estimated_weight', selectedPackageCapacity === '13kg' ? '13.0' : '8.0');
+            formData.set('machine_capacity', selectedPackageCapacity === '13kg' ? '13' : '8');
+            formData.set('load_details', `1 Machine (${selectedPackageCapacity === '13kg' ? '13kg Titan' : '8kg Regular'}) | Est. Weight: ${selectedPackageCapacity === '13kg' ? '13.0' : '8.0'}kg`);
+            formData.set('total_price', (selectedServicePrice + selectedAddonsPrice).toFixed(2));
+            formData.set('liability_agreed', 'true');
+
+            const addonsList = [...activeAddons].map(k => ({ name: ADDONS[k].name, price: ADDONS[k].price }));
+            formData.set('addons', JSON.stringify(addonsList));
+
+            try {
+                const res = await fetch('/api/order/create', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if (res.ok && data.status === 'success') {
+                    const orderCode = data.order_id || (data.data && data.data.order_id) || 'ORD-SUCCESS';
+                    lastCreatedOrderCode = orderCode;
+
+                    document.getElementById('ticket-order-code').textContent = orderCode;
+                    document.getElementById('ticket-qr-code').src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(orderCode);
+                    
+                    const ticketPkg = document.getElementById('ticket-package-name');
+                    if (ticketPkg) ticketPkg.textContent = selectedPackageName;
+                    
+                    const ticketSchedule = document.getElementById('ticket-schedule-time');
+                    if (ticketSchedule) ticketSchedule.textContent = `Counter Now (${timeFormatted})`;
+
+                    // Resolve validation route destination
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const returnTo = urlParams.get('return_to');
+                    const userRole = {{ current_user_role|tojson }};
+
+                    let validationUrl = '';
+                    if (returnTo === 'staff' || (!returnTo && userRole === 'Staff')) {
+                        validationUrl = `/staff/verify-order?code=${encodeURIComponent(orderCode)}`;
+                    } else if (returnTo === 'manager' || returnTo === 'verify' || userRole === 'Manager' || userRole === 'Super Admin') {
+                        validationUrl = `/manager/dashboard?tab=verify&code=${encodeURIComponent(orderCode)}`;
+                    } else if (returnTo) {
+                        validationUrl = `/manager/dashboard?tab=verify&code=${encodeURIComponent(orderCode)}`;
+                    } else {
+                        validationUrl = `/manager/dashboard?tab=verify&code=${encodeURIComponent(orderCode)}`;
+                    }
+
+                    const directBtn = document.getElementById('ticket-direct-validation-btn');
+                    if (directBtn) directBtn.href = validationUrl;
+
+                    document.getElementById('walkin-form').classList.add('hidden');
+                    document.getElementById('wizard-stepper').classList.add('hidden');
+                    document.getElementById('wizard-success-ticket').classList.remove('hidden');
+                    document.getElementById('wizard-success-ticket').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                    // Automatically direct to order validation in 1 second
+                    setTimeout(() => {
+                        window.location.href = validationUrl;
+                    }, 1000);
+                } else {
+                    showWizardError(data.message || 'Unable to create order. Please check inputs.');
+                    btn.disabled = false;
+                    btn.innerHTML = `
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                        <span>Generate Counter Check-In Pass</span>
+                    `;
+                }
+            } catch (err) {
+                showWizardError('Network connection error: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                    <span>Generate Counter Check-In Pass</span>
+                `;
+            }
+        }
+
+        // Copy order code helper
+        function copyOrderCode() {
+            if (!lastCreatedOrderCode) return;
+            navigator.clipboard.writeText(lastCreatedOrderCode).then(() => {
+                const hint = document.getElementById('copy-status-hint');
+                if (hint) {
+                    hint.classList.remove('opacity-0');
+                    setTimeout(() => hint.classList.add('opacity-0'), 2500);
+                }
+            }).catch(() => alert('Order Code: ' + lastCreatedOrderCode));
+        }
+
+        // Reset wizard for new check-in
+        function resetWizard() {
+            document.getElementById('walkin-form').reset();
+            activeAddons.clear();
+            selectedAddonsPrice = 0;
+            updateAddonsSummary();
+
+            Object.keys(ADDONS).forEach(k => {
+                const card = document.getElementById('addon-' + k);
+                if (card) {
+                    card.classList.remove('addon-active');
+                    card.classList.add('border-slate-200');
+                }
+            });
+
+            selectPackageCard('8');
+
+            document.getElementById('wizard-success-ticket').classList.add('hidden');
+            document.getElementById('walkin-form').classList.remove('hidden');
+            document.getElementById('wizard-stepper').classList.remove('hidden');
+            goToStep(1);
+        }
+
+        // Refresh machine lobby fleet status
+        async function refreshLobbyIndicator() {
+            try {
+                const res = await fetch('/api/lobby/status');
+                if (!res.ok) return;
+                const json = await res.json();
+                if (json.status !== 'success' || !json.data) return;
+                const d = json.data;
+
+                const strip = document.getElementById('lobby-status-strip');
+                const ewtContainer = document.getElementById('lobby-ewt-container');
+                const availEl = document.getElementById('lobby-available-count');
+
+                if (availEl) availEl.textContent = d.available_count;
+
+                if (d.should_display_ewt) {
+                    if (strip) strip.className = 'mb-8 p-4 rounded-2xl border transition-all duration-300 bg-amber-50/90 border-amber-300';
+                    if (ewtContainer) {
+                        ewtContainer.innerHTML = `
+                            <div class="inline-flex flex-col sm:items-end">
+                                <span class="text-[9px] uppercase font-extrabold tracking-wider text-amber-700">Estimated Waiting Time</span>
+                                <span class="text-xs font-black text-amber-950 bg-amber-200/90 border border-amber-400 px-2.5 py-1 rounded-lg">~${d.ewt_mins} mins wait</span>
+                            </div>
+                        `;
+                    }
+                } else {
+                    if (strip) strip.className = 'mb-8 p-4 rounded-2xl border transition-all duration-300 bg-emerald-50/90 border-emerald-300';
+                    if (ewtContainer) {
+                        ewtContainer.innerHTML = `
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-black">
+                                <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                <span>Ready Now &bull; No Wait</span>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (e) { /* ignore */ }
+        }
+        setInterval(refreshLobbyIndicator, 15000);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateLiveClock();
+            selectPackageCard('8');
+
+            // Contextual header navigation
+            const userRole = {{ current_user_role|tojson }};
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnTo = urlParams.get('return_to');
+            const backBtn = document.getElementById('header-back-to-verification');
+            const signInBtn = document.getElementById('header-customer-signin');
+
+            if (returnTo === 'staff' || (!returnTo && userRole === 'Staff')) {
+                if (backBtn) {
+                    backBtn.href = '/staff/verify-order';
+                    backBtn.classList.remove('hidden');
+                }
+                if (signInBtn) signInBtn.classList.add('hidden');
+            } else if (returnTo === 'manager' || returnTo === 'verify' || userRole === 'Manager' || userRole === 'Super Admin') {
+                if (backBtn) {
+                    backBtn.href = '/manager/dashboard?tab=verify';
+                    backBtn.classList.remove('hidden');
+                }
+                if (signInBtn) signInBtn.classList.add('hidden');
+            } else if (returnTo) {
+                if (backBtn) {
+                    backBtn.href = '/manager/dashboard?tab=verify';
+                    backBtn.classList.remove('hidden');
+                }
+                if (signInBtn) signInBtn.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

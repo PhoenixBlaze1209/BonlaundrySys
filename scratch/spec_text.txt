@@ -1,0 +1,154 @@
+[0] BON LAUNDRY STATION • CUSTOMER ACCOUNT PORTAL
+[1] User-Side Module Functionality & Navigation Guide
+[2] Comprehensive System Analyst Specification for Customer Navigation, Telemetry & Booking Modules
+[3] 
+[4] 1. Executive Summary & Architecture Overview
+[5] Overview: This functional specification document presents a rigorous technical and operational analysis of the user-facing Customer Account Portal developed for Bon Laundry Station. Operating as a responsive web application tailored for condominium residents at Urban Deca Homes Ortigas and walk-in patrons, the customer portal bridges end-user service demand with on-site commercial operations.
+[6] Architectural Purpose: The customer portal is engineered with four primary functional pillars, accessible through both a persistent top navigation bar and a secondary tab strip. These modules comprise: (1) Live Machine Fleet Lobby, (2) Services & Official Rate Card, (3) Step-by-Step Booking Wizard, and (4) My Orders & Live Tracking. Together with real-time telemetry metrics and automated SMS integration, the user interface eliminates common customer friction points such as uncertain wait times, physical counter queues, and fabric misplacement.
+[7] 1.1 Global Application Shell & Persistent Navigation Components
+[8] Shell Framework: Across all customer portal views, a consistent global application shell provides authenticated identity context, continuous telemetry feedback, and effortless navigation:
+[9] Primary Navbar: Top Sticky Navigation Bar: Houses the Bon Laundry brand badge, high-level navigation buttons (My Orders, Book Order, Services & Rates, and Live Fleet Lobby with an active pulsing status dot), the customer profile pill showing Google account verification and email, and the Sign Out button.
+[10] Telemetry Hero Banner: Hero Banner with Real-Time Telemetry Strip: A dark navy/teal gradient hero banner that acknowledges the customer's Google-authenticated identity and displays three mission-critical operational KPI metrics: Active Orders (e.g., 1), Ready Washers ratio (e.g., 19/19 machines idle), and Current Wait time (e.g., ~65m Estimated Waiting Time).
+[11] Tab Strip: Secondary Tab Navigation: An intuitive secondary tab menu with active blue indicators and numeric badges (e.g., 'My Orders & Live Tracking [1]'), allowing customers to toggle seamlessly between views without triggering disruptive page reloads.
+[12] Alert Notifications: System Flash Alerts & Dismissible Toasts: Informative feedback banners displaying sign-in acknowledgment and operational status messages.
+[13] Footer: Application Footer: Displays facility copyright, physical branch location (Urban Deca Homes Ortigas Commercial Area), and quick navigational shortcuts to the public landing page and sign-out route.
+[14] 
+[15] 2. Module 1: Live Machine Fleet Lobby
+[16] 
+[17] Figure 1: Live 19-Machine Fleet Lobby Interface (Real-Time Hardware Telemetry Grid)
+[18] 2.1 Module Objective & Business Role
+[19] Business Purpose: The Live Machine Fleet Lobby provides real-time visibility into the operational state of the physical laundry shop. In traditional laundromats, customers frequently encounter long, unpredictable delays upon arriving on-site with heavy hampers, only to discover that every machine is occupied. The Live Fleet Lobby completely eliminates this asymmetry by streaming the live occupancy, capacity, and cycle state of all 19 commercial laundry machines directly to the customer's device.
+[20] Traffic Optimization: By allowing customers to inspect machine availability prior to leaving their residential unit in Urban Deca Homes, the module distributes customer traffic evenly, reduces peak-hour bottlenecking, and encourages self-service adoption.
+[21] 2.2 Navigator & User Interface Component Breakdown
+[22] Figure 1 illustrates the following user interface controls and visual indicators:
+[23] 
+[24] 2.3 Hardware Fleet Specifications & Telemetry Logic
+[25] Fleet Composition: The Bon Laundry Station fleet comprises 19 specialized commercial units structured as follows:
+[26] Washer Fleet: 14 Regular Commercial Washers (Machines 1 to 14): Standard 8kg capacity, priced at ₱145 per cycle. Designed for everyday casuals, undergarments, linens, and light garments with an average cycle time of 35-40 minutes.
+[27] Titan Dryer Fleet: 5 Titan Heavy-Duty Dryers (Machines 15 to 19): High-capacity 13kg commercial tumbler dryers, priced at ₱240 per cycle. Designed for heavy comforters, bulky towels, bedsheets, and high-volume loads with an average drying duration of 45 minutes.
+[28] Cycle Expiry Engine: Automated Status Synchronization: The backend executes `refresh_machine_cycles(db)` whenever the customer portal is accessed. This procedure checks current timestamps against machine cycle end-times, automatically releasing hardware from 'In-Use' to 'Available' once cycles conclude.
+[29] 
+[30] 
+[31] 3. Module 2: Services & Official Rate Card
+[32] 
+[33] Figure 2: Services & Official Rate Card Module (Service Catalog, Packages & Delivery Pricing)
+[34] 3.1 Module Objective & Business Role
+[35] Commercial Purpose: The Services & Official Rate Card module acts as the official commercial catalog for Bon Laundry Station. It provides clear, transparent pricing and detailed service level agreements (SLAs) for every offered laundry package, turnaround option, and delivery tier. By setting unambiguous expectations regarding detergent brands, fabric conditioners, stain treatments, and folding standards, the module eliminates pricing disputes and empowers customers to make informed service choices.
+[36] Conversion Funnel: Furthermore, each package card features an integrated 'Select & Book' action that bridges directly into the Booking Wizard, dramatically reducing the user friction typically required to initiate an appointment.
+[37] 3.2 Service Packages Comparison & Feature Matrix
+[38] As shown in Figure 2, the rate card organizes services into four tiered drop-off packages and self-service/delivery options:
+[39] 
+[40] 3.3 Turnaround Speed SLAs & Logistic Add-Ons
+[41] SLA Specifications: The module explicitly communicates turnaround SLAs and secondary station fees in the bottom auxiliary cards:
+[42] Express SLA: 24 Hours Express (Standard Rate): Clean and neatly folded laundry ready for pickup or delivery the following day. Ideal for standard operational flow.
+[43] Economy SLA: 2 Days Economy (Graveyard Batch): Orders processed during off-peak and overnight graveyard shifts. Offered at a reduced service charge (₱70 vs. ₱120), optimizing energy consumption and offering savings to patient customers.
+[44] Interactive Linkage: Seamless Navigator Bridge: Clicking the 'Book Service →' link in the module header or clicking any individual 'Select & Book' button immediately routes the customer to the Booking Appointment tab with the chosen package pre-selected in state memory.
+[45] 
+[46] 
+[47] 4. Module 3: Book Laundry Appointment Wizard
+[48] 
+[49] Figure 3: Step-by-Step Interactive Laundry Booking Wizard (Step 1: Service & Mode Selection)
+[50] 4.1 Module Objective & Business Role
+[51] Business Objective: The Book Laundry Appointment module provides a guided, error-resilient 4-stage booking wizard for self-service reservations, counter drop-offs, and condominium delivery orders. Manual laundry intake often suffers from illegible customer handwriting, uncommunicated garment separation preferences, and mismatched arrival schedules. The booking wizard completely streamlines intake by capturing validated customer information upfront and producing an optical check-in code.
+[52] Fabric Separation Engine: A standout engineering highlight visible in Figure 3 is the 'Laundry Loads & Machine Separation' feature. This tool enables customers to configure multi-machine allocations—such as isolating delicate undergarments/bras from heavy streetwear or reserving a separate Titan unit for bed linens—prior to visiting the station.
+[53] 4.2 4-Stage Stepper Navigation Architecture
+[54] The top progress stepper enforces progressive disclosure and client-side validation across four structured stages:
+[55] 
+[56] 4.3 Step 1 Deep-Dive: Service Packages & Garment Separation
+[57] Step 1 Components: As rendered in Figure 3, Step 1 includes two critical interactive sections:
+[58] Package Selector: Package Radio Cards: Grid offering Classic Care (₱130), Saver Package (₱160), Signature Package (₱200), Premium Complete (₱260), and Self-Service Kiosk (₱120 base / ₱145). Active selection is highlighted with an indigo/sky border, light blue fill, and real-time subtotal updates.
+[59] Separation Controls: Multi-Machine Separation Controls: Patrons can choose 1 Load, 2 Loads, 3 Loads, or dynamically click '+ Add Another Laundry Load / Separate Machine'. Each configured load specifies category tags (e.g. 'Undergarments, Bras & Delicates', 'Everyday Clothes', 'Bed Linens') and required machine capacity (8kg vs. 13kg Titan).
+[60] Service Mode Selector: Order & Service Mode: Offers Counter Drop-Off (Drop clothes at station counter), Self-Service Machine (DIY washer & dryer reservation), and Deca Condo Delivery (+₱40) (door-to-door building delivery). Selecting condo delivery dynamically expands building and unit address inputs in Step 2.
+[61] Stepper Transition: Step Navigation Action: The 'Continue to Schedule →' button executes client-side validation, ensuring valid package selection before smoothly transitioning the stepper line and revealing Step 2.
+[62] 4.4 Post-Booking Digital Ticket & Counter Check-In Flow
+[63] Ticket Generation: Upon completing Step 4 and clicking 'Place Order & Generate Code', the portal submits an asynchronous payload to `POST /customer/book`. The backend creates a pending Appointment record, initializes a Queue token, and generates a formatted Order Code (e.g. `ORD-66611`).
+[64] Fast Counter Intake: The customer immediately receives a digital ticket modal featuring a large high-contrast Order Code, an optical QR barcode for counter terminal scanning, a clipboard copy button, and a 3-step guide: (1) Head to the counter at the scheduled time, (2) Present the code or QR to staff, and (3) Receive immediate verification, garment weighing, and automated machine queue assignment.
+[65] 
+[66] 5. Module 4: My Orders & Live Tracking
+[67] 
+[68] Figure 4: Active Orders & Live Queue Status Tracking Dashboard (Live Stepper & Telemetry)
+[69] 5.1 Module Objective & Business Role
+[70] Anxiety-Reduction Engine: The My Orders & Live Tracking module serves as the primary tracking hub for active and historical customer orders. In conventional laundry operations, customers must repeatedly call the counter or physically visit the shop to inquire whether their garments are washed, dried, or folded. This module eliminates customer anxiety by streaming real-time queue position, assigned machinery, and progressive service stage indicators directly to the customer's portal.
+[71] Real-Time Context: Figure 4 illustrates an active live order (`ORD-66611`) currently residing in the active shop queue, allowing the customer to monitor estimated wait times and request cancellations before washing commenced.
+[72] 5.2 UI Component Breakdown & Order Card Anatomy
+[73] The elements visible in Figure 4 represent the following operational capabilities:
+[74] 
+[75] 5.3 4-Stage Lifecycle State Machine
+[76] State Progression: Every order in the Bon Laundry System transitions through four strictly sequenced operational states:
+[77] Stage 1: Stage 1 — Received (Intake & Weighed): Staff inspects garments, confirms package deliverables, records actual weight, and verifies customer contact info at the POS terminal.
+[78] Stage 2: Stage 2 — In Queue (Waiting Fleet Slot): The order is issued a sequential queue number (#82) and waits for an available washer matching the load requirements. (Currently depicted as active in Figure 4).
+[79] Stage 3: Stage 3 — Processing (Wash & Dry Cycles): The load is placed into an allocated commercial washer or dryer. Cycle countdown timers initiate, and machine state transitions to 'In-Use'.
+[80] Stage 4: Stage 4 — Ready (Folded & Packed / Delivered): Garments have concluded high-heat drying, been neatly flat-folded, packed in sealed plastic, and placed in pickup cubbies or dispatched for condo doorstep delivery.
+[81] 5.4 Real-Time Synchronization & Cancellation Logic
+[82] Polling Engine: The customer portal incorporates an automated polling mechanism targeting `GET /api/customer/my-orders`. Every 10-15 seconds, the background script queries the backend to determine if the order status, queue number, or assigned machine has updated in response to staff floor actions.
+[83] Cancellation Safeguards: Order cancellation is constrained by business logic: if an order is in 'Pending' or 'In Queue' status (before washing commences), the customer can click 'Request Cancellation'. This prompts a confirmation modal, invalidates the queue ticket, and restores machine allocation without requiring manager intervention.
+[84] 
+[85] 6. Cross-Functional Module Navigation Matrix
+[86] Synthesis Matrix: The following matrix summarizes the technical interactions, routing paths, data entities, and operational objectives across the four customer portal modules:
+[87] 
+[88] 7. System Analyst Evaluation & Recommendations
+[89] Analytical Assessment: From a human-computer interaction (HCI) and systems analysis perspective, the customer portal of Bon Laundry Station exhibits several best-in-class software engineering design patterns:
+[90] Performance: Single-Page Application (SPA) Ergonomics: Tab switching is executed client-side via lightweight JavaScript DOM manipulation, eliminating page re-rendering delays and providing instantaneous feedback.
+[91] Transparency: Transparency & Trust: By publishing live machine run counts, active queue positions, and transparent pricing cards, the portal demystifies laundry operations and builds strong resident loyalty.
+[92] Data Integrity: Operational Error Reduction: The 4-stage booking wizard prevents common intake errors by enforcing mobile phone format validation, date restrictions, and explicit garment separation choices.
+[93] Throughput Velocity: Omnichannel Counter Integration: Digital QR codes bridge the online reservation portal with the physical shop counter scanner, cutting customer check-in times from 3 minutes down to less than 15 seconds.
+
+--- TABLES ---
+Table 0:
+Metadata Attribute | Specification Details
+System Name | Web-Based Laundry Management System with Machine Learning for Demand Forecasting & Fleet Optimization
+Subsystem / Portal | Customer Account Portal (User-Side Client Application)
+Target Facility | Bon Laundry Station — Urban Deca Homes, Ortigas Commercial Area
+Author / Role | Senior System Analyst & Lead Technical Writer
+Document Identifier | FS-CAP-2026-V1.0
+Authentication Framework | Google OAuth 2.0 Single Sign-On (Role: Customer)
+Release Date | September 2026
+Table 1:
+UI Component | Display State / Value | Functional & Technical Description
+Module Header | Live 19-Machine Fleet Lobby | Identifies the module and features an animated green pulse dot indicating active WebSocket/polling connectivity.
+Fleet Description | Real-time status of 14 Regular Washers (8kg) and 5 Titan Dryers (13kg) | Summarizes physical hardware capacity and operational machine composition.
+Availability Badges | 19 Available (Emerald) / 0 In Cycle (Sky Blue) | Real-time summary pills that instantly communicate total ready capacity vs. currently running hardware.
+Manual Refresh Action | Sync Button (Circular Arrow) | Triggers client-side fleet lobby refresh via JavaScript fetch without reloading the entire webpage.
+Machine Status Pills | Available (Green) / In-Use (Blue) / Maintenance (Red) | Color-coded pill badges reflecting the operational_state attribute in the MachineStatus table.
+Capacity Rating | 8kg / 13kg | Specifies unit load rating (8kg for standard front-load washers, 13kg for heavy-duty Titan dryers).
+Machine Designation | Machine 1 to Machine 19 | Unique hardware identifier physically labeled on the station floor for clear patron orientation.
+Machine Classification | Washer / Dryer | Categorizes hardware function, preventing customer confusion between washing and drying bays.
+Preventive Run Counter | Total Runs: 17 to 25 | Displays cumulative operational cycles executed, supporting transparency and backend maintenance scheduling.
+Cycle Tariff | ₱145 (Washer) / ₱240 (Dryer) | Clear per-cycle base pricing for self-service machine reservations.
+Table 2:
+System Analyst Insight: Machine Sorting Algorithm & Customer Transparency The Fleet Lobby sorts machine cards using a tiered priority algorithm: (1) Available units appear first to highlight ready capacity, (2) Dryers (Titan) are grouped distinctly from Washers, and (3) Machines are indexed sequentially by ID. Displaying the 'Total Runs' metric builds customer trust by demonstrating that equipment is well-maintained and cycled equitably across the facility.
+Table 3:
+Package Name | Rate / Capacity | Included Deliverables & Features | Target Patron Profile
+Classic Care | ₱130 / 8kg | Commercial Washer Cycle, High-Heat Dryer Cycle, Neat Flat Folding, Standard Detergent, 24-Hour Express Turnaround. | Budget-conscious residents, students, and casual weekly loads.
+Saver Package | ₱160 / 8kg | Complete Wash, Dry, and Fold bundle + 1 packet Ariel/Tide detergent + 1 packet Downy fabric conditioner + 1 plastic packaging. Ready in 24h. | Patrons seeking an all-inclusive bundle without bringing their own consumables.
+Signature Package (Best Value) | ₱200 / 8kg | Complete Wash, Dry, and Fold + 2 detergents + 2 Downy fabric conditioners + specialized stain pre-treatment + Priority Queue processing. | Customers washing dirty workwear, children's clothes, or stained items needing scent and deep cleaning.
+Premium Care (VIP Care) | ₱260 / 8kg | Garment color sorting (whites separated from coloreds), extended superwash cycle, gentle cycle for delicates, individual garment care, hypoallergenic soap, express finish. | Executives, high-end garment owners, delicate fabrics, and infant/sensitive skin apparel.
+Self-Service DIY Wash | ₱145 / cycle | Independent access to 8kg commercial washer. Customer loads machine, operates cycle, and handles detergents. | Do-it-yourself patrons seeking immediate machine control and privacy.
+Self-Service Titan Dryer | ₱240 / cycle | Independent access to 13kg heavy-duty Titan commercial dryer for comforters, blankets, and bulky laundry. | Patrons with king/queen beddings, heavy curtains, or multi-hamper drying requirements.
+Deca Condo Delivery | ₱40 flat fee | Door-to-door condominium courier service directly to the resident's specific building and unit in Urban Deca Homes. | Busy residents, work-from-home tenants, and patrons avoiding hamper transit.
+Table 4:
+System Analyst Insight: Dynamic State Pre-population via JavaScript When the user clicks 'Select & Book' on the Signature Package, the frontend executes `selectServiceAndBook('Signature Package (Complete Det & Fabcon)')`. This function automatically sets `currentWizardStep = 1`, checks the matching radio button, recalculates the subtotal, triggers the UI border highlight, and invokes `switchTab('book')`, creating an effortless, unified shopping-to-booking experience.
+Table 5:
+Wizard Step | Step Title | Input Requirements & Operational Workflow
+Step 1 (Active) | Service & Mode | Selection of laundry package card, configuration of laundry loads/separation (1, 2, or 3+ machines), and choice of service mode (Counter Drop-Off, Self-Service Kiosk, or Condo Delivery).
+Step 2 | Schedule & Window | Selection of target date (Today/Tomorrow shortcuts), selection of a guaranteed two-hour operational arrival window, turnaround SLA selection, and conditional condominium unit/building inputs.
+Step 3 | Contact & Payment | Verification of customer full name, input of 11-digit Philippine mobile phone number (09XXXXXXXXX) for SMS cycle tracking, and selection of payment method (Cash/COD, GCash QR, Maya/Card).
+Step 4 | Review & Ticket | Inspection of complete digital ticket preview, itemized price subtotal calculation, terms confirmation, order ticket generation, and display of QR counter check-in code.
+Table 6:
+UI Component | Visible Value in Fig. 4 | Functional & Technical Role
+Lookup Input Bar | Search Order ID (e.g. ORD-12345) | Allows patrons to manually search for any specific order code linked to their profile or family account.
+Track Button | Track (Sky Blue Button) | Executes client-side lookup or focuses the corresponding order card in the DOM list.
+Order Avatar Badge | ORD (Sky Box) | Visual shorthand for active drop-off and self-service appointment orders.
+Order Code & Status | ORD-66611 | Pending (Amber) | Unique database order identifier and payment status pill (Pending counter settlement or Paid).
+Appointment Metadata | Sep 19, 2026 08:00 AM • Self-Service | Scheduled drop-off or self-service reservation timestamp and selected turnaround tier.
+Queue Number Pill | In Queue (#82) | Indicates that the order has been verified and assigned sequential position #82 in the facility's active queue.
+Machine Assignment | Assigned: Auto-Allocation | Displays the specific washer/dryer allocated by the QueueManager algorithm or indicates auto-dispatch readiness.
+4-Stage Stepper | Step 2: In Queue Active | Visual progress stepper indicating that Stage 1 (Received) is complete, Stage 2 (In Queue) is active, and Stages 3-4 are pending.
+Estimated Wait Time | Estimated wait: ~65 mins | Dynamic calculation derived from queue depth, washer cycle remaining durations, and load quantities.
+Cancellation Trigger | Request Cancellation (Rose Red) | Allows self-service order cancellation prior to machine loading, automatically releasing the assigned queue slot.
+Table 7:
+Module / Navigator | Frontend Trigger | Backend Route & Method | Primary Data Models | Key Operational Output
+Live Machine Fleet Lobby | Tab: 'Live Fleet Lobby' or button on secondary bar | GET /customer/dashboard (or /api/fleet/status) | MachineStatus, Queue | Real-time 19-machine availability grid, cycle status, and hardware usage telemetry.
+Services & Official Rate Card | Tab: 'Services & Rates' / 'Book Service →' | GET /customer/dashboard (client-rendered) | ServicePackages, PricingConfig | Transparent price catalog, turnaround SLAs, and 1-click booking pre-population.
+Book Laundry Appointment | Tab: 'Book Order' / '+ Book Laundry Appointment' | POST /customer/book -> /api/orders/create | Appointment, Queue, User | 4-step wizard, multi-machine load separation, arrival slot reservation, and digital check-in code.
+My Orders & Live Tracking | Tab: 'My Orders (X)' / 'Track in My Orders' | GET /customer/dashboard & GET /api/customer/my-orders | Appointment, Queue, MachineStatus | Live order status, 4-stage stepper, queue positioning (#82), estimated wait (~65m), and cancellation.

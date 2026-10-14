@@ -1,14 +1,27 @@
 # routes/pos.py
-from flask import Blueprint, request, jsonify, session
+from datetime import datetime
+from flask import Blueprint, request, jsonify, session, redirect, url_for
 from config.database import SessionLocal
 from models.schemas import Transaction, User, Queue, MachineStatus
 from services.pricing import POSProcessor
 from services.email_service import EmailService
-from services.machines import refresh_machine_cycles, start_machine_cycle
+from services.queuing import QueueManager
+from services.machines import (
+    refresh_machine_cycles, start_machine_cycle, is_machine_available,
+    estimated_wait_for_machine
+)
 
 pos_bp = Blueprint('pos', __name__)
 
+@pos_bp.route('/pos', methods=['GET'])
+@pos_bp.route('/pos/checkout', methods=['GET'])
+def pos_redirect():
+    """Redirect deprecated POS routes to the Verification Terminal."""
+    return redirect('/staff/verify-order')
+
+
 @pos_bp.route('/pos/checkout', methods=['POST'])
+
 def checkout():
     # 1. Security Check: Enforce Role-Based Access Control (RBAC)
     if session.get('user_role') not in ['Staff', 'Manager']:
@@ -59,16 +72,28 @@ def checkout():
             machine_id=int(selected_machine_id), cycle_type=cycle_type
         )
         db.add(new_transaction)
-        machine = db.get(MachineStatus, int(selected_machine_id))
+        # Lock the chosen row so two simultaneous checkouts cannot both start it.
+        machine = (db.query(MachineStatus)
+                   .filter(MachineStatus.machine_id == int(selected_machine_id))
+                   .with_for_update().first())
         if not machine or machine.capacity_kg < validation_result['weight']:
             return jsonify({'status': 'error', 'message': 'Selected machine cannot handle this load.'}), 409
-        start_machine_cycle(machine, customer_name, cycle_type)
-        last_queue = db.query(Queue).order_by(Queue.queue_number.desc()).first()
-        next_queue_number = (last_queue.queue_number if last_queue else 0) + 1
+        if machine.operational_state != 'available':
+            return jsonify({'status': 'error', 'message': 'Selected machine is under maintenance or not available.'}), 409
+        now = datetime.now()
+        starts_now = is_machine_available(machine)
+        estimated_wait = 0 if starts_now else estimated_wait_for_machine(db, machine)
+        if starts_now:
+            start_machine_cycle(machine, customer_name, cycle_type)
+        next_queue_number = QueueManager.generate_next_queue_number(db)
         queue_entry = Queue(
-            queue_number=next_queue_number,
-            machine_id=machine.machine_id, status='Processing', estimated_waiting_time=0,
-            customer_name=customer_name
+            queue_number=next_queue_number, machine_id=machine.machine_id,
+            status='Processing' if starts_now else 'Waiting',
+            verified_at=now,
+            started_at=now if starts_now else None,
+            actual_wait_mins=0 if starts_now else None,
+            created_at=now,
+            estimated_waiting_time=estimated_wait, customer_name=customer_name
         )
         db.add(queue_entry)
         db.flush()
@@ -83,7 +108,7 @@ def checkout():
         
         return jsonify({
             "status": "success",
-            "message": "Transaction recorded cleanly.",
+            "message": "Transaction recorded and machine started." if starts_now else "Transaction recorded and queued for the selected machine.",
             "data": {
                 "transaction_id": new_transaction.transaction_id,
                 "weight_kg": float(new_transaction.weight_kg),
@@ -95,12 +120,14 @@ def checkout():
                 "queue": {
                     "queue_number": queue_entry.queue_number,
                     "status": queue_entry.status,
-                    "machine": machine.machine_name or f"Machine {machine.machine_id}",
+                    "machine": machine.machine_name or f"Machine {machine.machine_id} (Dryer and Washer)",
                     "estimated_waiting_time": queue_entry.estimated_waiting_time
                 }
             }
         }), 201
-        
+    except ValueError as error:
+        db.rollback()
+        return jsonify({"status": "error", "message": str(error)}), 409
     except Exception as e:
         db.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500

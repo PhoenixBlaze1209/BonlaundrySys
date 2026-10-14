@@ -1,0 +1,449 @@
+/* =============================================================
+   BON LAUNDRY STATION - Shared Design System
+   ============================================================= */
+
+/* 1. DESIGN TOKENS */
+:root {
+  --aqua:       #0ea5e9;
+  --aqua-deep:  #0369a1;
+  --aqua-pale:  #e0f2fe;
+  --aqua-mid:   #7dd3fc;
+  --ink:        #0f172a;
+  --ink-2:      #334155;
+  --muted:      #64748b;
+  --faint:      #94a3b8;
+  --surface:    #ffffff;
+  --canvas:     #f8fafc;
+  --tint:       #f1f5f9;
+  --tint-2:     #e9eef2;
+  --border:     #e2e8f0;
+  --border-med: #cbd5e1;
+  --emerald:       #10b981;
+  --emerald-pale:  #d1fae5;
+  --emerald-text:  #065f46;
+  --amber:         #f59e0b;
+  --amber-pale:    #fef3c7;
+  --amber-text:    #78350f;
+  --slate-pill:    #94a3b8;
+  --slate-pale:    #f1f5f9;
+  --slate-text:    #475569;
+  --rose:          #f43f5e;
+  --rose-pale:     #ffe4e6;
+  --rose-text:     #9f1239;
+  --sidebar-bg:    #071827;
+  --sidebar-text:  #94a3b8;
+  --sidebar-hover: #0d2536;
+  --sidebar-active:#102f42;
+  --shadow-sm:   0 1px 3px rgba(15,23,42,.08), 0 1px 2px rgba(15,23,42,.06);
+  --shadow-md:   0 4px 12px rgba(15,23,42,.10), 0 2px 4px rgba(15,23,42,.06);
+  --shadow-lg:   0 8px 24px rgba(15,23,42,.12), 0 4px 8px rgba(15,23,42,.06);
+  --ring:        0 0 0 3px rgba(14,165,233,.20);
+  --r-sm:  6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px; --r-2xl: 28px; --r-full: 9999px;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-ui:      'Manrope', 'DM Sans', system-ui, sans-serif;
+  --font-mono:    ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+
+/* 2. BASE */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-ui); color: var(--ink); background: var(--canvas); -webkit-font-smoothing: antialiased; }
+::selection { background: #bae6fd; color: var(--ink); }
+:focus-visible { outline: none; box-shadow: var(--ring); }
+
+/* 3. TYPOGRAPHY */
+.t-display { font-family: var(--font-display); font-weight: 700; line-height: 1.15; letter-spacing: -.01em; }
+.t-headline { font-family: var(--font-display); font-size: 1.75rem; font-weight: 600; line-height: 1.25; }
+.t-title { font-family: var(--font-ui); font-size: 1rem; font-weight: 700; line-height: 1.4; color: var(--ink); }
+.t-body { font-family: var(--font-ui); font-size: .9375rem; font-weight: 400; line-height: 1.65; color: var(--ink-2); }
+.t-label { font-family: var(--font-ui); font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.t-mono { font-family: var(--font-mono); font-size: .8125rem; }
+
+/* 4. BUTTONS */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .4375rem; border: none; border-radius: var(--r-md); font-family: var(--font-ui); font-size: .8125rem; font-weight: 700; line-height: 1; padding: .625rem 1rem; cursor: pointer; transition: background-color .15s ease, box-shadow .15s ease, transform .12s ease; text-decoration: none; white-space: nowrap; }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none !important; }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn-primary { background: var(--aqua); color: #fff; box-shadow: 0 4px 12px rgba(14,165,233,.28); }
+.btn-primary:hover:not(:disabled) { background: var(--aqua-deep); box-shadow: 0 6px 16px rgba(14,165,233,.36); transform: translateY(-1px); }
+.btn-secondary { background: var(--tint); color: var(--ink-2); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.btn-secondary:hover:not(:disabled) { background: var(--tint-2); border-color: var(--border-med); }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+.btn-ghost:hover:not(:disabled) { background: var(--tint); color: var(--ink-2); }
+.btn-danger { background: var(--rose-pale); color: var(--rose-text); border: 1px solid #fecdd3; }
+.btn-danger:hover:not(:disabled) { background: #fecdd3; }
+.btn-sm { padding: .4375rem .75rem; font-size: .75rem; border-radius: var(--r-sm); }
+.btn-lg { padding: .875rem 1.375rem; font-size: .9375rem; border-radius: var(--r-lg); }
+.btn-block { width: 100%; }
+
+/* 5. FORM FIELDS */
+.field { width: 100%; font-family: var(--font-ui); font-size: .875rem; font-weight: 500; color: var(--ink); background: var(--tint); border: 1.5px solid var(--border); border-radius: var(--r-md); padding: .625rem .875rem; transition: border-color .15s ease, background .15s ease, box-shadow .15s ease; outline: none; -webkit-appearance: none; appearance: none; }
+.field::placeholder { color: var(--faint); font-weight: 400; }
+.field:focus { background: var(--surface); border-color: var(--aqua); box-shadow: var(--ring); }
+.field:disabled { opacity: .55; cursor: not-allowed; }
+select.field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .875rem center; padding-right: 2.25rem; }
+.field-label { display: block; font-size: .8125rem; font-weight: 700; color: var(--ink-2); margin-bottom: .375rem; }
+.field-hint { font-size: .75rem; color: var(--muted); margin-top: .25rem; }
+.field-error { font-size: .75rem; color: var(--rose); margin-top: .25rem; font-weight: 600; }
+.field-well { background: var(--tint); border: 1.5px solid var(--border); box-shadow: inset 0 1px 3px rgba(15,23,42,.07); border-radius: var(--r-lg); padding: .75rem 1rem; font-size: .9375rem; font-family: var(--font-ui); font-weight: 500; color: var(--ink); width: 100%; outline: none; transition: border-color .15s ease, background .15s ease, box-shadow .15s ease; -webkit-appearance: none; }
+.field-well::placeholder { color: var(--faint); font-weight: 400; }
+.field-well:focus { background: var(--surface); border-color: var(--aqua); box-shadow: var(--ring), inset 0 1px 2px rgba(15,23,42,.04); }
+
+/* 6. ALERTS */
+.alert { padding: .75rem 1rem; border-radius: var(--r-md); font-size: .8125rem; font-weight: 500; border: 1px solid transparent; line-height: 1.5; }
+.alert-error { background: var(--rose-pale); border-color: #fecdd3; color: var(--rose-text); }
+.alert-success { background: var(--emerald-pale); border-color: #a7f3d0; color: var(--emerald-text); }
+.alert-info { background: var(--aqua-pale); border-color: #bae6fd; color: var(--aqua-deep); }
+
+/* 7. STATUS BADGES */
+.badge { display: inline-flex; align-items: center; gap: .3125rem; padding: .25rem .625rem; border-radius: var(--r-full); font-size: .6875rem; font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+.badge-available, .badge-success, .badge-confirmed { background: var(--emerald-pale); color: var(--emerald-text); }
+.badge-in-use, .badge-processing, .badge-pending, .badge-washing, .badge-drying { background: var(--amber-pale); color: var(--amber-text); }
+.badge-maintenance, .badge-neutral, .badge-cancelled { background: var(--slate-pale); color: var(--slate-text); }
+.badge-error, .badge-failed { background: var(--rose-pale); color: var(--rose-text); }
+.badge-info, .badge-waiting { background: var(--aqua-pale); color: var(--aqua-deep); }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.status-dot-available { background: var(--emerald); box-shadow: 0 0 0 2px var(--emerald-pale); }
+.status-dot-in-use    { background: var(--amber);   box-shadow: 0 0 0 2px var(--amber-pale); }
+.status-dot-maintenance { background: var(--slate-pill); }
+.status-dot-live { background: var(--emerald); animation: pulse-dot 2s ease-in-out infinite; }
+@keyframes pulse-dot { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,.4); } 50% { box-shadow: 0 0 0 4px rgba(16,185,129,0); } }
+
+/* 8. TABLES */
+.data-table { width: 100%; border-collapse: collapse; font-size: .8125rem; }
+.data-table thead th { padding: .5625rem .875rem; text-align: left; font-size: .6875rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--tint); border-bottom: 1px solid var(--border); white-space: nowrap; }
+.data-table tbody td { padding: .6875rem .875rem; color: var(--ink-2); font-weight: 500; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr { transition: background-color .1s ease; }
+.data-table tbody tr:hover td { background: var(--tint); }
+.data-table .col-strong { font-weight: 700; color: var(--ink); }
+.data-table .col-mono { font-family: var(--font-mono); font-size: .75rem; color: var(--aqua-deep); }
+.data-table .col-right { text-align: right; }
+.data-table .col-muted { color: var(--muted); }
+.table-shell { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); box-shadow: var(--shadow-sm); }
+
+/* 9. PANELS */
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); }
+.panel-body { padding: 1.25rem 1.5rem; }
+.panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); }
+.section-label { font-size: .6875rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--aqua-deep); }
+
+/* 10. MACHINE CELLS */
+.machine-cell { border-radius: var(--r-md); padding: .5rem; text-align: center; font-size: .6875rem; font-weight: 700; line-height: 1.3; transition: transform .15s ease; }
+.machine-cell:hover { transform: scale(1.04); }
+.machine-cell-available   { background: var(--emerald-pale); color: var(--emerald-text); border: 1px solid #6ee7b7; }
+.machine-cell-in-use      { background: var(--aqua-pale);   color: var(--aqua-deep);    border: 1px solid #bae6fd; }
+.machine-cell-maintenance { background: var(--slate-pale);  color: var(--slate-text);   border: 1px solid var(--border); }
+
+/* 11. SIDEBAR NAV */
+.nav-item { display: flex; align-items: center; gap: .75rem; width: 100%; padding: .625rem .875rem; border-radius: var(--r-md); font-size: .8125rem; font-weight: 600; color: var(--sidebar-text); background: transparent; border: none; cursor: pointer; text-align: left; transition: background-color .12s ease, color .12s ease; text-decoration: none; position: relative; }
+.nav-item:hover { background: var(--sidebar-hover); color: #e2e8f0; }
+.nav-item.active { background: var(--sidebar-active); color: #f0f9ff; font-weight: 700; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: .25rem; bottom: .25rem; width: 3px; background: var(--aqua); border-radius: 0 2px 2px 0; }
+.nav-item svg { flex-shrink: 0; opacity: .7; }
+.nav-item.active svg { opacity: 1; }
+
+/* 12. METRIC CARD */
+.metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.125rem 1.25rem; box-shadow: var(--shadow-sm); }
+.metric-card-label { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.metric-card-value { font-size: 1.75rem; font-weight: 800; color: var(--ink); line-height: 1.1; margin-top: .25rem; font-variant-numeric: tabular-nums; }
+.metric-card-value.accent { color: var(--aqua-deep); }
+.metric-card-value.emerald { color: var(--emerald-text); }
+.metric-card-sub { font-size: .75rem; color: var(--muted); margin-top: .25rem; }
+
+/* 13. EMPTY STATE */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 1.5rem; text-align: center; color: var(--muted); }
+.empty-state-title { font-size: .9375rem; font-weight: 700; color: var(--ink-2); margin-bottom: .375rem; }
+.empty-state-body { font-size: .8125rem; line-height: 1.6; }
+
+/* 14. INLINE STATUS MESSAGE */
+.status-msg { font-size: .8125rem; font-weight: 600; border-radius: var(--r-sm); padding: .5rem .75rem; display: none; }
+.status-msg.is-visible { display: block; }
+.status-msg.is-success { background: var(--emerald-pale); color: var(--emerald-text); }
+.status-msg.is-error   { background: var(--rose-pale);    color: var(--rose-text); }
+.status-msg.is-info    { background: var(--aqua-pale);    color: var(--aqua-deep); }
+
+/* 15. REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* =============================================================
+   PRODUCTION UI SYSTEM — operational, restrained, and shared
+   This layer intentionally supersedes the earlier decorative styles.
+   ============================================================= */
+:root {
+  --ink:#17252d; --ink-2:#3d505a; --muted:#667b85; --canvas:#f5f7f7;
+  --surface:#ffffff; --tint:#edf2f3; --tint-2:#e5ecee; --border:#d5e0e3;
+  --aqua:#087f98; --aqua-deep:#056276; --aqua-pale:#e1f2f4;
+  --emerald:#167c57; --emerald-pale:#e4f4ed; --amber:#a76600; --amber-pale:#fff2dc;
+  --rose:#b23b43; --rose-pale:#fcebed; --sidebar-bg:#17252d; --sidebar-hover:#243841;
+  --font-ui:'Archivo',Arial,sans-serif; --font-display:'Archivo',Arial,sans-serif;
+  --font-mono:'Roboto Mono',ui-monospace,monospace; --r-sm:4px; --r-md:6px; --r-lg:10px; --r-xl:12px;
+}
+html { background:var(--canvas); }
+body { font-family:var(--font-ui)!important; background:var(--canvas)!important; color:var(--ink)!important; }
+.display,.display-font,.font-display,.t-display,.t-headline { font-family:var(--font-display)!important; letter-spacing:-.025em!important; font-weight:700!important; }
+button,input,select,textarea { font-family:var(--font-ui)!important; }
+button, a { -webkit-tap-highlight-color:transparent; }
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible { outline:3px solid rgba(8,127,152,.35)!important; outline-offset:2px!important; box-shadow:none!important; }
+::selection { background:#bfe7ea; color:var(--ink); }
+
+/* Operational UI layer styling */
+
+/* Inputs are intentionally calm, not recessed or sculpted. */
+.field,.field-well,.recessed,.recessed-input,
+input:not([type=checkbox]):not([type=radio]),select,textarea {
+  background:var(--surface)!important; border:1px solid var(--border)!important;
+  border-radius:var(--r-md)!important; box-shadow:none!important; color:var(--ink)!important;
+}
+.field:focus,.field-well:focus,.recessed:focus,.recessed-input:focus,input:focus,select:focus,textarea:focus {
+  background:#fff!important; border-color:var(--aqua)!important; box-shadow:0 0 0 3px rgba(8,127,152,.13)!important; outline:0!important;
+}
+
+/* Buttons get a single semantic primary style; no gradients, glows, or lift. */
+.btn-primary,.tactile-btn,.tactile,.bg-\[\#00B4F4\].text-white,.bg-cyan-600.text-white {
+  background:var(--aqua)!important; color:#fff!important; border:1px solid var(--aqua)!important; box-shadow:none!important;
+}
+.btn-primary:hover,.tactile-btn:hover,.tactile:hover { background:var(--aqua-deep)!important; transform:none!important; }
+.btn-secondary,.btn-ghost { border-radius:var(--r-md)!important; box-shadow:none!important; }
+
+/* Data comes first: compact density, stable tabular figures, quiet row hover. */
+table, .font-mono, #pos-total, #metric-active-queue, #metric-wait-time, #metric-machines, #metric-revenue,
+#queue-number, #queue-wait, #ready-machines { font-variant-numeric:tabular-nums; }
+.data-table,.page-content table { font-size:.8125rem; }.data-table thead th,.page-content thead th { background:var(--tint)!important; color:var(--muted)!important; }
+.data-table tbody tr:hover td,.page-content tbody tr:hover td { background:#f0f6f6!important; }
+.table-shell { border-radius:var(--r-lg)!important; box-shadow:none!important; }
+
+/* Operations shell. */
+.app-sidebar { background:var(--sidebar-bg)!important; box-shadow:none!important; border-right:1px solid #30454e!important; }
+.app-sidebar button,.app-sidebar a { border-radius:var(--r-md)!important; }
+.active-tab { background:#294650!important; box-shadow:inset 3px 0 0 #6bd0d9!important; }
+.topbar { background:var(--surface)!important; backdrop-filter:none!important; box-shadow:none!important; }
+.page-content { background:var(--canvas)!important; }
+.page-content .bg-white.rounded-\[24px\] { border-radius:var(--r-lg)!important; border-color:var(--border)!important; box-shadow:none!important; }
+
+/* Customer/public pages use flat sections rather than repeated floating tiles. */
+header { backdrop-filter:none!important; box-shadow:none!important; }
+.hero-gradient { background:var(--sidebar-bg)!important; }
+.service-card { box-shadow:none!important; border:1px solid var(--border)!important; border-radius:var(--r-lg)!important; }
+.service-card:hover,.service-card.selected { transform:none!important; box-shadow:none!important; border-color:var(--aqua)!important; }
+.machine-cell { border-radius:var(--r-sm)!important; box-shadow:none!important; }
+
+/* Loading and failure states remain legible even when populated by existing JS. */
+[aria-live] { min-height:1.25rem; }
+button:disabled { cursor:not-allowed!important; opacity:.55!important; transform:none!important; }
+@media (max-width:767px) {
+  .page-content { padding:16px!important; }
+  .topbar { padding-inline:16px!important; }
+  .data-table,.page-content table { font-size:.75rem; }
+}
+
+/* Second-pass density: turn repeated KPI/card patterns into information strips. */
+.backdrop-blur-sm,.backdrop-blur-md,.backdrop-blur { backdrop-filter:none!important; }
+.animate-pulse,.animate-in { animation:none!important; }
+.hover\:-translate-y-0\.5:hover,.hover\:-translate-y-1:hover { transform:none!important; }
+
+/* The dashboard's first row is an operational readout, not four decorative tiles. */
+#view-dashboard > .grid:first-child,
+#view-queue > .grid:first-of-type { gap:0!important; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); }
+#view-dashboard > .grid:first-child > div,
+#view-queue > .grid:first-of-type > div {
+  height:auto!important; min-height:108px; padding:20px 24px!important; border:0!important;
+  border-radius:0!important; box-shadow:none!important; background:transparent!important;
+}
+#view-dashboard > .grid:first-child > div + div,
+#view-queue > .grid:first-of-type > div + div { border-left:1px solid var(--border)!important; }
+#view-dashboard > .grid:first-child > div > div:first-child,
+#view-queue > .grid:first-of-type > div > div:first-child { display:none!important; }
+#view-dashboard > .grid:first-child h3,
+#view-queue > .grid:first-of-type h3 { margin-top:7px; font-size:1.75rem!important; letter-spacing:-.04em; }
+
+/* The customer headline and metrics become a single service status composition. */
+#overview > div:first-child > div.absolute { display:none!important; }
+main > section:nth-of-type(2) { gap:0!important; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--surface); }
+main > section:nth-of-type(2) > article { padding:18px 22px!important; border:0!important; border-radius:0!important; box-shadow:none!important; background:transparent!important; }
+main > section:nth-of-type(2) > article + article { border-left:1px solid var(--border)!important; }
+
+/* Flat, meaningful grouping for service configuration and activity lists. */
+#view-dashboard .space-y-3 > .rounded-2xl,
+#appointment-list > .rounded-2xl,
+#live-activity-list > .rounded-2xl { border-radius:0!important; border-inline:0!important; box-shadow:none!important; }
+#view-dashboard .space-y-3 > .rounded-2xl + .rounded-2xl,
+#appointment-list > .rounded-2xl + .rounded-2xl,
+#live-activity-list > .rounded-2xl + .rounded-2xl { border-top:1px solid var(--border)!important; }
+
+/* Checkout, queue, and machine monitoring are workstation views: clear panels,
+   compact selection controls, and no visual competition with the live data. */
+#view-pos > div,
+#view-queue > div,
+#view-machines > div,
+#view-settings > div { box-shadow:none!important; }
+#view-pos .rounded-\[24px\],
+#view-queue .rounded-\[24px\],
+#view-machines .rounded-\[24px\],
+#view-settings .rounded-\[24px\] { border-radius:var(--r-lg)!important; }
+#view-pos .service-option,
+#view-pos [data-service],
+#view-pos [data-machine] { border-radius:var(--r-md)!important; box-shadow:none!important; }
+#view-pos .service-option:hover,
+#view-pos [data-service]:hover,
+#view-pos [data-machine]:hover { transform:none!important; }
+#machine-status-grid { gap:10px!important; }
+#machine-status-grid > div { border-radius:var(--r-md)!important; box-shadow:none!important; padding:14px!important; }
+#view-queue .heatmap-cell,
+#machine-heatmap .machine-dot { border-radius:var(--r-sm)!important; }
+
+/* Customer booking removes explanatory nesting and keeps the next action obvious. */
+#book > div:first-child > div:last-child { display:none!important; }
+#book > div:first-child { border-radius:var(--r-lg)!important; box-shadow:none!important; }
+#book > form { border-radius:var(--r-lg)!important; box-shadow:none!important; }
+#appointments > div { border-radius:var(--r-lg)!important; box-shadow:none!important; }
+#appointments .rounded-full { border-radius:999px!important; }
+
+/* The public booking flow is a task form, not a collection of promo tiles. */
+#order-section,#track-section,#lobby-section { border-radius:var(--r-lg)!important; box-shadow:none!important; }
+#tracking-results .rounded-2xl,#lobby-section .rounded-2xl { border-radius:var(--r-md)!important; box-shadow:none!important; }
+
+/* ========================================================================
+   BON SERVICE LEDGER
+   A front-counter operating language: receipt-like precision, quiet service
+   surfaces, and live state that earns the visual emphasis it receives.
+   ======================================================================== */
+:root {
+  --ink:#132531; --ink-soft:#4a5b64; --ledger:#f6f4ef; --paper:#fffefa;
+  --rule:#d9d9d2; --rule-dark:#bfc3bf; --brand:#0d6d9b; --brand-deep:#084d70;
+  --signal:#d97b31; --ready:#18785e; --waiting:#a86518; --danger:#b43b40;
+  --font-ui:'Archivo',system-ui,sans-serif; --font-mono:'Roboto Mono',ui-monospace,monospace;
+}
+html,body { background:var(--ledger)!important; color:var(--ink)!important; }
+body { letter-spacing:-.006em; }
+::selection { background:#cbe5ee; color:var(--ink); }
+
+/* The operations shell feels like a serious service desk, not an app demo. */
+.app-sidebar { background:var(--ink)!important; border-right:0!important; box-shadow:none!important; padding:18px 14px!important; }
+.app-sidebar > div:first-child > div:first-child { margin:0 0 22px!important; padding:10px 12px 18px!important; border-bottom:1px solid rgba(255,255,255,.16); }
+.app-sidebar img { background:#fff!important; border-radius:7px!important; padding:3px!important; box-shadow:none!important; }
+.app-sidebar h1 { font-size:15px!important; letter-spacing:-.02em!important; }
+.app-sidebar nav { position:relative; }
+.app-sidebar nav::before { content:'WORKSPACE'; display:block; margin:8px 12px 9px; color:#86a0aa; font-size:9px; letter-spacing:.13em; font-weight:700; }
+.app-sidebar button,.app-sidebar a { min-height:42px; border-radius:5px!important; color:#b9cad0!important; }
+.app-sidebar button span,.app-sidebar a span { font-size:13px!important; }
+.app-sidebar button:not(.active-tab):hover { background:#1d3542!important; color:#fff!important; box-shadow:none!important; }
+.app-sidebar .active-tab { background:#f5f1e8!important; color:var(--ink)!important; box-shadow:none!important; font-weight:700!important; }
+.app-sidebar .active-tab::before { display:none!important; }
+.app-sidebar .active-tab svg { color:var(--brand)!important; opacity:1!important; }
+.app-sidebar > div:last-child { padding-top:12px; border-top:1px solid rgba(255,255,255,.16); }
+.app-sidebar > div:last-child a { color:#ffb0a5!important; }
+
+.main-workspace { background:var(--ledger)!important; }
+.topbar { height:68px!important; background:rgba(246,244,239,.96)!important; border-color:var(--rule)!important; box-shadow:none!important; }
+.topbar #page-title { font-family:var(--font-ui)!important; font-size:19px!important; letter-spacing:-.03em!important; }
+.topbar .text-sky-600 { color:var(--brand)!important; font-size:10px!important; }
+.topbar > div:last-child > div:last-child { background:#e3e9e8!important; border:0!important; border-radius:50%!important; }
+.page-content { padding:30px 34px 44px!important; background:var(--ledger)!important; }
+
+/* Page-level titles and values are calm; live data is the strongest thing on screen. */
+.page-content h1,.page-content h2,.page-content h3,.page-content h4 { color:var(--ink)!important; }
+.page-content .text-slate-400 { color:#71808a!important; }
+.page-content .text-slate-500 { color:var(--ink-soft)!important; }
+.page-content .text-\[\#00B4F4\],.page-content .text-cyan-600,.page-content .text-sky-600 { color:var(--brand)!important; }
+.page-content .bg-\[\#00B4F4\],.page-content .bg-cyan-600 { background:var(--brand)!important; }
+
+/* A surface means a worksheet, a live board, or a form: no ornamental card stack. */
+.page-content .bg-white.rounded-\[24px\],
+.page-content .bg-white.rounded-3xl,
+.page-content .bg-white.rounded-2xl { background:var(--paper)!important; border:1px solid var(--rule)!important; border-radius:8px!important; box-shadow:none!important; }
+.page-content .rounded-xl,.page-content .rounded-2xl { border-radius:6px!important; }
+.page-content .rounded-full { border-radius:999px!important; }
+.page-content input,.page-content select,.page-content textarea { background:#fffefa!important; border:1px solid var(--rule-dark)!important; border-radius:5px!important; box-shadow:none!important; min-height:44px; }
+.page-content input:focus,.page-content select:focus,.page-content textarea:focus { border-color:var(--brand)!important; box-shadow:0 0 0 3px rgba(13,109,155,.14)!important; }
+.page-content button { border-radius:5px!important; box-shadow:none!important; }
+
+/* Dashboard: one continuous live reading, then a working queue and forecast. */
+#view-dashboard > .grid:first-child { border:1px solid var(--rule)!important; border-radius:8px!important; overflow:hidden; }
+#view-dashboard > .grid:first-child > div { min-height:118px!important; padding:19px 22px!important; }
+#view-dashboard > .grid:first-child h3 { font-family:var(--font-mono)!important; font-size:25px!important; line-height:1!important; letter-spacing:-.06em!important; }
+#view-dashboard > .grid:first-child span { color:#60717b!important; font-size:10px!important; }
+#view-dashboard #live-activity-list > div { background:transparent!important; padding:13px 0!important; border:0!important; border-radius:0!important; }
+#view-dashboard #live-activity-list > div + div { border-top:1px solid var(--rule)!important; }
+#view-dashboard #live-activity-list .bg-cyan-50 { background:#e1eff4!important; color:var(--brand-deep)!important; }
+#view-dashboard #live-activity-list .bg-orange-50 { background:#f9ead9!important; color:#8d4d12!important; }
+#view-dashboard .lg\:col-span-2 + div { background:var(--ink)!important; border-color:var(--ink)!important; }
+#view-dashboard .lg\:col-span-2 + div h2,#view-dashboard .lg\:col-span-2 + div span,#view-dashboard .lg\:col-span-2 + div div { color:#f8f6ef!important; }
+#view-dashboard .lg\:col-span-2 + div #forecast-load-label { color:#90d1e4!important; }
+
+/* POS reads left-to-right: sale details, then the amount and final action. */
+#view-pos { gap:18px!important; }
+#view-pos > div { border-radius:8px!important; }
+#view-pos label { color:#54656d!important; font-size:10px!important; letter-spacing:.11em!important; }
+#view-pos #pos-reference { color:var(--brand)!important; font-family:var(--font-mono)!important; }
+#view-pos .lg\:col-span-2 { padding:26px!important; }
+#view-pos > div:last-child { background:var(--ink)!important; border-color:var(--ink)!important; color:#fff!important; }
+#view-pos > div:last-child h1,#view-pos > div:last-child h2,#view-pos > div:last-child h3,#view-pos > div:last-child h4,#view-pos > div:last-child p,#view-pos > div:last-child span { color:#fff!important; }
+#view-pos > div:last-child .border-t,#view-pos > div:last-child .border-b { border-color:rgba(255,255,255,.2)!important; }
+
+/* Queue and machines become an actual dispatch board. */
+#view-queue > .grid:first-of-type { background:var(--paper)!important; border-color:var(--rule)!important; }
+#view-queue .overflow-x-auto,#view-sales .overflow-x-auto,#view-appointment .overflow-x-auto { border:1px solid var(--rule)!important; border-radius:8px!important; background:var(--paper)!important; }
+#view-queue table thead,#view-sales table thead,#view-appointment table thead { background:#eae8e1!important; }
+#view-queue table th,#view-sales table th,#view-appointment table th { color:#52636b!important; letter-spacing:.08em!important; font-size:10px!important; }
+#view-queue table td,#view-sales table td,#view-appointment table td { border-color:var(--rule)!important; }
+#view-machines > div { padding:26px!important; background:var(--paper)!important; }
+#machine-status-grid { gap:9px!important; }
+#machine-status-grid > div { border-radius:5px!important; padding:15px!important; box-shadow:none!important; }
+#machine-status-grid > div p:first-child { font-family:var(--font-mono)!important; color:var(--ink)!important; }
+
+/* Settings uses the existing side navigation as a ledger index. */
+#view-settings > div { background:var(--paper)!important; border:1px solid var(--rule)!important; border-radius:8px!important; }
+#view-settings aside { background:#eceae3!important; border-color:var(--rule)!important; }
+#view-settings aside button { border-radius:4px!important; }
+#view-settings aside button:hover { background:#dddcd6!important; }
+
+/* Public booking is hospitality, not a SaaS landing page. */
+header.sticky { background:rgba(255,254,250,.97)!important; border-color:var(--rule)!important; box-shadow:none!important; }
+header.sticky .max-w-7xl { height:76px!important; }
+header.sticky .rounded-2xl { border-radius:6px!important; }
+header.sticky .rounded-xl { border-radius:5px!important; }
+.hero-gradient { background:var(--ink)!important; }
+.hero-gradient .bg-white\/10,.hero-gradient .border-white\/30 { background:transparent!important; border-color:rgba(255,255,255,.3)!important; }
+#order-section,#track-section,#lobby-section { background:var(--paper)!important; border-color:var(--rule)!important; border-radius:8px!important; }
+.service-card { min-height:132px!important; border:1px solid var(--rule)!important; border-radius:6px!important; background:#fffefa!important; }
+.service-card:hover { background:#f5fafb!important; border-color:var(--brand)!important; }
+.service-card.selected { border:2px solid var(--brand)!important; background:#f1f8fa!important; }
+.service-card > div:first-child { border-radius:4px!important; }
+.recessed-input { background:#fffefa!important; border-color:var(--rule-dark)!important; border-radius:5px!important; box-shadow:none!important; }
+.tactile-btn { background:var(--brand)!important; border-radius:5px!important; box-shadow:none!important; }
+.tactile-btn:hover { background:var(--brand-deep)!important; transform:none!important; box-shadow:none!important; }
+
+/* Customer dashboard is a private service journal, with their active work first. */
+#overview > div:first-child { background:var(--ink)!important; border-radius:8px!important; }
+#overview > div:first-child .text-cyan-300 { color:#8bd4e7!important; }
+#overview > div:last-child,#book > form,#appointments > div { background:var(--paper)!important; border-color:var(--rule)!important; border-radius:8px!important; }
+#book > div:first-child { background:var(--brand)!important; border-radius:8px!important; }
+#book > div:first-child .text-cyan-100,#book > div:first-child .text-cyan-50 { color:#def3f8!important; }
+#machine-heatmap .machine-dot { border-radius:3px!important; }
+
+/* Authentication is deliberately quieter than the workspaces. */
+.auth-shell { background:var(--ledger)!important; }
+.auth-panel,.auth-card { background:var(--paper)!important; border-color:var(--rule)!important; border-radius:8px!important; box-shadow:none!important; }
+
+@media (max-width:767px) {
+  .page-content { padding:18px 16px 32px!important; }
+  .app-sidebar { padding:16px 12px!important; }
+  #view-dashboard > .grid:first-child > div { min-height:96px!important; padding:15px!important; }
+  #view-pos .lg\:col-span-2,#view-machines > div { padding:18px!important; }
+}
+
+/* Mobile keeps the readout scannable rather than forcing compressed mini-cards. */
+@media (max-width:767px) {
+  #view-dashboard > .grid:first-child,
+  #view-queue > .grid:first-of-type,
+  main > section:nth-of-type(2) { display:grid; grid-template-columns:1fr 1fr; }
+  #view-dashboard > .grid:first-child > div + div,
+  #view-queue > .grid:first-of-type > div + div,
+  main > section:nth-of-type(2) > article + article { border-left:0!important; border-top:1px solid var(--border)!important; }
+  #view-dashboard > .grid:first-child > div:nth-child(even),
+  #view-queue > .grid:first-of-type > div:nth-child(even),
+  main > section:nth-of-type(2) > article:nth-child(even) { border-left:1px solid var(--border)!important; }
+}

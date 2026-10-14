@@ -1,0 +1,647 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2800 2050" width="2800" height="2050">
+      
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#000000"/>
+  </marker>
+  <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+    <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+  </filter>
+</defs>
+<rect width="2800" height="2050" fill="#ffffff"/>
+<g transform="translate(60, 60)">
+  <text font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="bold" fill="#0f172a">BON LAUNDRY STATION — LEVEL 0 SYSTEM OVERVIEW DFD</text>
+  <text y="30" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#64748b">Updated with Super Admin Actor, Google SSO Provisioning, Role Perspective Switching, Tariffs &amp; Audit Trail</text>
+</g>
+
+    <!-- Vertex: p1h -->
+    <g id="v_p1h">
+      <rect x="1120.0" y="70.0" width="320.0" height="28.0"
+            rx="0" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="86.19999999999999" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">1.0</text></g>
+    <!-- Vertex: p1b -->
+    <g id="v_p1b">
+      <rect x="1120.0" y="98.0" width="320.0" height="52.0"
+            rx="0" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="126.19999999999999" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#000000" text-anchor="middle">User Account &amp; Profile Management</text></g>
+    <!-- Vertex: p2h -->
+    <g id="v_p2h">
+      <rect x="1120.0" y="350.0" width="320.0" height="28.0"
+            rx="0" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="366.20000000000005" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">2.0</text></g>
+    <!-- Vertex: p2b -->
+    <g id="v_p2b">
+      <rect x="1120.0" y="378.0" width="320.0" height="52.0"
+            rx="0" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="406.20000000000005" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#000000" text-anchor="middle">Appointment &amp; Order Intake</text></g>
+    <!-- Vertex: p3h -->
+    <g id="v_p3h">
+      <rect x="1120.0" y="650.0" width="320.0" height="28.0"
+            rx="0" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="666.2" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">3.0</text></g>
+    <!-- Vertex: p3b -->
+    <g id="v_p3b">
+      <rect x="1120.0" y="678.0" width="320.0" height="52.0"
+            rx="0" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="706.2" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#000000" text-anchor="middle">Process Sales &amp; Transactions</text></g>
+    <!-- Vertex: p4h -->
+    <g id="v_p4h">
+      <rect x="1120.0" y="970.0" width="320.0" height="28.0"
+            rx="0" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="986.2" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">4.0</text></g>
+    <!-- Vertex: p4b -->
+    <g id="v_p4b">
+      <rect x="1120.0" y="998.0" width="320.0" height="52.0"
+            rx="0" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="1026.2" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#000000" text-anchor="middle">Queue &amp; Machine Fleet Monitoring</text></g>
+    <!-- Vertex: p5h -->
+    <g id="v_p5h">
+      <rect x="1120.0" y="1290.0" width="320.0" height="28.0"
+            rx="0" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="1306.1999999999998" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">5.0</text></g>
+    <!-- Vertex: p5b -->
+    <g id="v_p5b">
+      <rect x="1120.0" y="1318.0" width="320.0" height="52.0"
+            rx="0" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="1346.1999999999998" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#000000" text-anchor="middle">Generate Analytics &amp; Forecasts</text></g>
+    <!-- Vertex: p6h -->
+    <g id="v_p6h">
+      <rect x="1120.0" y="1600.0" width="320.0" height="28.0"
+            rx="0" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="1616.1999999999998" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">6.0</text></g>
+    <!-- Vertex: p6b -->
+    <g id="v_p6b">
+      <rect x="1120.0" y="1628.0" width="320.0" height="52.0"
+            rx="0" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1280.0" y="1656.1999999999998" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#000000" text-anchor="middle">Manage System Settings &amp; Tariffs</text></g>
+    <!-- Vertex: e_cust -->
+    <g id="v_e_cust">
+      <rect x="60.0" y="350.0" width="190.0" height="300.0"
+            rx="0" fill="#f5f5f5" stroke="#666666" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="155.0" y="502.4" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#000000" text-anchor="middle">Customer</text></g>
+    <!-- Vertex: e_staff -->
+    <g id="v_e_staff">
+      <rect x="2480.0" y="350.0" width="190.0" height="300.0"
+            rx="0" fill="#f5f5f5" stroke="#666666" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="2575.0" y="502.4" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#000000" text-anchor="middle">Staff</text></g>
+    <!-- Vertex: e_mgr -->
+    <g id="v_e_mgr">
+      <rect x="2480.0" y="1180.0" width="190.0" height="300.0"
+            rx="0" fill="#f5f5f5" stroke="#666666" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="2575.0" y="1332.4" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#000000" text-anchor="middle">Manager</text></g>
+    <!-- Vertex: e_admin -->
+    <g id="v_e_admin">
+      <rect x="2480.0" y="1720.0" width="190.0" height="250.0"
+            rx="0" fill="#f5f5f5" stroke="#666666" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="2575.0" y="1847.4" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#000000" text-anchor="middle">Super Admin</text></g>
+    <!-- Vertex: s_usr_d -->
+    <g id="v_s_usr_d">
+      <rect x="1780.0" y="87.0" width="40.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1800.0" y="112.19999999999999" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">D1</text></g>
+    <!-- Vertex: s_usr_n -->
+    <g id="v_s_usr_n">
+      <rect x="1820.0" y="87.0" width="210.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1925.0" y="112.19999999999999" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">tbl_users</text></g>
+    <!-- Vertex: s_apt_d -->
+    <g id="v_s_apt_d">
+      <rect x="1780.0" y="367.0" width="40.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1800.0" y="392.20000000000005" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">D2</text></g>
+    <!-- Vertex: s_apt_n -->
+    <g id="v_s_apt_n">
+      <rect x="1820.0" y="367.0" width="210.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1925.0" y="392.20000000000005" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">tbl_appointment</text></g>
+    <!-- Vertex: s_trx_d -->
+    <g id="v_s_trx_d">
+      <rect x="1780.0" y="667.0" width="40.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1800.0" y="692.2" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">D5</text></g>
+    <!-- Vertex: s_trx_n -->
+    <g id="v_s_trx_n">
+      <rect x="1820.0" y="667.0" width="210.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1925.0" y="692.2" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">tbl_transaction</text></g>
+    <!-- Vertex: s_log_d -->
+    <g id="v_s_log_d">
+      <rect x="1780.0" y="1307.0" width="40.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1800.0" y="1332.1999999999998" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">D7</text></g>
+    <!-- Vertex: s_log_n -->
+    <g id="v_s_log_n">
+      <rect x="1820.0" y="1307.0" width="210.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="1925.0" y="1332.1999999999998" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">tbl_prediction_logs</text></g>
+    <!-- Vertex: s_que_d -->
+    <g id="v_s_que_d">
+      <rect x="580.0" y="950.0" width="40.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="600.0" y="975.2" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">D3</text></g>
+    <!-- Vertex: s_que_n -->
+    <g id="v_s_que_n">
+      <rect x="620.0" y="950.0" width="210.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="725.0" y="975.2" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">tbl_queue</text></g>
+    <!-- Vertex: s_mac_d -->
+    <g id="v_s_mac_d">
+      <rect x="580.0" y="1090.0" width="40.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="600.0" y="1115.1999999999998" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">D4</text></g>
+    <!-- Vertex: s_mac_n -->
+    <g id="v_s_mac_n">
+      <rect x="620.0" y="1090.0" width="210.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="725.0" y="1115.1999999999998" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">tbl_machine_status</text></g>
+    <!-- Vertex: s_set_d -->
+    <g id="v_s_set_d">
+      <rect x="580.0" y="1617.0" width="40.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="600.0" y="1642.1999999999998" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">D6</text></g>
+    <!-- Vertex: s_set_n -->
+    <g id="v_s_set_n">
+      <rect x="620.0" y="1617.0" width="210.0" height="46.0"
+            rx="0" fill="#ffffff" stroke="#000000" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="725.0" y="1642.1999999999998" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">tbl_system_settings</text></g>
+    <!-- Edge: l0_p1_in1 -->
+    <path d="M 250.0 386.0 L 340.0 386.0 L 340.0 114.0 L 1120.0 113.6" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(340.0, 250.0)">
+              <rect x="-108.0" y="-9" width="216" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Registration &amp; Account Credentials</text>
+            </g>
+            
+    <!-- Edge: l0_p1_out1 -->
+    <path d="M 1120.0 134.4 L 380.0 134.0 L 380.0 416.0 L 250.0 416.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(380.0, 275.0)">
+              <rect x="-117.0" y="-9" width="234" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Account Confirmation &amp; Access Session</text>
+            </g>
+            
+    <!-- Edge: l0_p1_in2 -->
+    <path d="M 2480.0 386.0 L 2200.0 386.0 L 2200.0 114.0 L 1440.0 113.6" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2200.0, 250.0)">
+              <rect x="-75.0" y="-9" width="150" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Staff Login Credentials</text>
+            </g>
+            
+    <!-- Edge: l0_p1_out2 -->
+    <path d="M 1440.0 134.4 L 2160.0 134.0 L 2160.0 416.0 L 2480.0 416.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2160.0, 275.0)">
+              <rect x="-87.0" y="-9" width="174" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Staff Authentication Status</text>
+            </g>
+            
+    <!-- Edge: l0_p1_in3 -->
+    <path d="M 2670.0 1225.0 L 2720.0 1225.0 L 2720.0 50.0 L 1376.0 50.0 L 1376.0 98.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2720.0, 637.5)">
+              <rect x="-81.0" y="-9" width="162" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Manager Login Credentials</text>
+            </g>
+            
+    <!-- Edge: l0_p1_out3 -->
+    <path d="M 1312.0 98.0 L 1312.0 35.0 L 2740.0 35.0 L 2740.0 1270.0 L 2670.0 1270.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2026.0, 35.0)">
+              <rect x="-93.0" y="-9" width="186" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Manager Authentication Status</text>
+            </g>
+            
+    <!-- Edge: l0_p1_in4 -->
+    <path d="M 2480.0 1225.0 L 2120.0 1225.0 L 2120.0 142.0 L 1440.0 142.2" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2120.0, 683.5)">
+              <rect x="-102.0" y="-9" width="204" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Staff Account Role Configuration</text>
+            </g>
+            
+    <!-- Edge: l0_p1_db1 -->
+    <path d="M 1440.0 118.8 L 1620.0 119.0 L 1620.0 105.0 L 1820.0 105.4" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1620.0, 112.0)">
+              <rect x="-66.0" y="-9" width="132" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">User Account Records</text>
+            </g>
+            
+    <!-- Edge: l0_p1_db2 -->
+    <path d="M 1820.0 121.5 L 1640.0 122.0 L 1640.0 127.0 L 1440.0 126.6" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1640.0, 124.5)">
+              <rect x="-96.0" y="-9" width="192" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Stored User &amp; Role Credentials</text>
+            </g>
+            
+    <!-- Edge: l0_p2_in1 -->
+    <path d="M 250.0 455.0 L 420.0 455.0 L 420.0 391.0 L 1120.0 391.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(420.0, 423.0)">
+              <rect x="-96.0" y="-9" width="192" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Booking Details &amp; Address Data</text>
+            </g>
+            
+    <!-- Edge: l0_p2_in2 -->
+    <path d="M 250.0 485.0 L 460.0 485.0 L 460.0 401.0 L 1120.0 401.4" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(460.0, 443.0)">
+              <rect x="-111.0" y="-9" width="222" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Order Tracking Query (Code / Phone)</text>
+            </g>
+            
+    <!-- Edge: l0_p2_in3 -->
+    <path d="M 250.0 515.0 L 500.0 515.0 L 500.0 412.0 L 1120.0 411.8" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(500.0, 463.5)">
+              <rect x="-123.0" y="-9" width="246" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Cancellation Request &amp; OTP Verification</text>
+            </g>
+            
+    <!-- Edge: l0_p2_out1 -->
+    <path d="M 1120.0 385.8 L 520.0 386.0 L 520.0 545.0 L 250.0 545.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(520.0, 465.5)">
+              <rect x="-138.0" y="-9" width="276" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Appointment Confirmation &amp; Order Code Ticket</text>
+            </g>
+            
+    <!-- Edge: l0_p2_out2 -->
+    <path d="M 1120.0 419.6 L 480.0 420.0 L 480.0 575.0 L 250.0 575.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(480.0, 497.5)">
+              <rect x="-141.0" y="-9" width="282" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Live Order Tracking Status &amp; Progress Details</text>
+            </g>
+            
+    <!-- Edge: l0_p2_out3 -->
+    <path d="M 1120.0 427.4 L 440.0 427.0 L 440.0 605.0 L 250.0 605.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(440.0, 516.0)">
+              <rect x="-111.0" y="-9" width="222" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Cancellation Notice &amp; Refund Status</text>
+            </g>
+            
+    <!-- Edge: l0_p2_out4 -->
+    <path d="M 1440.0 391.0 L 1520.0 391.0 L 1520.0 300.0 L 2350.0 300.0 L 2350.0 455.0 L 2480.0 455.0" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1935.0, 300.0)">
+              <rect x="-129.0" y="-9" width="258" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">Daily Intake Schedule &amp; Delivery Manifest</text>
+            </g>
+            
+    <!-- Edge: l0_p2_in4 -->
+    <path d="M 2480.0 485.0 L 2330.0 485.0 L 2330.0 320.0 L 1540.0 320.0 L 1540.0 401.0 L 1440.0 401.4" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1935.0, 320.0)">
+              <rect x="-132.0" y="-9" width="264" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Appointment Verification &amp; Check-in Status</text>
+            </g>
+            
+    <!-- Edge: l0_p2_db1 -->
+    <path d="M 1440.0 414.4 L 1620.0 414.0 L 1620.0 383.0 L 1820.0 383.1" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1620.0, 398.5)">
+              <rect x="-120.0" y="-9" width="240" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">New Appointment &amp; Cancellation Entries</text>
+            </g>
+            
+    <!-- Edge: l0_p2_db2 -->
+    <path d="M 1820.0 401.5 L 1640.0 402.0 L 1640.0 422.0 L 1440.0 422.2" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1640.0, 412.0)">
+              <rect x="-111.0" y="-9" width="222" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Appointment Records &amp; Order History</text>
+            </g>
+            
+    <!-- Edge: l0_p2_db3 -->
+    <path d="M 620.0 1626.2 L 540.0 1626.0 L 300.0 1626.0 L 300.0 320.0 L 1152.0 320.0 L 1152.0 378.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(300.0, 973.0)">
+              <rect x="-123.0" y="-9" width="246" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Active Service Rates &amp; Delivery Tariffs</text>
+            </g>
+            
+    <!-- Edge: l0_p3_in1 -->
+    <path d="M 250.0 626.0 L 400.0 626.0 L 400.0 694.0 L 1120.0 693.6" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(400.0, 660.0)">
+              <rect x="-141.0" y="-9" width="282" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Payment Details &amp; Proof of Payment Screenshot</text>
+            </g>
+            
+    <!-- Edge: l0_p3_out1 -->
+    <path d="M 1120.0 714.4 L 440.0 714.0 L 440.0 660.0 L 231.0 660.0 L 231.0 650.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(440.0, 687.0)">
+              <rect x="-120.0" y="-9" width="240" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Digital Payment Receipt &amp; Confirmation</text>
+            </g>
+            
+    <!-- Edge: l0_p3_in2 -->
+    <path d="M 2480.0 545.0 L 2280.0 545.0 L 2280.0 691.0 L 1440.0 691.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2280.0, 618.0)">
+              <rect x="-138.0" y="-9" width="276" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Walk-in Load Weight &amp; Service Specifications</text>
+            </g>
+            
+    <!-- Edge: l0_p3_in3 -->
+    <path d="M 2480.0 590.0 L 2250.0 590.0 L 2250.0 701.0 L 1440.0 701.4" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2250.0, 645.5)">
+              <rect x="-144.0" y="-9" width="288" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Cash Payment Collection &amp; Counter Verification</text>
+            </g>
+            
+    <!-- Edge: l0_p3_out2 -->
+    <path d="M 1440.0 714.4 L 2220.0 714.0 L 2220.0 626.0 L 2480.0 626.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2220.0, 670.0)">
+              <rect x="-123.0" y="-9" width="246" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Calculated Service Fee &amp; Bill Breakdown</text>
+            </g>
+            
+    <!-- Edge: l0_p3_out3 -->
+    <path d="M 1392.0 730.0 L 1392.0 730.0 L 1392.0 770.0 L 2260.0 770.0 L 2260.0 1240.0 L 2480.0 1240.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1826.0, 770.0)">
+              <rect x="-126.0" y="-9" width="252" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Sales Transaction Stream &amp; Revenue Feeds</text>
+            </g>
+            
+    <!-- Edge: l0_p3_db1 -->
+    <path d="M 1440.0 704.0 L 1620.0 704.0 L 1620.0 690.0 L 1820.0 690.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1620.0, 697.0)">
+              <rect x="-93.0" y="-9" width="186" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Completed Transaction Records</text>
+            </g>
+            
+    <!-- Edge: l0_p3_db2 -->
+    <path d="M 620.0 1640.0 L 520.0 1640.0 L 330.0 1640.0 L 330.0 630.0 L 1184.0 630.0 L 1184.0 678.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(330.0, 1135.0)">
+              <rect x="-141.0" y="-9" width="282" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Base Weight Rates &amp; Operational Pricing Rules</text>
+            </g>
+            
+    <!-- Edge: l0_p4_out1 -->
+    <path d="M 1120.0 1008.4 L 260.0 1008.0 L 260.0 675.0 L 212.0 675.0 L 212.0 650.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(260.0, 841.5)">
+              <rect x="-129.0" y="-9" width="258" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Queue Ticket Number, EWT &amp; Service Status</text>
+            </g>
+            
+    <!-- Edge: l0_p4_out2 -->
+    <path d="M 1120.0 1024.0 L 230.0 1024.0 L 230.0 700.0 L 174.0 700.0 L 174.0 650.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(230.0, 862.0)">
+              <rect x="-138.0" y="-9" width="276" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Live Machine Lobby Availability &amp; Rush Level</text>
+            </g>
+            
+    <!-- Edge: l0_p4_out3 -->
+    <path d="M 1120.0 1039.6 L 200.0 1040.0 L 200.0 725.0 L 136.0 725.0 L 136.0 650.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(200.0, 882.5)">
+              <rect x="-102.0" y="-9" width="204" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">SMS / Email Status Notifications</text>
+            </g>
+            
+    <!-- Edge: l0_p4_in1 -->
+    <path d="M 2518.0 650.0 L 2518.0 650.0 L 2518.0 860.0 L 2200.0 860.0 L 2200.0 1011.0 L 1440.0 1011.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2359.0, 860.0)">
+              <rect x="-123.0" y="-9" width="246" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Machine Allocation &amp; Cycle Start Timers</text>
+            </g>
+            
+    <!-- Edge: l0_p4_in2 -->
+    <path d="M 2556.0 650.0 L 2556.0 650.0 L 2556.0 890.0 L 2170.0 890.0 L 2170.0 1024.0 L 1440.0 1024.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2363.0, 890.0)">
+              <rect x="-144.0" y="-9" width="288" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Queue Status Progression &amp; Fulfillment Advance</text>
+            </g>
+            
+    <!-- Edge: l0_p4_in3 -->
+    <path d="M 2594.0 650.0 L 2594.0 650.0 L 2594.0 920.0 L 2140.0 920.0 L 2140.0 1037.0 L 1440.0 1037.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2367.0, 920.0)">
+              <rect x="-156.0" y="-9" width="312" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Hardware Operational State (Available/Maintenance)</text>
+            </g>
+            
+    <!-- Edge: l0_p4_out4 -->
+    <path d="M 1440.0 1005.8 L 2110.0 1006.0 L 2110.0 830.0 L 2499.0 830.0 L 2499.0 650.0 L 2499.0 650.0" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2304.5, 830.0)">
+              <rect x="-102.0" y="-9" width="204" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">Active Queue Sequence &amp; EWT List</text>
+            </g>
+            
+    <!-- Edge: l0_p4_out5 -->
+    <path d="M 1440.0 1042.2 L 2080.0 1042.0 L 2080.0 800.0 L 2632.0 800.0 L 2632.0 650.0 L 2632.0 650.0" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2356.0, 800.0)">
+              <rect x="-135.0" y="-9" width="270" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">Running Machine Timers &amp; Maintenance Alerts</text>
+            </g>
+            
+    <!-- Edge: l0_p4_db1 -->
+    <path d="M 1120.0 1016.2 L 950.0 1016.0 L 950.0 968.0 L 830.0 968.4" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(950.0, 992.0)">
+              <rect x="-96.0" y="-9" width="192" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Queue State &amp; Sequence Entries</text>
+            </g>
+            
+    <!-- Edge: l0_p4_db2 -->
+    <path d="M 830.0 984.5 L 930.0 985.0 L 930.0 1032.0 L 1120.0 1031.8" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(930.0, 1008.5)">
+              <rect x="-117.0" y="-9" width="234" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Active Queue Entries &amp; Status Details</text>
+            </g>
+            
+    <!-- Edge: l0_p4_db3 -->
+    <path d="M 1120.0 1042.2 L 950.0 1042.0 L 950.0 1106.0 L 830.0 1106.1" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(950.0, 1074.0)">
+              <rect x="-126.0" y="-9" width="252" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Machine Operational State &amp; Cycle Timers</text>
+            </g>
+            
+    <!-- Edge: l0_p4_db4 -->
+    <path d="M 830.0 1124.5 L 930.0 1125.0 L 930.0 1047.0 L 1120.0 1047.4" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(930.0, 1086.0)">
+              <rect x="-84.0" y="-9" width="168" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Live Machine Fleet Records</text>
+            </g>
+            
+    <!-- Edge: l0_p4_db5 -->
+    <path d="M 1820.0 1318.5 L 1560.0 1318.0 L 1560.0 1032.0 L 1440.0 1031.8" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1560.0, 1175.0)">
+              <rect x="-129.0" y="-9" width="258" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Historical EWT &amp; Service Time Multipliers</text>
+            </g>
+            
+    <!-- Edge: l0_p5_in1 -->
+    <path d="M 2480.0 1285.0 L 2280.0 1285.0 L 2280.0 1331.0 L 1440.0 1331.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2280.0, 1308.0)">
+              <rect x="-129.0" y="-9" width="258" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Forecast Date Filter &amp; Retrain Parameters</text>
+            </g>
+            
+    <!-- Edge: l0_p5_in2 -->
+    <path d="M 2480.0 1345.0 L 2250.0 1345.0 L 2250.0 1341.0 L 1440.0 1341.4" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2250.0, 1343.0)">
+              <rect x="-105.0" y="-9" width="210" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Ghost Slot Reservation Assignment</text>
+            </g>
+            
+    <!-- Edge: l0_p5_db1 -->
+    <path d="M 1883.0 713.0 L 1843.0 713.0 L 1843.0 800.0 L 1600.0 800.0 L 1600.0 1270.0 L 1376.0 1270.0 L 1376.0 1318.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1721.5, 800.0)">
+              <rect x="-138.0" y="-9" width="276" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Historical Transaction Records &amp; Load Volume</text>
+            </g>
+            
+    <!-- Edge: l0_p5_db2 -->
+    <path d="M 725.0 1136.0 L 705.0 1136.0 L 705.0 1338.0 L 1100.0 1338.0 L 1100.0 1333.0 L 1120.0 1333.6" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(902.5, 1338.0)">
+              <rect x="-129.0" y="-9" width="258" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Machine Fleet Utilization &amp; Cycle History</text>
+            </g>
+            
+    <!-- Edge: l0_p5_db3 -->
+    <path d="M 1440.0 1344.0 L 1600.0 1344.0 L 1600.0 1330.0 L 1820.0 1330.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1600.0, 1337.0)">
+              <rect x="-150.0" y="-9" width="300" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Regression Forecast Logs &amp; Model Accuracy (MAPE)</text>
+            </g>
+            
+    <!-- Edge: l0_p5_out1 -->
+    <path d="M 1440.0 1351.8 L 2220.0 1352.0 L 2220.0 1375.0 L 2480.0 1375.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2220.0, 1363.5)">
+              <rect x="-144.0" y="-9" width="288" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Peak Demand Forecasts &amp; Hourly Footfall Trends</text>
+            </g>
+            
+    <!-- Edge: l0_p5_out2 -->
+    <path d="M 1440.0 1359.6 L 2190.0 1360.0 L 2190.0 1420.0 L 2480.0 1420.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2190.0, 1390.0)">
+              <rect x="-138.0" y="-9" width="276" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Habitual Resident Ghost Slot Recommendations</text>
+            </g>
+            
+    <!-- Edge: l0_p5_out3 -->
+    <path d="M 1440.0 1367.4 L 2160.0 1367.0 L 2160.0 1456.0 L 2480.0 1456.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2160.0, 1411.5)">
+              <rect x="-162.0" y="-9" width="324" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Financial Summary, Daily Sales Tally &amp; Audit Reports</text>
+            </g>
+            
+    <!-- Edge: l0_p6_in1 -->
+    <path d="M 2537.0 1480.0 L 2537.0 1480.0 L 2537.0 1640.0 L 1440.0 1646.2" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2537.0, 1560.0)">
+              <rect x="-126.0" y="-9" width="252" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">System Parameter &amp; Tariff Configurations</text>
+            </g>
+            
+    <!-- Edge: l0_p6_out1 -->
+    <path d="M 1440.0 1667.0 L 2594.0 1661.0 L 2594.0 1480.0 L 2594.0 1480.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2594.0, 1570.5)">
+              <rect x="-144.0" y="-9" width="288" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Current System Settings &amp; Parameter Audit Data</text>
+            </g>
+            
+    <!-- Edge: l0_p6_db1 -->
+    <path d="M 1120.0 1654.0 L 980.0 1652.0 L 980.0 1640.0 L 830.0 1640.0" fill="none" stroke="#000000" stroke-width="1.2" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(980.0, 1646.0)">
+              <rect x="-120.0" y="-9" width="240" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="normal" fill="#000000" text-anchor="middle">Updated System Parameters &amp; Thresholds</text>
+            </g>
+            
+    <!-- Edge: l0_p1_in5 -->
+    <path d="M 2670.0 1770.0 L 2760.0 1770.0 L 2760.0 25.0 L 1420.0 25.0 L 1420.0 98.0 L 1420.8 98.0" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2090.0, 25.0)">
+              <rect x="-141.0" y="-9" width="282" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">Super Admin Credentials &amp; Role Switch Request</text>
+            </g>
+            
+    <!-- Edge: l0_p1_out4 -->
+    <path d="M 1248.0 98.0 L 1248.0 12.0 L 2780.0 12.0 L 2780.0 1832.0 L 2670.0 1832.5" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(2014.0, 12.0)">
+              <rect x="-138.0" y="-9" width="276" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">Super Admin Auth Status &amp; Perspective Render</text>
+            </g>
+            
+    <!-- Edge: l0_p1_in6 -->
+    <path d="M 2480.0 1870.0 L 2060.0 1870.0 L 2060.0 180.0 L 1380.0 180.0 L 1380.0 150.0 L 1379.2 150.0" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1720.0, 180.0)">
+              <rect x="-153.0" y="-9" width="306" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">Staff Google SSO Provisioning &amp; Role Reassignment</text>
+            </g>
+            
+    <!-- Edge: l0_p1_out5 -->
+    <path d="M 1337.6 150.0 L 1338.0 220.0 L 2090.0 220.0 L 2090.0 1915.0 L 2480.0 1915.0" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1714.0, 220.0)">
+              <rect x="-135.0" y="-9" width="270" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">User Directory Records &amp; Account Audit Data</text>
+            </g>
+            
+    <!-- Edge: l0_p5_in3 -->
+    <path d="M 2480.0 1745.0 L 2310.0 1745.0 L 2310.0 1490.0 L 1350.0 1490.0 L 1350.0 1370.0 L 1350.4 1370.0" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1830.0, 1490.0)">
+              <rect x="-117.0" y="-9" width="234" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">Audit Trail Query &amp; Filter Parameters</text>
+            </g>
+            
+    <!-- Edge: l0_p5_out4 -->
+    <path d="M 1280.0 1370.0 L 1280.0 1530.0 L 2340.0 1530.0 L 2340.0 1775.0 L 2480.0 1775.0" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1810.0, 1530.0)">
+              <rect x="-159.0" y="-9" width="318" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">Executive Operational Audit Trail &amp; Prediction Logs</text>
+            </g>
+            
+    <!-- Edge: l0_p6_in2 -->
+    <path d="M 2480.0 1807.5 L 1380.0 1807.0 L 1380.0 1680.0 L 1379.2 1680.0" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1380.0, 1743.5)">
+              <rect x="-165.0" y="-9" width="330" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">Master Tariffs &amp; Hardware Fleet Matrix Configurations</text>
+            </g>
+            
+    <!-- Edge: l0_p6_out2 -->
+    <path d="M 1312.0 1680.0 L 1312.0 1840.0 L 2480.0 1840.0 L 2480.0 1840.0" fill="none" stroke="#0369a1" stroke-width="1.6" marker-end="url(#arrow)"/>
+    
+            <g transform="translate(1896.0, 1840.0)">
+              <rect x="-153.0" y="-9" width="306" height="18" fill="#ffffff" fill-opacity="0.95" rx="3" stroke="#cbd5e1" stroke-width="0.5"/>
+              <text x="0" y="3.5" font-family="Helvetica, Arial, sans-serif" font-size="9.5" font-weight="600" fill="#0369a1" text-anchor="middle">Active Store Policies &amp; Machine Matrix Audit Data</text>
+            </g>
+            
+    </svg>

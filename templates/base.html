@@ -6,8 +6,12 @@
     <title>{% block title %}Bon Laundry{% endblock %}</title>
     <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Boxicons (para sa mga icons ng sidebar kung mayroon man) -->
+    <!-- Boxicons -->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Roboto+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bon.css') }}">
 </head>
 <body class="bg-slate-100 font-sans antialiased">
 
@@ -28,7 +32,6 @@
                         <i class='bx bx-grid-alt text-lg text-emerald-400'></i>
                         <span>Dashboard</span>
                     </a>
-                    <!-- Maaari mong idagdag ang iba pang routes dito tulad ng Transactions, Inventory, atbp. -->
                 </nav>
             </div>
 
@@ -38,19 +41,20 @@
                     <span class="text-xs font-semibold text-slate-200">Manager Portal</span>
                     <span class="text-[10px] text-slate-500 font-mono">v1.0.0-stable</span>
                 </div>
-                <a href="/logout" class="text-slate-500 hover:text-rose-400 transition" title="Sign Out">
+                <button type="button" onclick="openSignOutModal()" class="text-slate-500 hover:text-rose-400 transition cursor-pointer" title="Sign Out">
                     <i class='bx bx-log-out text-lg'></i>
-                </a>
+                </button>
             </div>
         </aside>
 
         <!-- DYNAMIC MAIN CONTENT WORKSPACE -->
         <div class="flex-1 flex flex-col overflow-hidden">
             {% block content %}
-            <!-- Dito kusang ikakarga ng Jinja2 ang code mula sa dashboard.html -->
+            <!-- Jinja2 dynamic content injection -->
             {% endblock %}
         </div>
     </div>
 
+    {% include 'components/signout_modal.html' %}
 </body>
 </html>

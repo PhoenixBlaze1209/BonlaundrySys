@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Verification Terminal — Bon Laundry Station</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+        }
+
+        .mono {
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-in {
+            animation: fadeSlideIn 0.35s ease forwards;
+        }
+
+        @keyframes pulse-ring {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+            }
+        }
+
+        .pulse-success {
+            animation: pulse-ring 1.5s ease-in-out 3;
+        }
+
+        .status-badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        .status-badge-confirmed {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .status-badge-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .status-badge-completed {
+            background: #f0f9ff;
+            color: #0369a1;
+            border: 1px solid #7dd3fc;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 min-h-screen antialiased text-slate-800">
+
+    <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 shadow-sm">
+        <div class="flex items-center gap-3">
+            <a href="/manager/dashboard" class="flex items-center gap-2 text-slate-400 hover:text-slate-700 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M15 18l-6-6 6-6" />
+                </svg>
+                <span class="text-xs font-semibold">Back to Dashboard</span>
+            </a>
+            <span class="text-slate-300 text-lg">|</span>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="M9 12l2 2 4-4" />
+                        <rect width="18" height="18" x="3" y="3" rx="2" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-slate-900 leading-none">Verification Terminal</h1>
+                    <p class="text-[10px] text-slate-400 font-medium">Counter Order Check-in System</p>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="/book?return_to=staff"
+                class="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Walk-in Booking
+            </a>
+            <div class="text-right">
+                <p class="text-xs font-bold text-slate-900">{{ staff_name }}</p>
+                <span class="text-[10px] font-semibold text-sky-600 uppercase">{{ role }}</span>
+            </div>
+            <a href="/auth/logout"
+                class="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+                </svg>
+                <span class="hidden sm:inline">Sign Out</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-10 space-y-6">
+        <div class="text-center space-y-1">
+            <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Counter Order Verification</h2>
+            <p class="text-sm text-slate-500">Enter the customer Order Code to inspect and confirm their booking.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Customer Order Code or
+                Number</label>
+            <div class="flex gap-3">
+                <input type="text" id="order-code-input" placeholder="e.g. 84920 or ORD-84920" autocomplete="off"
+                    class="flex-1 mono text-xl font-bold tracking-widest uppercase bg-slate-50 border-2 border-slate-200 focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 rounded-xl px-4 py-3 outline-none transition placeholder:text-slate-300 placeholder:normal-case placeholder:font-normal placeholder:text-base placeholder:tracking-normal"
+                    oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')lookupOrder()">
+                <button type="button" id="lookup-btn" onclick="lookupOrder()"
+                    class="px-5 py-3 bg-[#0284c7] hover:bg-[#0369a1] text-white text-sm font-bold rounded-xl transition shadow-sm flex items-center gap-2 active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <span>Look Up</span>
+                </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2 font-medium">Accepts numbers only (e.g. <strong
+                    class="text-slate-600 font-bold">84920</strong>) or the full code (<strong
+                    class="text-slate-600 font-bold">ORD-84920</strong>).</p>
+        </div>
+
+        <div id="status-message" class="hidden rounded-2xl px-5 py-4 text-sm font-semibold flex items-center gap-3">
+        </div>
+
+        <div id="order-card" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div
+                class="bg-gradient-to-r from-[#071827] to-[#0b3f5c] text-white px-6 py-5 flex items-center justify-between">
+                <div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-sky-300 mb-1">Order Reference</div>
+                    <div id="card-order-code" class="mono text-3xl font-black tracking-wide">ORD-00000</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Status</div>
+                    <span id="card-order-status"
+                        class="px-3 py-1 rounded-full text-xs font-bold status-badge-pending inline-block">Pending</span>
+                </div>
+            </div>
+
+            <div class="p-6 grid grid-cols-2 sm:grid-cols-4 gap-5 border-b border-slate-100">
+                <div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Customer Name
+                    </div>
+                    <div id="card-customer-name" class="text-sm font-bold text-slate-900">—</div>
+                </div>
+                <div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Contact</div>
+                    <div id="card-phone" class="text-sm font-bold text-slate-900 mono">—</div>
+                </div>
+                <div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Service Package
+                    </div>
+                    <div id="card-service" class="text-sm font-bold text-sky-700">—</div>
+                </div>
+                <div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Order Mode</div>
+                    <div id="card-mode" class="text-sm font-bold text-slate-900">—</div>
+                </div>
+                <div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Scale / Est.
+                        Weight</div>
+                    <div id="card-weight" class="text-sm font-black text-slate-900 font-mono">—</div>
+                </div>
+                <div id="card-turnaround-block">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Turnaround SLA
+                    </div>
+                    <div id="card-turnaround" class="text-sm font-bold text-slate-900">—</div>
+                </div>
+                <div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Scheduled</div>
+                    <div id="card-schedule" class="text-sm font-bold text-slate-900">—</div>
+                </div>
+                <div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Add-ons / Extras
+                    </div>
+                    <div id="card-addons-summary" class="text-xs font-bold text-slate-700">None</div>
+                </div>
+                <div id="card-address-block" class="hidden col-span-2 sm:col-span-4">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Delivery Address
+                    </div>
+                    <div id="card-address" class="text-sm font-bold text-slate-900">—</div>
+                </div>
+                <div id="card-load-block"
+                    class="col-span-2 sm:col-span-4 bg-sky-50/70 p-3.5 rounded-2xl border border-sky-100">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-widest text-sky-800 flex items-center gap-1.5">
+                            <span>🧺</span> Machine Fleet &amp; Load Breakdown
+                        </span>
+                        <span id="card-machines-badge"
+                            class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-200 text-sky-900">1
+                            Machine</span>
+                    </div>
+                    <div id="card-load-details"
+                        class="text-xs font-semibold text-slate-800 leading-relaxed font-mono-num">—</div>
+                </div>
+                <div id="card-rec-block"
+                    class="col-span-2 sm:col-span-4 bg-gradient-to-r from-sky-50 to-indigo-50/70 p-3.5 rounded-2xl border border-sky-200">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-widest text-sky-800 flex items-center gap-1.5">
+                            <span>✨</span> Recommended Machine Assignment
+                        </span>
+                        <span id="card-rec-badge"
+                            class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-200 text-sky-900">Auto
+                            Pick</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <div id="card-rec-name" class="text-xs font-black text-slate-900">—</div>
+                            <div id="card-rec-reason"
+                                class="text-[11px] text-slate-600 font-medium mt-0.5 leading-snug">—</div>
+                        </div>
+                        <div id="card-rec-status-wrap" class="flex-shrink-0 text-right">
+                            <span id="card-rec-status"
+                                class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">Available</span>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="col-span-2 sm:col-span-4 bg-emerald-50/70 p-3.5 rounded-2xl border border-emerald-200/80 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 flex-shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4" />
+                                    <circle cx="12" cy="12" r="9" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-emerald-950 block">Customer Equipment Liability
+                                    Policy</span>
+                                <span class="text-[10px] text-emerald-800 font-medium">Customer certified pocket check
+                                    &amp; accepted machine damage liability at checkout.</span>
+                            </div>
+                        </div>
+                        <span
+                            class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase tracking-wider flex-shrink-0">Acknowledged</span>
+                    </div>
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1.5 border-t border-emerald-200/60 text-[10px] text-emerald-900 font-semibold">
+                        <div>⏱️ <strong>44m Wash / 45m Dry</strong> (Verified now)</div>
+                        <div>⏳ <strong>10m Grace Period</strong> post-cycle</div>
+                        <div>⚠️ <strong>₱100 Overstay Penalty</strong> applies beyond grace</div>
+                    </div>
+                </div>
+                <div id="card-penalty-block"
+                    class="hidden col-span-2 sm:col-span-4 bg-rose-50 border-2 border-rose-300 rounded-2xl p-4 text-rose-900">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-rose-200/80 text-rose-800 flex items-center justify-center text-sm font-black flex-shrink-0">
+                                ⚠️
+                            </div>
+                            <div>
+                                <span class="text-xs font-black uppercase tracking-wider text-rose-800 block">Late
+                                    Retrieval / Overstay Penalty Incurred</span>
+                                <span id="card-penalty-reason"
+                                    class="text-[11px] text-rose-700 font-semibold block leading-tight">Exceeded
+                                    10-minute grace period post-cycle. Collect penalty before releasing laundry.</span>
+                            </div>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <span class="text-[9px] font-bold uppercase tracking-wider text-rose-500 block">Penalty
+                                Fee</span>
+                            <span id="card-penalty-amount"
+                                class="text-base font-black text-rose-700 font-mono-num">₱100.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-6">
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Payment
+                            Method</div>
+                        <div id="card-payment-method" class="text-sm font-bold text-slate-900">—</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Payment
+                            Status</div><span id="card-payment-status"
+                            class="px-2.5 py-1 rounded-full text-xs font-bold status-badge-pending inline-block">Pending</span>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Total Amount
+                            Due</div>
+                        <div id="card-total-amount" class="text-lg font-black text-emerald-600 font-mono">₱—</div>
+                    </div>
+                </div>
+                <div id="card-queue-number-wrap" class="hidden text-right">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Queue Number
+                    </div>
+                    <div id="card-queue-number" class="mono text-2xl font-black text-sky-600">#—</div>
+                </div>
+            </div>
+
+            <div class="px-6 py-5 bg-slate-50/60 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p id="action-hint" class="text-xs text-slate-500 font-medium max-w-sm">Review the order details above.
+                    Click "Verify &amp; Assign Machine" to check the customer in.</p>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="resetTerminal()"
+                        class="px-4 py-2.5 text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 rounded-xl transition cursor-pointer">Clear
+                        / New Order</button>
+                    <button type="button" id="alter-btn" onclick="openAlterModal()"
+                        class="px-5 py-2.5 text-xs font-extrabold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded-xl transition shadow-xs flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                        <svg class="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                        </svg>
+                        <span>Alter Order &amp; Weight</span>
+                    </button>
+                    <button type="button" id="confirm-btn" onclick="confirmOrder()"
+                        class="px-6 py-2.5 text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-md flex items-center gap-2 active:scale-95 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4" />
+                            <circle cx="12" cy="12" r="9" />
+                        </svg>
+                        Verify &amp; Assign Machine
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alter Order Modal -->
+        <div id="alter-order-modal"
+            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+            <div
+                class="bg-white rounded-3xl max-w-xl w-full shadow-2xl overflow-hidden animate-slide-in border border-slate-100 flex flex-col">
+                <!-- Modal Top Header -->
+                <div
+                    class="bg-gradient-to-r from-amber-900 via-slate-900 to-sky-950 text-white px-6 py-5 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 font-black text-base">
+                            ⚖️
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold leading-tight">Alter Order Details</h3>
+                            <p class="text-[11px] text-amber-200/80 font-medium">Update scale weight, machine capacity,
+                                service package, or extra add-ons</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeAlterModal()"
+                        class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition cursor-pointer">
+                        ✕
+                    </button>
+                </div>
+
+                <div class="p-6 space-y-5 overflow-y-auto max-h-[75vh]">
+                    <!-- Customer & Estimated Weight Context -->
+                    <div
+                        class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3.5 flex items-center justify-between text-xs">
+                        <div>
+                            <span
+                                class="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">Customer</span>
+                            <span id="alter-customer-name" class="font-bold text-slate-900">—</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">Customer
+                                Est. Weight</span>
+                            <span id="alter-est-weight-badge"
+                                class="font-extrabold text-amber-950 font-mono text-sm">8.0 kg</span>
+                        </div>
+                    </div>
+
+                    <!-- Section 1: Measured Scale Weight -->
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <label
+                                class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                                <span>⚖️</span> Actual Scale Weight
+                            </label>
+                            <span class="text-[11px] text-slate-500 font-semibold">Weighed at counter scale</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="relative flex-1">
+                                <input type="number" id="alter-scale-weight-input" step="0.1" min="0.5" max="50"
+                                    placeholder="e.g. 9.5" oninput="calculateLiveAlteration()"
+                                    class="w-full text-base font-black mono bg-slate-50 border-2 border-slate-200 focus:border-amber-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none transition text-slate-900">
+                                <span class="absolute right-3.5 top-3 text-xs font-extrabold text-slate-400">kg</span>
+                            </div>
+                            <!-- Quick Weight Presets -->
+                            <div class="flex gap-1.5">
+                                <button type="button" onclick="setAlterScaleWeight(5)"
+                                    class="px-2.5 py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 cursor-pointer">5kg</button>
+                                <button type="button" onclick="setAlterScaleWeight(8)"
+                                    class="px-2.5 py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 cursor-pointer">8kg</button>
+                                <button type="button" onclick="setAlterScaleWeight(10.5)"
+                                    class="px-2.5 py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 cursor-pointer">10.5kg</button>
+                                <button type="button" onclick="setAlterScaleWeight(13)"
+                                    class="px-2.5 py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 cursor-pointer">13kg</button>
+                            </div>
+                        </div>
+
+                        <!-- Advisor Warning / Feedback Strip -->
+                        <div id="alter-weight-advisor"
+                            class="p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-emerald-50 border-emerald-200 text-emerald-800">
+                            <span>✅</span> <span>Fits standard 8kg Regular Washer.</span>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Machine Capacity & Fleet Allocation -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-extrabold text-slate-900 uppercase tracking-wider block">
+                            Machine Fleet &amp; Capacity Allocation
+                        </label>
+                        <select id="alter-fleet-select" onchange="calculateLiveAlteration()"
+                            class="w-full text-xs font-bold bg-slate-50 border-2 border-slate-200 focus:border-amber-500 focus:bg-white rounded-xl px-3.5 py-2.5 outline-none text-slate-900">
+                            <option value="1_8">1 Machine (8kg Regular Washer) — Up to 8kg</option>
+                            <option value="1_13">1 Machine (13kg Titan Heavy-Duty Washer) — Up to 13kg (+₱95.00)
+                            </option>
+                            <option value="2_8">2 Machines (2x 8kg Regular Washers) — Split 2 loads</option>
+                            <option value="2_combo">2 Machines (1x 13kg Titan + 1x 8kg Regular) — Up to 21kg</option>
+                        </select>
+                    </div>
+
+                    <!-- Section 3: Service Package -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-extrabold text-slate-900 uppercase tracking-wider block">
+                            Service Package
+                        </label>
+                        <select id="alter-service-select" onchange="calculateLiveAlteration()"
+                            class="w-full text-xs font-bold bg-slate-50 border-2 border-slate-200 focus:border-amber-500 focus:bg-white rounded-xl px-3.5 py-2.5 outline-none text-slate-900">
+                            <option value="Drop-off Service (Wash, Dry, Fold)">Drop-off Service (Wash, Dry, Fold) —
+                                ₱130.00 base</option>
+                            <option value="Saver Package (+1 Det, +1 Fabcon)">Saver Package (+1 Det, +1 Fabcon) —
+                                ₱160.00 base</option>
+                            <option value="Signature Package (Complete Det & Fabcon)">Signature Package (+2 Det, +2
+                                Fabcon, Stain Treatment) — ₱200.00 base</option>
+                            <option value="Premium Complete Care (Sort & Superwash)">Premium Complete Care (Sort &
+                                Superwash) — ₱260.00 base</option>
+                            <option value="Self-Service Wash & Dry">Self-Service Wash & Dry (DIY) — ₱145.00 / ₱240.00
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Section 4: Add-ons & Extra Supplies -->
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <label
+                                class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                                <span>🧺</span> Add-ons, Extra Detergents &amp; Services
+                            </label>
+                            <span class="text-[10px] text-slate-400 font-semibold">Optional customer additions</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <!-- Extra Detergent -->
+                            <div
+                                class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
+                                <div>
+                                    <div class="font-bold text-slate-900">Extra Detergent</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">₱20.00 / pod</div>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="alterAddonStep('Extra Detergent', -1)"
+                                        class="w-6 h-6 rounded bg-white border border-slate-300 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer">-</button>
+                                    <span id="addon-det-qty" class="w-5 text-center font-bold font-mono">0</span>
+                                    <button type="button" onclick="alterAddonStep('Extra Detergent', 1)"
+                                        class="w-6 h-6 rounded bg-white border border-slate-300 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Fabric Conditioner -->
+                            <div
+                                class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
+                                <div>
+                                    <div class="font-bold text-slate-900">Fabric Conditioner</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">₱20.00 / cup</div>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="alterAddonStep('Fabric Conditioner', -1)"
+                                        class="w-6 h-6 rounded bg-white border border-slate-300 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer">-</button>
+                                    <span id="addon-fab-qty" class="w-5 text-center font-bold font-mono">0</span>
+                                    <button type="button" onclick="alterAddonStep('Fabric Conditioner', 1)"
+                                        class="w-6 h-6 rounded bg-white border border-slate-300 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Stain Treatment / Bleach -->
+                            <div
+                                class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
+                                <div>
+                                    <div class="font-bold text-slate-900">Color-safe Bleach</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">₱30.00 / shot</div>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="alterAddonStep('Color-safe Bleach', -1)"
+                                        class="w-6 h-6 rounded bg-white border border-slate-300 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer">-</button>
+                                    <span id="addon-bleach-qty" class="w-5 text-center font-bold font-mono">0</span>
+                                    <button type="button" onclick="alterAddonStep('Color-safe Bleach', 1)"
+                                        class="w-6 h-6 rounded bg-white border border-slate-300 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Extra Drying 10 Mins -->
+                            <div
+                                class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
+                                <div>
+                                    <div class="font-bold text-slate-900">Add Dry (+10m)</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">₱30.00 / cycle</div>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="alterAddonStep('Add Dry (+10m)', -1)"
+                                        class="w-6 h-6 rounded bg-white border border-slate-300 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer">-</button>
+                                    <span id="addon-dry-qty" class="w-5 text-center font-bold font-mono">0</span>
+                                    <button type="button" onclick="alterAddonStep('Add Dry (+10m)', 1)"
+                                        class="w-6 h-6 rounded bg-white border border-slate-300 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Superwash Deep Clean -->
+                            <label
+                                class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between cursor-pointer">
+                                <div>
+                                    <div class="font-bold text-slate-900">Superwash Deep Clean</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">+₱35.00</div>
+                                </div>
+                                <input type="checkbox" id="addon-superwash" onchange="calculateLiveAlteration()"
+                                    class="w-4 h-4 text-amber-600 rounded border-slate-300 focus:ring-amber-500">
+                            </label>
+
+                            <!-- Fold Service -->
+                            <label
+                                class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between cursor-pointer">
+                                <div>
+                                    <div class="font-bold text-slate-900">Neat Folding Service</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">+₱40.00</div>
+                                </div>
+                                <input type="checkbox" id="addon-fold" onchange="calculateLiveAlteration()"
+                                    class="w-4 h-4 text-amber-600 rounded border-slate-300 focus:ring-amber-500">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Section 5: Live Price Summary -->
+                    <div
+                        class="p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 space-y-2 text-xs">
+                        <div class="flex items-center justify-between font-bold text-slate-700">
+                            <span>Base Service Price:</span>
+                            <span id="alter-price-base" class="font-mono">₱130.00</span>
+                        </div>
+                        <div id="alter-upgrade-row"
+                            class="hidden flex items-center justify-between text-amber-800 font-semibold">
+                            <span>13kg Titan Capacity Upgrade:</span>
+                            <span id="alter-price-upgrade" class="font-mono">+₱95.00</span>
+                        </div>
+                        <div id="alter-addons-row"
+                            class="hidden flex items-center justify-between text-amber-800 font-semibold">
+                            <span>Supplies &amp; Add-ons:</span>
+                            <span id="alter-price-addons" class="font-mono">+₱0.00</span>
+                        </div>
+                        <div id="alter-sla-row" class="flex items-center justify-between text-slate-600 font-semibold">
+                            <span>Turnaround Service Charge:</span>
+                            <span id="alter-price-sla" class="font-mono">₱120.00</span>
+                        </div>
+                        <div class="pt-2 border-t border-amber-200 flex items-center justify-between text-slate-900">
+                            <div>
+                                <span class="font-black text-sm block">New Total Due:</span>
+                                <span id="alter-price-diff" class="text-[10px] font-bold text-amber-700">No price
+                                    change</span>
+                            </div>
+                            <span id="alter-price-total"
+                                class="text-2xl font-black text-amber-900 font-mono">₱250.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                    <button type="button" onclick="closeAlterModal()"
+                        class="px-4 py-2.5 text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 rounded-xl transition cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="button" id="save-alter-btn" onclick="saveOrderAlteration()"
+                        class="px-6 py-2.5 text-xs font-extrabold text-white bg-amber-700 hover:bg-amber-800 rounded-xl transition shadow-md flex items-center gap-2 active:scale-95 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                        <span>Save Alterations &amp; Update Order</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Machine Assignment Interactive Modal -->
+        <div id="machine-assign-modal"
+            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+            <div
+                class="bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden animate-slide-in border border-slate-100 flex flex-col">
+                <!-- Modal Top Header -->
+                <div
+                    class="bg-gradient-to-r from-slate-900 to-sky-950 text-white px-6 py-5 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-300 font-black text-sm">
+                            ⚙️
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold leading-tight">Assign Machine to Order</h3>
+                            <p class="text-[11px] text-sky-200/80 font-medium">Auto-allocate recommended machine or
+                                manually override</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeMachineModal()"
+                        class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition">
+                        ✕
+                    </button>
+                </div>
+
+                <div class="p-6 space-y-5 overflow-y-auto max-h-[75vh]">
+                    <!-- Order Profile Context Banner -->
+                    <div
+                        class="bg-slate-50 border border-slate-200/70 rounded-2xl p-3.5 flex items-center justify-between text-xs">
+                        <div>
+                            <span
+                                class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Customer</span>
+                            <span id="modal-customer-name" class="font-bold text-slate-800">—</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Load
+                                Requirement</span>
+                            <span id="modal-load-target" class="font-bold text-sky-700 font-mono-num">—</span>
+                        </div>
+                    </div>
+
+                    <!-- Machine Allocation Dynamic Section -->
+                    <div id="modal-allocation-wrapper" class="space-y-4">
+                        <!-- Populated by JS: either single assignment or per-load cards -->
+                    </div>
+
+                    <!-- Payment Section (Required before machine assignment) -->
+                    <div id="modal-payment-section"
+                        class="border-2 border-emerald-500/30 bg-emerald-50/20 rounded-2xl p-4 space-y-3.5">
+                        <div class="flex items-center justify-between border-b border-emerald-100 pb-2.5">
+                            <div>
+                                <span
+                                    class="text-[10px] font-black uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+                                    <span>💳</span> Payment Collection (Required to Assign)
+                                </span>
+                                <p class="text-[11px] text-slate-500 font-medium">Order must be paid before a machine
+                                    cycle can be allocated.</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total
+                                    Due</span>
+                                <span id="modal-payment-amount-due"
+                                    class="text-base font-black text-emerald-700 font-mono-num">₱0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Already Paid Banner (Shown if order is already Paid online/settled) -->
+                        <div id="modal-already-paid-banner"
+                            class="hidden p-3 bg-emerald-100 border border-emerald-300 rounded-xl text-xs font-bold text-emerald-800 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Already Paid in Full</span>
+                            </span>
+                            <span id="modal-already-paid-method"
+                                class="text-emerald-900 font-mono-num font-extrabold uppercase">ONLINE GCASH</span>
+                        </div>
+
+                        <!-- Payment Collection Form -->
+                        <div id="modal-payment-form" class="space-y-3">
+                            <div>
+                                <label
+                                    class="text-[11px] font-black uppercase tracking-wider text-slate-600 block mb-1.5">Mode
+                                    of Payment (MOP)</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <label
+                                        class="flex items-center justify-center gap-1.5 p-2 rounded-xl border-2 border-slate-200 bg-white cursor-pointer hover:border-sky-500 transition text-xs font-bold text-slate-800 has-[:checked]:border-sky-600 has-[:checked]:bg-sky-50 has-[:checked]:text-sky-900">
+                                        <input type="radio" name="modal_mop" value="Cash" checked
+                                            onchange="toggleMOPFields('Cash')"
+                                            class="w-3.5 h-3.5 text-sky-600 focus:ring-sky-500">
+                                        <span>💵 Cash</span>
+                                    </label>
+                                    <label
+                                        class="flex items-center justify-center gap-1.5 p-2 rounded-xl border-2 border-slate-200 bg-white cursor-pointer hover:border-sky-500 transition text-xs font-bold text-slate-800 has-[:checked]:border-sky-600 has-[:checked]:bg-sky-50 has-[:checked]:text-sky-900">
+                                        <input type="radio" name="modal_mop" value="GCash"
+                                            onchange="toggleMOPFields('GCash')"
+                                            class="w-3.5 h-3.5 text-sky-600 focus:ring-sky-500">
+                                        <span>📱 GCash</span>
+                                    </label>
+                                    <label
+                                        class="flex items-center justify-center gap-1.5 p-2 rounded-xl border-2 border-slate-200 bg-white cursor-pointer hover:border-sky-500 transition text-xs font-bold text-slate-800 has-[:checked]:border-sky-600 has-[:checked]:bg-sky-50 has-[:checked]:text-sky-900">
+                                        <input type="radio" name="modal_mop" value="Card"
+                                            onchange="toggleMOPFields('Card')"
+                                            class="w-3.5 h-3.5 text-sky-600 focus:ring-sky-500">
+                                        <span>💳 Card</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Cash Fields -->
+                            <div id="modal-mop-cash-fields"
+                                class="space-y-2 bg-white p-3 rounded-xl border border-slate-200">
+                                <div class="flex items-center justify-between">
+                                    <label for="modal-cash-tendered" class="text-xs font-bold text-slate-700">Cash
+                                        Received / Tendered (₱)</label>
+                                    <div class="flex items-center gap-1.5">
+                                        <button type="button" onclick="setExactCash()"
+                                            class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Exact</button>
+                                        <button type="button" onclick="addCashAmount(500)"
+                                            class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 transition">₱500</button>
+                                        <button type="button" onclick="addCashAmount(1000)"
+                                            class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 transition">₱1,000</button>
+                                    </div>
+                                </div>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-2.5 text-xs font-bold text-slate-400">₱</span>
+                                    <input type="number" id="modal-cash-tendered" step="0.01" min="0" placeholder="0.00"
+                                        oninput="computeCashChange()"
+                                        class="w-full pl-7 pr-3 py-2 border border-slate-200 rounded-xl text-xs font-bold font-mono-num text-slate-900 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                                </div>
+                                <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                                    <span class="text-slate-500 font-semibold">Change to Customer:</span>
+                                    <span id="modal-cash-change"
+                                        class="font-black font-mono-num text-emerald-700 text-sm">₱0.00</span>
+                                </div>
+                                <div id="modal-cash-warning"
+                                    class="hidden text-[11px] font-bold text-rose-600 bg-rose-50 p-2 rounded-lg border border-rose-200">
+                                    Cash received is less than amount due.
+                                </div>
+                            </div>
+
+                            <!-- GCash Fields -->
+                            <div id="modal-mop-gcash-fields"
+                                class="hidden space-y-2 bg-white p-3 rounded-xl border border-slate-200">
+                                <label for="modal-gcash-ref" class="text-xs font-bold text-slate-700 block">GCash
+                                    Reference ID (Last 6 Numbers)</label>
+                                <input type="text" id="modal-gcash-ref" maxlength="6" pattern="[0-9]{6}"
+                                    placeholder="e.g. 784920"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,6)"
+                                    class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold font-mono-num tracking-widest text-slate-900 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                                <p class="text-[10px] text-slate-400 font-medium">Input the last 6 numbers of the GCash
+                                    transaction reference</p>
+                            </div>
+
+                            <!-- Card Fields -->
+                            <div id="modal-mop-card-fields"
+                                class="hidden space-y-2 bg-white p-3 rounded-xl border border-slate-200">
+                                <label for="modal-card-ref" class="text-xs font-bold text-slate-700 block">Card ID
+                                    Number (Last 4 Numbers)</label>
+                                <input type="text" id="modal-card-ref" maxlength="4" pattern="[0-9]{4}"
+                                    placeholder="e.g. 4829"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,4)"
+                                    class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold font-mono-num tracking-widest text-slate-900 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                                <p class="text-[10px] text-slate-400 font-medium">Input the last 4 numbers from the card
+                                    / terminal receipt</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Immediate Execution Option -->
+                    <div class="p-3.5 rounded-2xl bg-sky-50/70 border border-sky-100 flex items-start gap-3">
+                        <input type="checkbox" id="modal-start-cycle-now" checked
+                            class="mt-1 w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300">
+                        <label for="modal-start-cycle-now" class="cursor-pointer">
+                            <span class="text-xs font-bold text-slate-900 block">Start Machine Cycle Immediately (44m
+                                Wash / 45m Dry)</span>
+                            <span class="text-[11px] text-slate-500 font-medium block leading-snug">
+                                Sets order status straight to <strong class="text-sky-800">In Laundry</strong> and locks
+                                the machine(s) as Occupied right now with automated countdown.
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Modal Action Buttons -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                    <button type="button" onclick="closeMachineModal()"
+                        class="px-4 py-2.5 text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 rounded-xl transition">
+                        Cancel
+                    </button>
+                    <button type="button" id="modal-confirm-assign-btn" onclick="executeConfirmWithMachine()"
+                        class="px-6 py-2.5 text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-md flex items-center gap-2 active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Confirm Payment &amp; Assign Machine</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Overlay Modal -->
+        <div id="success-overlay"
+            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+            <div
+                class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center space-y-4 animate-slide-in pulse-success border border-slate-100">
+                <div
+                    class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto text-emerald-600">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M9 12l2 2 4-4" />
+                        <circle cx="12" cy="12" r="9" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-extrabold text-slate-900">Order Verified &amp; Queued!</h3>
+                    <p class="text-xs text-slate-500 mt-1" id="success-customer-text">Customer order has been queued.
+                    </p>
+                </div>
+                <div class="bg-gradient-to-br from-sky-50 to-cyan-50 border border-sky-200 rounded-2xl p-4">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-sky-600 mb-1">Queue Number Assigned
+                    </div>
+                    <div id="success-queue-number" class="mono text-5xl font-black text-sky-600">#—</div>
+                </div>
+                <!-- Assigned Machine Details Block -->
+                <div id="success-machine-info-block"
+                    class="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 text-left space-y-2">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Assigned
+                        Machine(s)</div>
+                    <div id="success-machine-list" class="space-y-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <!-- Payment Receipt Block -->
+                <div id="success-payment-info-block"
+                    class="hidden bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3.5 text-left space-y-1.5">
+                    <div
+                        class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 flex items-center justify-between">
+                        <span>Payment Settled</span>
+                        <span id="success-pay-method"
+                            class="font-extrabold px-1.5 py-0.5 rounded bg-emerald-200/60 text-emerald-900">CASH</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-800">
+                        <span>Amount Paid:</span>
+                        <span id="success-pay-amount" class="font-mono-num text-emerald-700">₱0.00</span>
+                    </div>
+                    <div id="success-pay-detail" class="text-[11px] text-slate-600 font-mono-num"></div>
+                </div>
+                <p class="text-xs text-slate-400">Give the customer their queue ticket or call their number.</p>
+                <button type="button" onclick="closeSuccess()"
+                    class="w-full py-3 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold rounded-xl text-sm transition shadow-sm">Done
+                    — Next Customer</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentOrder = null;
+        const input = document.getElementById("order-code-input");
+        const card = document.getElementById("order-card");
+        const statusMsg = document.getElementById("status-message");
+
+        function showStatus(msg, type = "error") {
+            const c = { error: "bg-rose-50 border border-rose-200 text-rose-800", info: "bg-sky-50 border border-sky-200 text-sky-800", warning: "bg-amber-50 border border-amber-200 text-amber-800" };
+            statusMsg.className = `rounded-2xl px-5 py-4 text-sm font-semibold flex items-center gap-3 ${c[type]}`;
+            statusMsg.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>${msg}`;
+            statusMsg.classList.remove("hidden");
+        }
+        function hideStatus() { statusMsg.classList.add("hidden"); }
+
+        async function lookupOrder() {
+            const raw = input.value.trim();
+            const code = raw.toUpperCase();
+            if (!code) { showStatus("Please enter an Order Code or Number (e.g. 84920 or ORD-84920)."); return; }
+            const btn = document.getElementById("lookup-btn");
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Looking Up...`;
+            try {
+                const res = await fetch(`/api/staff/verify-order?code=${encodeURIComponent(code)}`);
+                let data = null;
+                try {
+                    data = await res.json();
+                } catch {
+                    showStatus(`Server error (${res.status}). Please try again.`);
+                    card.classList.add("hidden");
+                    currentOrder = null;
+                    return;
+                }
+                if (!res.ok || data.status !== "success") {
+                    showStatus(data.message || "Order not found.");
+                    card.classList.add("hidden");
+                    currentOrder = null;
+                    return;
+                }
+                hideStatus();
+                currentOrder = data.order;
+                if (/^\d+$/.test(raw) && data.order.order_code) {
+                    input.value = data.order.order_code;
+                }
+                populateCard(data.order);
+                card.classList.remove("hidden");
+            } catch { showStatus("Network connection error. Please try again."); }
+            finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><span>Look Up</span>`;
+            }
+        }
+
+        function populateCard(o) {
+            const badges = { Pending: "status-badge-pending", Confirmed: "status-badge-confirmed", Cancelled: "status-badge-cancelled", Completed: "status-badge-completed" };
+            const st = document.getElementById("card-order-status");
+            st.textContent = o.status; st.className = `px-3 py-1 rounded-full text-xs font-bold inline-block ${badges[o.status] || "status-badge-pending"}`;
+            document.getElementById("card-order-code").textContent = o.order_code;
+            document.getElementById("card-customer-name").textContent = o.customer_name;
+            document.getElementById("card-phone").textContent = o.phone_number;
+            document.getElementById("card-service").textContent = o.service_type;
+            document.getElementById("card-mode").textContent = o.order_mode;
+            const isSelf = (o.order_mode || '').toLowerCase().includes('self') || (o.service_type || '').toLowerCase().includes('self');
+            const turnaroundBlock = document.getElementById("card-turnaround-block");
+            if (turnaroundBlock) {
+                if (isSelf) {
+                    turnaroundBlock.classList.add("hidden");
+                } else {
+                    turnaroundBlock.classList.remove("hidden");
+                }
+            }
+            document.getElementById("card-turnaround").textContent = isSelf ? "—" : (o.turnaround_option || "—");
+            document.getElementById("card-schedule").textContent = o.schedule_time;
+            document.getElementById("card-payment-method").textContent = o.payment_method;
+            const ps = document.getElementById("card-payment-status");
+            ps.textContent = o.payment_status; ps.className = `px-2.5 py-1 rounded-full text-xs font-bold inline-block ${o.payment_status === "Paid" ? "status-badge-confirmed" : "status-badge-pending"}`;
+            const addrBlock = document.getElementById("card-address-block");
+            if (o.address && o.address !== "—") { document.getElementById("card-address").textContent = o.address; addrBlock.classList.remove("hidden"); } else { addrBlock.classList.add("hidden"); }
+            const macBadge = document.getElementById("card-machines-badge");
+            const loadDetails = document.getElementById("card-load-details");
+            if (macBadge) {
+                const count = o.total_machines || 1;
+                macBadge.textContent = `${count} Machine${count > 1 ? 's' : ''}`;
+            }
+            if (loadDetails) {
+                loadDetails.textContent = o.load_details || "Single 8kg Regular Load";
+            }
+
+            // Populate Recommendation Preview Block
+            const recBlock = document.getElementById("card-rec-block");
+            const rec = o.machine_recommendation;
+            if (rec && recBlock) {
+                if (rec.is_multi_load && rec.loads && rec.loads.length > 0) {
+                    const badge = document.getElementById("card-rec-badge");
+                    if (badge) badge.textContent = `${rec.loads.length} Machines`;
+                    document.getElementById("card-rec-name").innerHTML = rec.loads.map(l => {
+                        const bp = l.best_pick;
+                        const isAvail = bp && bp.is_available;
+                        return `<div class="flex items-center justify-between py-1.5 border-b border-sky-100 last:border-b-0">
+                            <div>
+                                <span class="font-black text-slate-800">${l.label}:</span>
+                                <span class="font-extrabold text-sky-900 ml-1">${bp ? bp.machine_name : 'No machine'} (${bp ? bp.capacity_kg : l.capacity_kg}kg)</span>
+                                <span class="text-[10px] text-slate-500 font-semibold block">${l.category}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold ${isAvail ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                ${isAvail ? 'Available Now' : `In Use (~${bp ? bp.remaining_minutes : 15}m)`}
+                            </span>
+                        </div>`;
+                    }).join('');
+                    document.getElementById("card-rec-reason").textContent = "Distinct machines automatically allocated per load to balance fleet wear and capacity.";
+                    const statWrap = document.getElementById("card-rec-status-wrap");
+                    if (statWrap) statWrap.classList.add("hidden");
+                    recBlock.classList.remove("hidden");
+                } else if (rec.best_pick) {
+                    const bp = rec.best_pick;
+                    const badge = document.getElementById("card-rec-badge");
+                    if (badge) badge.textContent = "Auto Pick";
+                    const recMachName = bp.machine_name.includes('(') ? `${bp.machine_name} [${bp.capacity_kg}kg]` : `${bp.machine_name} (${bp.capacity_kg}kg ${bp.machine_type || 'Dryer and Washer'})`;
+                    document.getElementById("card-rec-name").textContent = recMachName;
+                    document.getElementById("card-rec-reason").textContent = bp.reason || "Optimized for capacity match and fleet usage balance.";
+                    const recStatus = document.getElementById("card-rec-status");
+                    if (bp.is_available) {
+                        recStatus.textContent = "Available Now (0m wait)";
+                        recStatus.className = "px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200";
+                    } else {
+                        recStatus.textContent = `In Use (~${bp.remaining_minutes || 15}m wait)`;
+                        recStatus.className = "px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200";
+                    }
+                    const statWrap = document.getElementById("card-rec-status-wrap");
+                    if (statWrap) statWrap.classList.remove("hidden");
+                    recBlock.classList.remove("hidden");
+                } else {
+                    recBlock.classList.add("hidden");
+                }
+            } else if (recBlock) {
+                recBlock.classList.add("hidden");
+            }
+
+            // Penalty display if customer incurred late retrieval fee
+            const penaltyBlock = document.getElementById("card-penalty-block");
+            if (penaltyBlock) {
+                if (o.penalty_amount && Number(o.penalty_amount) > 0) {
+                    document.getElementById("card-penalty-amount").textContent = `₱${Number(o.penalty_amount).toFixed(2)}`;
+                    if (o.penalty_reason) {
+                        document.getElementById("card-penalty-reason").textContent = o.penalty_reason;
+                    }
+                    penaltyBlock.classList.remove("hidden");
+                } else {
+                    penaltyBlock.classList.add("hidden");
+                }
+            }
+
+            const weightEl = document.getElementById("card-weight");
+            if (weightEl) {
+                const isTitan = (o.load_details && (o.load_details.toLowerCase().includes("titan") || o.load_details.toLowerCase().includes("13kg")));
+                if (o.actual_weight !== null && o.actual_weight !== undefined) {
+                    weightEl.textContent = `${Number(o.actual_weight).toFixed(1)} kg (Scale Verified)`;
+                    weightEl.className = "text-sm font-black text-emerald-700 font-mono";
+                } else if (o.estimated_weight !== null && o.estimated_weight !== undefined) {
+                    const estNum = Number(o.estimated_weight);
+                    const dispWeight = (isTitan && estNum <= 8) ? 13.0 : estNum;
+                    weightEl.textContent = `${dispWeight.toFixed(1)} kg (Est.)`;
+                    weightEl.className = "text-sm font-black text-amber-700 font-mono";
+                } else {
+                    const defaultWeight = isTitan ? "13.0" : "8.0";
+                    weightEl.textContent = `~${defaultWeight} kg (Standard)`;
+                    weightEl.className = "text-sm font-black text-slate-800 font-mono";
+                }
+            }
+
+            const addonsEl = document.getElementById("card-addons-summary");
+            if (addonsEl) {
+                let summary = "None";
+                if (Array.isArray(o.addons) && o.addons.length > 0) {
+                    summary = o.addons.map(a => typeof a === 'object' ? `${a.qty || 1}x ${a.name}` : a).join(", ");
+                } else if (typeof o.addons === 'string' && o.addons.trim()) {
+                    summary = o.addons;
+                }
+                addonsEl.textContent = summary;
+            }
+
+            const totalEl = document.getElementById("card-total-amount");
+            if (totalEl) {
+                if (o.formatted_total) {
+                    totalEl.textContent = o.formatted_total;
+                } else if (o.total_amount !== undefined && o.total_amount !== null) {
+                    totalEl.textContent = `₱${Number(o.total_amount).toFixed(2)}`;
+                } else {
+                    totalEl.textContent = "₱—";
+                }
+            }
+
+            const alterBtn = document.getElementById("alter-btn");
+            if (alterBtn) {
+                if (o.status === "Cancelled" || o.status === "Completed") {
+                    alterBtn.disabled = true;
+                    alterBtn.classList.add("opacity-50", "cursor-not-allowed");
+                } else {
+                    alterBtn.disabled = false;
+                    alterBtn.classList.remove("opacity-50", "cursor-not-allowed");
+                }
+            }
+
+            const qWrap = document.getElementById("card-queue-number-wrap");
+            const cb = document.getElementById("confirm-btn");
+            const hint = document.getElementById("action-hint");
+            if (o.already_verified && o.queue_number) {
+                document.getElementById("card-queue-number").textContent = `#${o.queue_number}`; qWrap.classList.remove("hidden");
+                cb.disabled = true; cb.className = "px-6 py-2.5 text-xs font-extrabold text-white bg-slate-400 rounded-xl cursor-not-allowed flex items-center gap-2";
+                hint.textContent = `Already verified. Queue #${o.queue_number} assigned.`;
+            } else {
+                qWrap.classList.add("hidden"); cb.disabled = false;
+                cb.className = "px-6 py-2.5 text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-md flex items-center gap-2 active:scale-95";
+                if (o.status === "Cancelled") { cb.disabled = true; cb.className = "px-6 py-2.5 text-xs font-extrabold text-white bg-slate-400 rounded-xl cursor-not-allowed flex items-center gap-2"; hint.textContent = "This order was cancelled."; }
+                else hint.textContent = "Review the order, then click Verify & Assign Machine.";
+            }
+        }
+
+        // =========================================================================
+        // ORDER ALTERATION MODAL & RE-EVALUATION LOGIC
+        // =========================================================================
+        let alterAddonsState = {
+            detergent: 0,
+            fabcon: 0,
+            bleach: 0,
+            dry: 0,
+            superwash: false,
+            fold: false
+        };
+
+        function openAlterModal() {
+            if (!currentOrder) return;
+            if (currentOrder.status === "Cancelled" || currentOrder.status === "Completed") {
+                showStatus("This order cannot be altered because it is " + currentOrder.status);
+                return;
+            }
+
+            document.getElementById("alter-customer-name").textContent = currentOrder.customer_name || "—";
+            const tm = currentOrder.total_machines || 1;
+            const isTitan = (currentOrder.load_details && (currentOrder.load_details.toLowerCase().includes("titan") || currentOrder.load_details.toLowerCase().includes("13kg")));
+            let defaultEst = isTitan ? 13.0 : 8.0;
+            if (currentOrder.estimated_weight) {
+                const estNum = Number(currentOrder.estimated_weight);
+                defaultEst = (isTitan && estNum <= 8) ? 13.0 : estNum;
+            }
+            document.getElementById("alter-est-weight-badge").textContent = `${defaultEst.toFixed(1)} kg`;
+
+            const initWeight = (currentOrder.actual_weight !== null && currentOrder.actual_weight !== undefined) ? currentOrder.actual_weight : defaultEst;
+            const weightInput = document.getElementById("alter-scale-weight-input");
+            weightInput.value = Number(initWeight).toFixed(1);
+
+            const fleetSelect = document.getElementById("alter-fleet-select");
+            if (tm >= 2) {
+                fleetSelect.value = "2_8";
+            } else if (isTitan || Number(initWeight) > 8) {
+                fleetSelect.value = "1_13";
+            } else {
+                fleetSelect.value = "1_8";
+            }
+
+            const serviceSelect = document.getElementById("alter-service-select");
+            let matchedService = false;
+            for (const opt of serviceSelect.options) {
+                if (opt.value.toLowerCase().includes((currentOrder.service_type || '').toLowerCase()) ||
+                    (currentOrder.service_type || '').toLowerCase().includes(opt.value.toLowerCase().split(' ')[0])) {
+                    serviceSelect.value = opt.value;
+                    matchedService = true;
+                    break;
+                }
+            }
+            if (!matchedService) {
+                serviceSelect.value = "Drop-off Service (Wash, Dry, Fold)";
+            }
+
+            alterAddonsState = {
+                detergent: 0,
+                fabcon: 0,
+                bleach: 0,
+                dry: 0,
+                superwash: false,
+                fold: false
+            };
+
+            if (Array.isArray(currentOrder.addons)) {
+                for (const item of currentOrder.addons) {
+                    const name = (typeof item === 'object' ? item.name : item).toLowerCase();
+                    const qty = (typeof item === 'object' ? item.qty : 1) || 1;
+                    if (name.includes("detergent") || name.includes("det")) alterAddonsState.detergent = qty;
+                    else if (name.includes("fabric") || name.includes("fabcon")) alterAddonsState.fabcon = qty;
+                    else if (name.includes("bleach") || name.includes("stain")) alterAddonsState.bleach = qty;
+                    else if (name.includes("dry")) alterAddonsState.dry = qty;
+                    else if (name.includes("superwash")) alterAddonsState.superwash = true;
+                    else if (name.includes("fold")) alterAddonsState.fold = true;
+                }
+            }
+
+            updateAddonsUI();
+            calculateLiveAlteration();
+            document.getElementById("alter-order-modal").classList.remove("hidden");
+        }
+
+        function closeAlterModal() {
+            document.getElementById("alter-order-modal").classList.add("hidden");
+        }
+
+        function setAlterScaleWeight(w) {
+            const input = document.getElementById("alter-scale-weight-input");
+            input.value = Number(w).toFixed(1);
+
+            const fleetSelect = document.getElementById("alter-fleet-select");
+            if (w > 8 && w <= 13 && fleetSelect.value === "1_8") {
+                fleetSelect.value = "1_13";
+            } else if (w <= 8 && fleetSelect.value === "1_13") {
+                fleetSelect.value = "1_8";
+            } else if (w > 13 && (fleetSelect.value === "1_8" || fleetSelect.value === "1_13")) {
+                fleetSelect.value = "2_8";
+            }
+
+            calculateLiveAlteration();
+        }
+
+        function alterAddonStep(key, step) {
+            const k = key.toLowerCase();
+            if (k.includes("detergent")) {
+                alterAddonsState.detergent = Math.max(0, alterAddonsState.detergent + step);
+            } else if (k.includes("fabric") || k.includes("fabcon")) {
+                alterAddonsState.fabcon = Math.max(0, alterAddonsState.fabcon + step);
+            } else if (k.includes("bleach")) {
+                alterAddonsState.bleach = Math.max(0, alterAddonsState.bleach + step);
+            } else if (k.includes("dry")) {
+                alterAddonsState.dry = Math.max(0, alterAddonsState.dry + step);
+            }
+            updateAddonsUI();
+            calculateLiveAlteration();
+        }
+
+        function updateAddonsUI() {
+            document.getElementById("addon-det-qty").textContent = alterAddonsState.detergent;
+            document.getElementById("addon-fab-qty").textContent = alterAddonsState.fabcon;
+            document.getElementById("addon-bleach-qty").textContent = alterAddonsState.bleach;
+            document.getElementById("addon-dry-qty").textContent = alterAddonsState.dry;
+            document.getElementById("addon-superwash").checked = alterAddonsState.superwash;
+            document.getElementById("addon-fold").checked = alterAddonsState.fold;
+        }
+
+        function calculateLiveAlteration() {
+            const rawWeight = parseFloat(document.getElementById("alter-scale-weight-input").value) || 0;
+            const advisor = document.getElementById("alter-weight-advisor");
+            const fleetVal = document.getElementById("alter-fleet-select").value;
+            const svcVal = document.getElementById("alter-service-select").value;
+
+            alterAddonsState.superwash = document.getElementById("addon-superwash").checked;
+            alterAddonsState.fold = document.getElementById("addon-fold").checked;
+
+            if (rawWeight <= 0) {
+                advisor.className = "p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-slate-100 border-slate-200 text-slate-700";
+                advisor.innerHTML = "<span>⚖️</span> <span>Place laundry on counter digital scale.</span>";
+            } else if (rawWeight <= 8.0) {
+                advisor.className = "p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-emerald-50 border-emerald-200 text-emerald-800";
+                advisor.innerHTML = "<span>✅</span> <span>Fits standard 8kg Regular Washer (0-8kg).</span>";
+            } else if (rawWeight <= 13.0) {
+                if (fleetVal === "1_8") {
+                    advisor.className = "p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-amber-50 border-amber-300 text-amber-900";
+                    advisor.innerHTML = "<span>⚠️</span> <span>Over 8kg! Switch fleet allocation to 13kg Titan or split into 2 loads.</span>";
+                } else {
+                    advisor.className = "p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-sky-50 border-sky-200 text-sky-800";
+                    advisor.innerHTML = "<span>⚡</span> <span>Optimal fit for 13kg Titan Heavy-Duty Washer (+₱95.00).</span>";
+                }
+            } else {
+                advisor.className = "p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 bg-purple-50 border-purple-200 text-purple-900";
+                advisor.innerHTML = "<span>📦</span> <span>Heavy multi-load laundry (>13kg). Requires 2 or more machines.</span>";
+            }
+
+            let totalMachines = 1;
+            let machineCapacity = 8;
+            if (fleetVal === "1_13") {
+                totalMachines = 1;
+                machineCapacity = 13;
+            } else if (fleetVal === "2_8") {
+                totalMachines = 2;
+                machineCapacity = 8;
+            } else if (fleetVal === "2_combo") {
+                totalMachines = 2;
+                machineCapacity = 13;
+            }
+
+            let baseRate = 130;
+            const sLower = svcVal.toLowerCase();
+            if (sLower.includes("saver")) baseRate = 160;
+            else if (sLower.includes("signature")) baseRate = 200;
+            else if (sLower.includes("premium")) baseRate = 260;
+            else if (sLower.includes("self")) baseRate = (machineCapacity >= 13 ? 240 : 145);
+
+            let loadSubtotal = baseRate * totalMachines;
+
+            let titanUpgrade = 0;
+            if (machineCapacity >= 13 && !sLower.includes("self") && !sLower.includes("titan")) {
+                titanUpgrade = 95 * totalMachines;
+            }
+
+            let addonsTotal = 0;
+            addonsTotal += (alterAddonsState.detergent * 20);
+            addonsTotal += (alterAddonsState.fabcon * 20);
+            addonsTotal += (alterAddonsState.bleach * 30);
+            addonsTotal += (alterAddonsState.dry * 30);
+            if (alterAddonsState.superwash) addonsTotal += 35;
+            if (alterAddonsState.fold) addonsTotal += 40;
+
+            const mode = (currentOrder ? currentOrder.order_mode : 'Drop-Off') || 'Drop-Off';
+            const turnaround = (currentOrder ? currentOrder.turnaround_option : '24 Hours') || '24 Hours';
+            let serviceCharge = 0;
+            if (!sLower.includes("self") && mode.toLowerCase() !== "self-service") {
+                const tLower = turnaround.toLowerCase();
+                serviceCharge = (tLower.includes("2 day") || tLower.includes("economy")) ? 70 : 120;
+            }
+            let deliveryFee = 0;
+            if (mode.toLowerCase().includes("pick") || mode.toLowerCase().includes("delivery")) {
+                deliveryFee = 40;
+            }
+
+            const totalDue = loadSubtotal + titanUpgrade + addonsTotal + serviceCharge + deliveryFee;
+
+            document.getElementById("alter-price-base").textContent = `₱${loadSubtotal.toFixed(2)}`;
+
+            const upgradeRow = document.getElementById("alter-upgrade-row");
+            if (titanUpgrade > 0) {
+                document.getElementById("alter-price-upgrade").textContent = `+₱${titanUpgrade.toFixed(2)}`;
+                upgradeRow.classList.remove("hidden");
+            } else {
+                upgradeRow.classList.add("hidden");
+            }
+
+            const addonsRow = document.getElementById("alter-addons-row");
+            if (addonsTotal > 0) {
+                document.getElementById("alter-price-addons").textContent = `+₱${addonsTotal.toFixed(2)}`;
+                addonsRow.classList.remove("hidden");
+            } else {
+                addonsRow.classList.add("hidden");
+            }
+
+            const slaRow = document.getElementById("alter-sla-row");
+            if (slaRow) {
+                if (serviceCharge + deliveryFee > 0) {
+                    slaRow.classList.remove("hidden");
+                    document.getElementById("alter-price-sla").textContent = `₱${(serviceCharge + deliveryFee).toFixed(2)}`;
+                } else {
+                    slaRow.classList.add("hidden");
+                }
+            }
+            document.getElementById("alter-price-total").textContent = `₱${totalDue.toFixed(2)}`;
+
+            const prevTotal = currentOrder ? (parseFloat(currentOrder.total_amount) || 0) : 0;
+            const diff = totalDue - prevTotal;
+            const diffEl = document.getElementById("alter-price-diff");
+            if (Math.abs(diff) < 0.01) {
+                diffEl.textContent = "No price change";
+                diffEl.className = "text-[10px] font-bold text-slate-500";
+            } else if (diff > 0) {
+                diffEl.textContent = `+₱${diff.toFixed(2)} added to bill`;
+                diffEl.className = "text-[10px] font-bold text-emerald-700";
+            } else {
+                diffEl.textContent = `-₱${Math.abs(diff).toFixed(2)} reduced`;
+                diffEl.className = "text-[10px] font-bold text-sky-700";
+            }
+        }
+
+        async function saveOrderAlteration() {
+            if (!currentOrder) return;
+            const saveBtn = document.getElementById("save-alter-btn");
+            const rawWeight = parseFloat(document.getElementById("alter-scale-weight-input").value);
+            if (!rawWeight || rawWeight <= 0) {
+                alert("Please enter a valid scale weight greater than 0 kg.");
+                return;
+            }
+
+            const fleetVal = document.getElementById("alter-fleet-select").value;
+            let totalMachines = 1;
+            let machineCapacity = 8;
+            if (fleetVal === "1_13") {
+                totalMachines = 1;
+                machineCapacity = 13;
+            } else if (fleetVal === "2_8") {
+                totalMachines = 2;
+                machineCapacity = 8;
+            } else if (fleetVal === "2_combo") {
+                totalMachines = 2;
+                machineCapacity = 13;
+            }
+
+            const serviceType = document.getElementById("alter-service-select").value;
+
+            const addons = [];
+            if (alterAddonsState.detergent > 0) addons.push({ name: "Extra Detergent", qty: alterAddonsState.detergent, price: 20 });
+            if (alterAddonsState.fabcon > 0) addons.push({ name: "Fabric Conditioner", qty: alterAddonsState.fabcon, price: 20 });
+            if (alterAddonsState.bleach > 0) addons.push({ name: "Color-safe Bleach", qty: alterAddonsState.bleach, price: 30 });
+            if (alterAddonsState.dry > 0) addons.push({ name: "Add Dry (+10m)", qty: alterAddonsState.dry, price: 30 });
+            if (alterAddonsState.superwash) addons.push({ name: "Superwash Deep Clean", qty: 1, price: 35 });
+            if (alterAddonsState.fold) addons.push({ name: "Neat Folding Service", qty: 1, price: 40 });
+
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> <span>Saving Changes...</span>`;
+
+            try {
+                const res = await fetch("/api/staff/alter-order", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        order_code: currentOrder.order_code,
+                        actual_weight: rawWeight,
+                        service_type: serviceType,
+                        total_machines: totalMachines,
+                        machine_capacity: machineCapacity,
+                        addons: addons
+                    })
+                });
+
+                const data = await res.json();
+                if (data.status === "success" && data.order) {
+                    currentOrder = data.order;
+                    populateCard(data.order);
+                    closeAlterModal();
+                    showStatus("✅ Order details, scale weight, and machine requirements successfully updated!", "info");
+                } else {
+                    alert(data.message || "Failed to update order.");
+                }
+            } catch (err) {
+                alert("Network error while updating order. Please try again.");
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg> <span>Save Alterations &amp; Update Order</span>`;
+            }
+        }
+
+        // =========================================================================
+        // MACHINE ASSIGNMENT MODAL & VERIFICATION FLOW
+        // =========================================================================
+        function confirmOrder() {
+            if (!currentOrder) return;
+            if (currentOrder.already_verified) return;
+            openMachineModal();
+        }
+
+        function toggleMOPFields(mop) {
+            document.getElementById("modal-mop-cash-fields")?.classList.toggle("hidden", mop !== "Cash");
+            document.getElementById("modal-mop-gcash-fields")?.classList.toggle("hidden", mop !== "GCash");
+            document.getElementById("modal-mop-card-fields")?.classList.toggle("hidden", mop !== "Card");
+            if (mop === "Cash") computeCashChange();
+        }
+
+        function getOrderTotalDue() {
+            if (!currentOrder) return 0;
+            return parseFloat(currentOrder.total_amount) || 0;
+        }
+
+        function computeCashChange() {
+            const totalDue = getOrderTotalDue();
+            const input = document.getElementById("modal-cash-tendered");
+            const changeEl = document.getElementById("modal-cash-change");
+            const warningEl = document.getElementById("modal-cash-warning");
+            const val = parseFloat(input?.value) || 0;
+            const diff = val - totalDue;
+            if (diff >= -0.001) {
+                changeEl.textContent = `₱${Math.max(0, diff).toFixed(2)}`;
+                changeEl.className = "font-black font-mono-num text-emerald-700 text-sm";
+                warningEl?.classList.add("hidden");
+            } else {
+                changeEl.textContent = `₱0.00`;
+                changeEl.className = "font-black font-mono-num text-slate-400 text-sm";
+                if (val > 0) {
+                    warningEl.textContent = `Cash received is less than amount due. Need ₱${Math.abs(diff).toFixed(2)} more.`;
+                    warningEl?.classList.remove("hidden");
+                } else {
+                    warningEl?.classList.add("hidden");
+                }
+            }
+        }
+
+        function setExactCash() {
+            const totalDue = getOrderTotalDue();
+            const input = document.getElementById("modal-cash-tendered");
+            if (input) {
+                input.value = totalDue.toFixed(2);
+                computeCashChange();
+            }
+        }
+
+        function addCashAmount(denom) {
+            const input = document.getElementById("modal-cash-tendered");
+            if (input) {
+                input.value = (parseFloat(input.value || 0) + denom).toFixed(2);
+                computeCashChange();
+            }
+        }
+
+        function openMachineModal() {
+            if (!currentOrder) return;
+            document.getElementById("modal-customer-name").textContent = currentOrder.customer_name || "—";
+            document.getElementById("modal-load-target").textContent = currentOrder.load_details || `${currentOrder.service_type} (${currentOrder.total_machines || 1} Machine)`;
+
+            const isPaid = (currentOrder.payment_status || '').toLowerCase() === 'paid';
+            const totalDue = getOrderTotalDue();
+            const dueEl = document.getElementById("modal-payment-amount-due");
+            if (dueEl) dueEl.textContent = `₱${totalDue.toFixed(2)}`;
+
+            if (isPaid) {
+                document.getElementById("modal-already-paid-banner")?.classList.remove("hidden");
+                const mEl = document.getElementById("modal-already-paid-method");
+                if (mEl) mEl.textContent = (currentOrder.payment_method || 'PAID').toUpperCase();
+                document.getElementById("modal-payment-form")?.classList.add("hidden");
+            } else {
+                document.getElementById("modal-already-paid-banner")?.classList.add("hidden");
+                document.getElementById("modal-payment-form")?.classList.remove("hidden");
+                const cashRadio = document.querySelector('input[name="modal_mop"][value="Cash"]');
+                if (cashRadio) cashRadio.checked = true;
+                toggleMOPFields("Cash");
+                const cashInput = document.getElementById("modal-cash-tendered");
+                if (cashInput) cashInput.value = totalDue.toFixed(2);
+                computeCashChange();
+                const gcashInput = document.getElementById("modal-gcash-ref");
+                if (gcashInput) gcashInput.value = "";
+                const cardInput = document.getElementById("modal-card-ref");
+                if (cardInput) cardInput.value = "";
+            }
+
+            const rec = currentOrder.machine_recommendation;
+            const wrapper = document.getElementById("modal-allocation-wrapper");
+            const confirmBtn = document.getElementById("modal-confirm-assign-btn");
+
+            if (rec && rec.is_multi_load && rec.loads && rec.loads.length > 0) {
+                confirmBtn.querySelector("span").textContent = `Confirm Payment & Assign ${rec.loads.length} Machines`;
+
+                let allAvailable = true;
+                wrapper.innerHTML = rec.loads.map(ld => {
+                    const bp = ld.best_pick;
+                    if (!bp || !bp.is_available) allAvailable = false;
+                    const isTitan = ld.capacity_kg >= 13;
+
+                    const candOpts = (ld.candidates || []).map(c => {
+                        const waitStr = c.is_available ? 'Available' : `In Use (~${c.remaining_minutes || 15}m wait)`;
+                        const isSelected = bp && c.machine_id === bp.machine_id;
+                        const isCompat = c.matches_capacity;
+                        const compatLabel = isCompat ? '' : ' [Incompatible - Under Capacity]';
+                        const labelText = c.machine_name.includes('(') ? `${c.machine_name} [${c.capacity_kg}kg]` : `${c.machine_name} (${c.capacity_kg}kg ${c.machine_type || 'Dryer and Washer'})`;
+                        return `<option value="${c.machine_id}" ${isSelected ? 'selected' : ''}>
+                            ${labelText} — ${waitStr} · ${c.usage_count || 0} cycles ${isSelected ? '[Recommended]' : ''}${compatLabel}
+                        </option>`;
+                    }).join('');
+
+                    return `
+                    <div class="p-4 rounded-2xl border-2 border-slate-200 bg-white space-y-3 shadow-xs">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                            <div>
+                                <span class="text-xs font-black text-slate-900 block">${ld.label}</span>
+                                <span class="text-[10px] text-slate-500 font-semibold">${ld.category} · ${ld.service_type}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${isTitan ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-sky-100 text-sky-800 border border-sky-200'}">
+                                ${isTitan ? '13kg Titan' : '8kg Regular'}
+                            </span>
+                        </div>
+
+                        ${bp ? `
+                        <!-- Best Pick Recommendation -->
+                        <div class="p-3 rounded-xl border border-emerald-400 bg-emerald-50/50 flex items-start gap-2.5">
+                            <input type="radio" name="load_select_${ld.load_index}" id="radio_rec_${ld.load_index}" value="rec" checked
+                                class="mt-0.5 w-4 h-4 text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                            <label for="radio_rec_${ld.load_index}" class="flex-1 min-w-0 cursor-pointer">
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="text-xs font-black text-slate-900">${bp.machine_name.includes('(') ? `${bp.machine_name} [${bp.capacity_kg}kg]` : `${bp.machine_name} (${bp.capacity_kg}kg ${bp.machine_type || 'Dryer and Washer'})`}</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold ${bp.is_available ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'}">
+                                        ${bp.is_available ? 'Available Now' : `In Use (~${bp.remaining_minutes || 15}m)`}
+                                    </span>
+                                </div>
+                                <p class="text-[11px] text-slate-600 mt-0.5 leading-snug">${bp.reason}</p>
+                            </label>
+                        </div>
+                        ` : ''}
+
+                        <!-- Override Selection -->
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-1.5">
+                                <input type="radio" name="load_select_${ld.load_index}" id="radio_manual_${ld.load_index}" value="manual"
+                                    ${!bp ? 'checked' : ''}
+                                    class="w-3.5 h-3.5 text-sky-600 focus:ring-sky-500 border-slate-300">
+                                <label for="radio_manual_${ld.load_index}" class="text-[10px] font-bold uppercase tracking-wider text-slate-500 cursor-pointer">
+                                    Manual Override
+                                </label>
+                            </div>
+                            <select id="load_dropdown_${ld.load_index}" onchange="document.getElementById('radio_manual_${ld.load_index}').checked = true;"
+                                class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 focus:border-sky-500 focus:bg-white rounded-xl px-3 py-2 outline-none text-slate-800">
+                                <option value="">-- General Queue (No machine assigned yet) --</option>
+                                ${candOpts}
+                            </select>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+
+                document.getElementById("modal-start-cycle-now").checked = allAvailable;
+            } else {
+                // Single Load Layout
+                confirmBtn.querySelector("span").textContent = "Confirm Payment & Assign Machine";
+                const bp = rec ? rec.best_pick : null;
+                const candidates = (rec && rec.candidates) ? rec.candidates : [];
+
+                const candOpts = candidates.map(c => {
+                    const waitStr = c.is_available ? 'Available' : `In Use (~${c.remaining_minutes || 15}m wait)`;
+                    const isSelected = bp && c.machine_id === bp.machine_id;
+                    const isCompat = c.matches_capacity;
+                    const compatLabel = isCompat ? '' : ' [Incompatible - Under Capacity]';
+                    const labelText = c.machine_name.includes('(') ? `${c.machine_name} [${c.capacity_kg}kg]` : `${c.machine_name} (${c.capacity_kg}kg ${c.machine_type || 'Dryer and Washer'})`;
+                    return `<option value="${c.machine_id}" ${isSelected ? 'selected' : ''}>
+                        ${labelText} — ${waitStr} · ${c.usage_count || 0} cycles ${isSelected ? '[Recommended]' : ''}${compatLabel}
+                    </option>`;
+                }).join('');
+
+                wrapper.innerHTML = `
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-[11px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                            <span>⭐</span> Recommended Assignment (Best Pick)
+                        </label>
+                        <span class="text-[10px] font-bold text-sky-600 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded-full">AI Load Balance</span>
+                    </div>
+
+                    ${bp ? `
+                    <div id="modal-best-pick-card" onclick="document.getElementById('radio-best-pick').checked = true;"
+                        class="relative p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/40 cursor-pointer transition hover:bg-emerald-50/70 shadow-xs flex items-start gap-3 ring-2 ring-emerald-200">
+                        <input type="radio" id="radio-best-pick" name="single_machine_selection" value="recommended" checked
+                            class="mt-1 w-4 h-4 text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="text-sm font-black text-slate-900">${bp.machine_name}</h4>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-slate-200 text-slate-700">${bp.capacity_kg}kg ${bp.machine_type || 'Dryer and Washer'}</span>
+                                </div>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${bp.is_available ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'} whitespace-nowrap">
+                                    ${bp.is_available ? 'Available Now' : `In Use (~${bp.remaining_minutes || 15}m)`}
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-600 font-medium mt-1 leading-snug">${bp.reason}</p>
+                            <div class="flex items-center gap-3 mt-2 text-[10px] font-semibold text-slate-400">
+                                <span>${bp.usage_count || 0} cycles run</span>
+                                <span>•</span>
+                                <span>${bp.queue_count || 0} waiting</span>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2">
+                        <input type="radio" id="radio-manual-pick" name="single_machine_selection" value="manual"
+                            ${!bp ? 'checked' : ''}
+                            class="w-4 h-4 text-sky-600 focus:ring-sky-500 border-slate-300">
+                        <label for="radio-manual-pick" class="text-xs font-bold text-slate-700 cursor-pointer">
+                            Override &amp; choose a different machine from fleet
+                        </label>
+                    </div>
+                    <select id="modal-single-dropdown" onchange="document.getElementById('radio-manual-pick').checked = true;"
+                        class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 rounded-xl px-3.5 py-2.5 outline-none transition text-slate-800">
+                        <option value="">-- General Queue (No machine assigned yet) --</option>
+                        ${candOpts}
+                    </select>
+                </div>
+                `;
+
+                document.getElementById("modal-start-cycle-now").checked = bp ? bp.is_available : false;
+            }
+
+            document.getElementById("machine-assign-modal").classList.remove("hidden");
+        }
+
+        function closeMachineModal() {
+            document.getElementById("machine-assign-modal").classList.add("hidden");
+        }
+
+        async function executeConfirmWithMachine() {
+            if (!currentOrder) return;
+            const confirmBtn = document.getElementById("modal-confirm-assign-btn");
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> <span>Assigning &amp; Verifying...</span>`;
+
+            const rec = currentOrder.machine_recommendation;
+            const startNow = document.getElementById("modal-start-cycle-now").checked;
+            const payload = {
+                order_code: currentOrder.order_code,
+                start_now: startNow
+            };
+
+            // Payment verification gate
+            const isPaid = (currentOrder.payment_status || '').toLowerCase() === 'paid';
+            if (!isPaid) {
+                const selectedMop = document.querySelector('input[name="modal_mop"]:checked')?.value || 'Cash';
+                const totalDue = getOrderTotalDue();
+                if (selectedMop === 'Cash') {
+                    const tendered = parseFloat(document.getElementById("modal-cash-tendered")?.value) || 0;
+                    if (tendered < totalDue - 0.001) {
+                        alert(`Cash received (₱${tendered.toFixed(2)}) is less than total amount due (₱${totalDue.toFixed(2)}). Please enter full cash amount.`);
+                        confirmBtn.disabled = false;
+                        confirmBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> <span>Confirm Payment &amp; Assign Machine</span>`;
+                        return;
+                    }
+                    payload.payment = {
+                        method: 'Cash',
+                        cash_amount: tendered
+                    };
+                } else if (selectedMop === 'GCash') {
+                    const gcashRef = (document.getElementById("modal-gcash-ref")?.value || '').trim();
+                    if (!/^\d{6}$/.test(gcashRef)) {
+                        alert("Please enter the last 6 numbers of the GCash reference ID.");
+                        confirmBtn.disabled = false;
+                        confirmBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> <span>Confirm Payment &amp; Assign Machine</span>`;
+                        return;
+                    }
+                    payload.payment = {
+                        method: 'GCash',
+                        reference: gcashRef
+                    };
+                } else if (selectedMop === 'Card') {
+                    const cardRef = (document.getElementById("modal-card-ref")?.value || '').trim();
+                    if (!/^\d{4}$/.test(cardRef)) {
+                        alert("Please enter the last 4 numbers of the Card ID.");
+                        confirmBtn.disabled = false;
+                        confirmBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> <span>Confirm Payment &amp; Assign Machine</span>`;
+                        return;
+                    }
+                    payload.payment = {
+                        method: 'Card',
+                        reference: cardRef
+                    };
+                }
+            }
+
+            if (rec && rec.is_multi_load && rec.loads && rec.loads.length > 0) {
+                const assignments = [];
+                for (const ld of rec.loads) {
+                    const isManual = document.getElementById(`radio_manual_${ld.load_index}`)?.checked;
+                    let mId = null;
+                    if (isManual) {
+                        const val = document.getElementById(`load_dropdown_${ld.load_index}`)?.value;
+                        mId = val ? parseInt(val) : null;
+                    } else if (ld.best_pick) {
+                        mId = ld.best_pick.machine_id;
+                    }
+                    assignments.push({
+                        load_index: ld.load_index,
+                        machine_id: mId
+                    });
+                }
+                payload.assignments = assignments;
+            } else {
+                const isBest = document.getElementById("radio-best-pick")?.checked;
+                let machineId = null;
+                if (isBest && rec && rec.best_pick) {
+                    machineId = rec.best_pick.machine_id;
+                } else {
+                    const val = document.getElementById("modal-single-dropdown")?.value;
+                    machineId = val ? parseInt(val) : null;
+                }
+                payload.machine_id = machineId;
+            }
+
+            try {
+                const res = await fetch("/api/staff/confirm-order", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.status === "success" || data.status === "already_verified") {
+                    closeMachineModal();
+                    document.getElementById("success-queue-number").textContent = `#${data.queue_number}`;
+                    document.getElementById("success-customer-text").textContent = `${data.customer_name || currentOrder.customer_name} has been verified and added to active queue.`;
+
+                    const machineListEl = document.getElementById("success-machine-list");
+                    if (data.assigned_machines && data.assigned_machines.length > 0) {
+                        machineListEl.innerHTML = data.assigned_machines.map(m => `
+                            <div class="bg-white border border-slate-200/90 rounded-xl p-3 flex items-center justify-between shadow-2xs">
+                                <div>
+                                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${m.load_title || 'Load'}</div>
+                                    <div class="text-xs font-extrabold text-slate-800">${m.machine_name}</div>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${m.started_immediately ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-sky-100 text-sky-800 border border-sky-200'}">
+                                    ${m.started_immediately ? '⚡ In Laundry' : 'In Queue'}
+                                </span>
+                            </div>
+                        `).join('');
+                        document.getElementById("success-machine-info-block").classList.remove("hidden");
+                    } else if (data.assigned_machine && data.assigned_machine !== "Unassigned") {
+                        machineListEl.innerHTML = `
+                            <div class="text-sm font-black text-slate-800">${data.assigned_machine}</div>
+                            <div class="text-[11px] font-semibold text-emerald-700 mt-0.5">
+                                ${data.started_immediately ? '⚡ Cycle started immediately (In Laundry)' : 'Queued in line for this machine'}
+                            </div>
+                        `;
+                        document.getElementById("success-machine-info-block").classList.remove("hidden");
+                    } else {
+                        document.getElementById("success-machine-info-block").classList.add("hidden");
+                    }
+
+                    // Payment summary in success modal
+                    const paymentBlock = document.getElementById("success-payment-info-block");
+                    if (data.payment && paymentBlock) {
+                        document.getElementById("success-pay-method").textContent = data.payment.method.toUpperCase();
+                        document.getElementById("success-pay-amount").textContent = `₱${data.payment.amount.toFixed(2)}`;
+                        let detailStr = '';
+                        if (data.payment.method === 'Cash') {
+                            detailStr = `Tendered: ₱${(data.payment.cash_tendered || 0).toFixed(2)} • Change: ₱${(data.payment.change || 0).toFixed(2)}`;
+                        } else if (data.payment.reference) {
+                            detailStr = `Ref / ID No: ${data.payment.reference}`;
+                        }
+                        document.getElementById("success-pay-detail").textContent = detailStr;
+                        paymentBlock.classList.remove("hidden");
+                    } else if (paymentBlock) {
+                        paymentBlock.classList.add("hidden");
+                    }
+
+                    document.getElementById("success-overlay").classList.remove("hidden");
+                } else {
+                    showStatus(data.message || "Could not confirm order.");
+                    closeMachineModal();
+                }
+            } catch (err) {
+                showStatus("Network error while assigning machine.");
+                closeMachineModal();
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> <span>Confirm Payment &amp; Assign Machine</span>`;
+            }
+        }
+
+        function closeSuccess() { document.getElementById("success-overlay").classList.add("hidden"); resetTerminal(); }
+        function resetTerminal() { input.value = ""; input.focus(); card.classList.add("hidden"); hideStatus(); currentOrder = null; }
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetCode = urlParams.get('code');
+            if (targetCode) {
+                input.value = targetCode;
+                lookupOrder();
+            } else {
+                input.focus();
+            }
+        });
+    </script>
+</body>
+
+</html>
