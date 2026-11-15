@@ -12,6 +12,7 @@ Erika P. Cardana
 
 Mary Lloyd E. Firma
 
+### Roles
 
 - **Genesis D. Samson** – Project Manager / Lead Developer / Documentation Lead
 - **Genesis D. Samson** – Frontend / UI/UX Developer
