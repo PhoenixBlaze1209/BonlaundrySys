@@ -4,9 +4,19 @@ Bon Laundry Station is a web-based laundromat management system and customer por
 
 ## Group Members & Roles
 
-- **Genesis Samson** – Project Manager / Lead Developer
-- **Genesis Samson** – Frontend / UI/UX Developer
-- **Genesis Samson** – Backend / Database Administrator
+**Leader:** Genesis D. Samson
+**Members:**
+Erika P. Cardana
+Mary Lloyd E. Firma
+
+
+- **Genesis D. Samson** – Project Manager / Lead Developer / Documentation Lead
+- **Genesis D. Samson** – Frontend / UI/UX Developer
+- **Genesis D. Samson** – Backend / Database Administrator
+
+- **Erika P. Cardana** – Documentation Lead
+- **Mary Lloyd E. Firma** – Documentation Assistant
+
 
 
 ## Key Features
