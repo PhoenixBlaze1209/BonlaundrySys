@@ -4,11 +4,10 @@ Bon Laundry Station is a web-based laundromat management system and customer por
 
 ## Group Members & Roles
 
-- **[Leader Name]** – Project Manager / Lead Developer
-- **[Member 2 Name]** – Frontend / UI/UX Developer
-- **[Member 3 Name]** – Backend / Database Administrator
+- **Genesis Samson** – Project Manager / Lead Developer
+- **Genesis Samson** – Frontend / UI/UX Developer
+- **Genesis Samson** – Backend / Database Administrator
 
-> Replace the names above with the actual group members before submission.
 
 ## Key Features
 
@@ -144,22 +143,3 @@ The application can run locally without every integration configured, although t
 - **SMS:** PhilSMS or Semaphore API credentials
 - **PayMongo:** public, secret, and webhook keys
 
-## Project Structure
-
-```text
-bon-laundry/
-|-- app.py                 # Flask entry point and application initialization
-|-- config/                # Database configuration
-|-- models/                # SQLAlchemy database models
-|-- routes/                # Authentication, dashboard, booking, POS, and API routes
-|-- services/              # Queue, machine, payment, messaging, and analytics logic
-|-- templates/             # Jinja HTML templates
-|-- static/                # CSS and image assets
-|-- docs/                  # User manuals, specifications, diagrams, and screenshots
-|-- seed_analytics_data.py # Optional demonstration-data generator
-`-- requirements.txt       # Python runtime dependencies
-```
-
-## Documentation
-
-Detailed end-user and system documentation is available in the [`docs`](docs/) directory, including the [User Manual](docs/USER_MANUAL.md), [Data Dictionary](docs/CHAPTER_3_DATA_DICTIONARY.md), and [Use Case Documentation](docs/CAPSTONE_USE_CASE_DOCUMENTATION.md).
